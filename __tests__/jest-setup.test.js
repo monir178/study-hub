@@ -26,11 +26,11 @@ describe("Jest Configuration Validation", () => {
 
 describe("Mock Validation", () => {
   test("Next.js navigation mocks work", () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const {
       useRouter,
       useSearchParams,
       usePathname,
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
     } = require("next/navigation");
 
     const router = useRouter();
