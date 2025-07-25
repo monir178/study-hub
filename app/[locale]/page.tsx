@@ -14,164 +14,256 @@ import {
   Shield,
 } from "lucide-react";
 import Link from "next/link";
+import { HeroSection, Header } from "@/features/landing/components";
+import { generateLandingPageMetadata } from "@/features/landing/utils/metadata";
+import {
+  landingPageStructuredData,
+  organizationStructuredData,
+  faqStructuredData,
+} from "@/features/landing/utils/structuredData";
 
-export default function Home() {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return generateLandingPageMetadata(locale);
+}
+
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted">
-      {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold">S</span>
+    <div className="w-full">
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            landingPageStructuredData,
+            organizationStructuredData,
+            faqStructuredData,
+          ]),
+        }}
+      />
+
+      {/* Header - positioned absolutely over hero */}
+      <Header locale={locale} />
+
+      {/* Hero Section - Full width, no container */}
+      <HeroSection />
+
+      {/* Main Content */}
+      <main className="relative z-10">
+        {/* Features Section */}
+        <section id="features" className="py-20 px-4 bg-muted/50">
+          <div className="container mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+                Everything You Need to Study Together
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Powerful features designed to enhance collaborative learning and
+                boost productivity
+              </p>
             </div>
-            <span className="text-xl font-bold">StudyHub</span>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader>
+                  <Clock className="w-10 h-10 text-primary mb-2" />
+                  <CardTitle>Synchronized Timers</CardTitle>
+                  <CardDescription>
+                    Pomodoro timers that sync across all room members for
+                    focused study sessions with breaks in perfect harmony
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader>
+                  <FileText className="w-10 h-10 text-primary mb-2" />
+                  <CardTitle>Collaborative Notes</CardTitle>
+                  <CardDescription>
+                    Real-time markdown editor for shared note-taking with live
+                    collaboration and version history
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader>
+                  <MessageSquare className="w-10 h-10 text-primary mb-2" />
+                  <CardTitle>Group Chat</CardTitle>
+                  <CardDescription>
+                    Instant messaging within study rooms to discuss topics,
+                    share resources, and stay connected
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader>
+                  <Users className="w-10 h-10 text-primary mb-2" />
+                  <CardTitle>Study Rooms</CardTitle>
+                  <CardDescription>
+                    Create or join public/private rooms with role-based
+                    permissions and member management
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader>
+                  <Zap className="w-10 h-10 text-primary mb-2" />
+                  <CardTitle>Real-time Sync</CardTitle>
+                  <CardDescription>
+                    Everything updates instantly across all devices and
+                    participants with lightning-fast performance
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader>
+                  <Shield className="w-10 h-10 text-primary mb-2" />
+                  <CardTitle>Secure & Private</CardTitle>
+                  <CardDescription>
+                    Your data is protected with enterprise-grade security,
+                    encryption, and privacy controls
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </div>
           </div>
-          <nav className="hidden md:flex space-x-6">
-            <Link
-              href="#features"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Features
-            </Link>
-            <Link
-              href="#about"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              About
-            </Link>
-          </nav>
-          <div className="flex space-x-2">
-            <Button variant="ghost" asChild>
-              <Link href="/auth/signin">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/auth/signup">Get Started</Link>
-            </Button>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 px-4">
+          <div className="container mx-auto text-center">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-6">
+              Ready to Transform Your Study Sessions?
+            </h2>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Join thousands of students already using StudyHub to achieve their
+              learning goals together. Start your collaborative learning journey
+              today.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="px-8 py-6 text-lg" asChild>
+                <Link href={`/${locale}/auth/signup`}>
+                  Start Learning Together
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="px-8 py-6 text-lg"
+                asChild
+              >
+                <Link href={`/${locale}/rooms`}>Explore Rooms</Link>
+              </Button>
+            </div>
           </div>
-        </div>
-      </header>
+        </section>
 
-      {/* Hero Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Collaborative Learning
-            <span className="text-primary block">Made Simple</span>
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join study rooms, sync Pomodoro timers, collaborate on notes, and
-            chat in real-time. The ultimate platform for focused group learning.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" asChild>
-              <Link href="/rooms">Explore Study Rooms</Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/auth/signup">Create Account</Link>
-            </Button>
+        {/* Footer */}
+        <footer className="border-t py-12 px-4 bg-muted/30">
+          <div className="container mx-auto">
+            <div className="grid md:grid-cols-4 gap-8 mb-8">
+              <div>
+                <div className="flex items-center space-x-2 mb-4">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">S</span>
+                  </div>
+                  <span className="text-xl font-bold">StudyHub</span>
+                </div>
+                <p className="text-muted-foreground">
+                  The ultimate collaborative learning platform for students
+                  worldwide.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-3">Product</h3>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li>
+                    <Link href="#features" className="hover:text-foreground">
+                      Features
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="#pricing" className="hover:text-foreground">
+                      Pricing
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href={`/${locale}/rooms`}
+                      className="hover:text-foreground"
+                    >
+                      Study Rooms
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-3">Company</h3>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li>
+                    <Link href="#about" className="hover:text-foreground">
+                      About
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="#contact" className="hover:text-foreground">
+                      Contact
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/privacy" className="hover:text-foreground">
+                      Privacy
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-3">Support</h3>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li>
+                    <Link href="/help" className="hover:text-foreground">
+                      Help Center
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/docs" className="hover:text-foreground">
+                      Documentation
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/community" className="hover:text-foreground">
+                      Community
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="border-t pt-8 text-center text-muted-foreground">
+              <p>
+                &copy; 2024 StudyHub. Built with Next.js, Tailwind CSS, and ❤️.
+                All rights reserved.
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-muted/50">
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Everything You Need to Study Together
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card>
-              <CardHeader>
-                <Clock className="w-10 h-10 text-primary mb-2" />
-                <CardTitle>Synchronized Timers</CardTitle>
-                <CardDescription>
-                  Pomodoro timers that sync across all room members for focused
-                  study sessions
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <FileText className="w-10 h-10 text-primary mb-2" />
-                <CardTitle>Collaborative Notes</CardTitle>
-                <CardDescription>
-                  Real-time markdown editor for shared note-taking with live
-                  collaboration
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <MessageSquare className="w-10 h-10 text-primary mb-2" />
-                <CardTitle>Group Chat</CardTitle>
-                <CardDescription>
-                  Instant messaging within study rooms to discuss topics and
-                  stay connected
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <Users className="w-10 h-10 text-primary mb-2" />
-                <CardTitle>Study Rooms</CardTitle>
-                <CardDescription>
-                  Create or join public/private rooms with role-based
-                  permissions
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <Zap className="w-10 h-10 text-primary mb-2" />
-                <CardTitle>Real-time Sync</CardTitle>
-                <CardDescription>
-                  Everything updates instantly across all devices and
-                  participants
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <Shield className="w-10 h-10 text-primary mb-2" />
-                <CardTitle>Secure & Private</CardTitle>
-                <CardDescription>
-                  Your data is protected with enterprise-grade security and
-                  privacy
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">
-            Ready to Transform Your Study Sessions?
-          </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join thousands of students already using StudyHub to achieve their
-            learning goals together.
-          </p>
-          <Button size="lg" asChild>
-            <Link href="/auth/signup">Start Learning Together</Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t py-8 px-4">
-        <div className="container mx-auto text-center text-muted-foreground">
-          <p>&copy; 2024 StudyHub. Built with Next.js, Tailwind CSS, and ❤️</p>
-        </div>
-      </footer>
+        </footer>
+      </main>
     </div>
   );
 }
