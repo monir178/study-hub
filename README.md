@@ -1,36 +1,196 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# StudyHub - Collaborative Learning Platform
 
-## Getting Started
+A modern, full-featured collaborative learning platform built with Next.js 15, featuring real-time collaboration, Pomodoro timers, and comprehensive study tools.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Real-time Pomodoro Timers** - Synchronized across all study room members
+- **Collaborative Notes** - Live markdown editor with real-time collaboration
+- **Group Chat** - Instant messaging within study rooms
+- **Study Rooms** - Create or join public/private rooms with role-based permissions
+- **User Authentication** - NextAuth.js with email/password and OAuth providers
+- **Internationalization** - Multi-language support (English & Spanish)
+- **Dark/Light Mode** - Theme switching with system preference detection
+- **Responsive Design** - Mobile-first approach with Tailwind CSS
+- **Real-time Sync** - Socket.IO powered real-time features
+- **Media Uploads** - Cloudinary integration for profile images and attachments
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **UI Components**: Radix UI + shadcn/ui
+- **Authentication**: NextAuth.js
+- **Database**: MongoDB with Prisma ORM
+- **State Management**: Redux Toolkit
+- **Real-time**: Socket.IO
+- **Internationalization**: next-intl
+- **Testing**: Jest + React Testing Library
+- **Storybook**: Component documentation
+- **Package Manager**: pnpm
+
+## 📁 Project Structure
+
+```
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   ├── auth/              # Authentication pages
+│   ├── dashboard/         # Dashboard pages
+│   └── globals.css        # Global styles
+├── components/            # Reusable UI components
+│   └── ui/               # shadcn/ui components
+├── features/             # Feature-based modules
+│   ├── auth/             # Authentication feature
+│   ├── chat/             # Chat feature
+│   ├── notes/            # Notes feature
+│   ├── rooms/            # Study rooms feature
+│   └── timer/            # Timer feature
+├── lib/                  # Utility libraries
+├── messages/             # Internationalization messages
+├── prisma/               # Database schema
+├── stories/              # Storybook stories
+└── types/                # TypeScript type definitions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚦 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js 18+
+- pnpm
+- MongoDB database
 
-## Learn More
+### Installation
 
-To learn more about Next.js, take a look at the following resources:
+1. Clone the repository:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+git clone <repository-url>
+cd studyhub
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. Install dependencies:
 
-## Deploy on Vercel
+```bash
+pnpm install
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. Set up environment variables:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+cp .env.example .env.local
+```
+
+Fill in your environment variables:
+
+- Database connection string
+- NextAuth configuration
+- OAuth provider credentials
+- Cloudinary credentials
+
+4. Set up the database:
+
+```bash
+pnpm db:generate
+pnpm db:push
+```
+
+5. Run the development server:
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+## 📝 Available Scripts
+
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
+- `pnpm start` - Start production server
+- `pnpm lint` - Run ESLint
+- `pnpm test` - Run tests
+- `pnpm storybook` - Start Storybook
+- `pnpm db:generate` - Generate Prisma client
+- `pnpm db:push` - Push schema to database
+- `pnpm db:studio` - Open Prisma Studio
+
+## 🧪 Testing
+
+Run the test suite:
+
+```bash
+pnpm test
+```
+
+Run tests in watch mode:
+
+```bash
+pnpm test:watch
+```
+
+Generate coverage report:
+
+```bash
+pnpm test:coverage
+```
+
+## 📚 Storybook
+
+View component documentation:
+
+```bash
+pnpm storybook
+```
+
+Build Storybook:
+
+```bash
+pnpm build-storybook
+```
+
+## 🌍 Internationalization
+
+The app supports multiple languages using next-intl:
+
+- English (default)
+- Spanish
+
+Add new languages by:
+
+1. Creating message files in `/messages/`
+2. Updating the locale configuration in `i18n.ts`
+
+## 🎨 Theming
+
+The app supports light/dark mode with system preference detection. Themes are configured using CSS custom properties in `globals.css`.
+
+## 🚀 Deployment
+
+The app is optimized for deployment on Vercel:
+
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Configure environment variables
+4. Deploy
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🙏 Acknowledgments
+
+- [Next.js](https://nextjs.org/) - React framework
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Radix UI](https://www.radix-ui.com/) - Unstyled, accessible components
+- [shadcn/ui](https://ui.shadcn.com/) - Beautiful component library
+- [Prisma](https://www.prisma.io/) - Next-generation ORM

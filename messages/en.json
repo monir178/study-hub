@@ -1,0 +1,111 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "open": "Open",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember me",
+    "orContinueWith": "Or continue with",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithGitHub": "Sign in with GitHub"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "rooms": "Study Rooms",
+    "profile": "Profile",
+    "settings": "Settings",
+    "help": "Help"
+  },
+  "rooms": {
+    "title": "Study Rooms",
+    "createRoom": "Create Room",
+    "joinRoom": "Join Room",
+    "roomName": "Room Name",
+    "roomDescription": "Room Description",
+    "maxMembers": "Max Members",
+    "isPublic": "Public Room",
+    "password": "Password",
+    "members": "Members",
+    "online": "Online",
+    "studying": "Studying",
+    "onBreak": "On Break",
+    "offline": "Offline"
+  },
+  "timer": {
+    "pomodoro": "Pomodoro",
+    "shortBreak": "Short Break",
+    "longBreak": "Long Break",
+    "custom": "Custom",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "stop": "Stop",
+    "reset": "Reset",
+    "minutes": "minutes",
+    "seconds": "seconds"
+  },
+  "chat": {
+    "typeMessage": "Type a message...",
+    "send": "Send",
+    "typing": "typing...",
+    "online": "online",
+    "lastSeen": "last seen"
+  },
+  "notes": {
+    "title": "Collaborative Notes",
+    "untitled": "Untitled Note",
+    "createNote": "Create Note",
+    "saveNote": "Save Note",
+    "deleteNote": "Delete Note",
+    "noteTitle": "Note Title",
+    "noteContent": "Note Content"
+  },
+  "profile": {
+    "title": "Profile",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined At",
+    "updateProfile": "Update Profile",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "notifications": "Notifications",
+    "emailNotifications": "Email Notifications",
+    "pushNotifications": "Push Notifications"
+  }
+}

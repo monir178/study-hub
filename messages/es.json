@@ -1,0 +1,111 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "signUp": "Registrarse",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "rememberMe": "Recordarme",
+    "orContinueWith": "O continúa con",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "dontHaveAccount": "¿No tienes una cuenta?",
+    "signInWithGoogle": "Iniciar sesión con Google",
+    "signInWithGitHub": "Iniciar sesión con GitHub"
+  },
+  "navigation": {
+    "dashboard": "Panel",
+    "rooms": "Salas de Estudio",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "help": "Ayuda"
+  },
+  "rooms": {
+    "title": "Salas de Estudio",
+    "createRoom": "Crear Sala",
+    "joinRoom": "Unirse a Sala",
+    "roomName": "Nombre de la Sala",
+    "roomDescription": "Descripción de la Sala",
+    "maxMembers": "Máximo de Miembros",
+    "isPublic": "Sala Pública",
+    "password": "Contraseña",
+    "members": "Miembros",
+    "online": "En línea",
+    "studying": "Estudiando",
+    "onBreak": "En descanso",
+    "offline": "Desconectado"
+  },
+  "timer": {
+    "pomodoro": "Pomodoro",
+    "shortBreak": "Descanso Corto",
+    "longBreak": "Descanso Largo",
+    "custom": "Personalizado",
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "resume": "Reanudar",
+    "stop": "Detener",
+    "reset": "Reiniciar",
+    "minutes": "minutos",
+    "seconds": "segundos"
+  },
+  "chat": {
+    "typeMessage": "Escribe un mensaje...",
+    "send": "Enviar",
+    "typing": "escribiendo...",
+    "online": "en línea",
+    "lastSeen": "visto por última vez"
+  },
+  "notes": {
+    "title": "Notas Colaborativas",
+    "untitled": "Nota Sin Título",
+    "createNote": "Crear Nota",
+    "saveNote": "Guardar Nota",
+    "deleteNote": "Eliminar Nota",
+    "noteTitle": "Título de la Nota",
+    "noteContent": "Contenido de la Nota"
+  },
+  "profile": {
+    "title": "Perfil",
+    "name": "Nombre",
+    "email": "Correo Electrónico",
+    "role": "Rol",
+    "joinedAt": "Se unió el",
+    "updateProfile": "Actualizar Perfil",
+    "changePassword": "Cambiar Contraseña",
+    "currentPassword": "Contraseña Actual",
+    "newPassword": "Nueva Contraseña",
+    "confirmNewPassword": "Confirmar Nueva Contraseña"
+  },
+  "settings": {
+    "title": "Configuración",
+    "language": "Idioma",
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema",
+    "notifications": "Notificaciones",
+    "emailNotifications": "Notificaciones por Correo",
+    "pushNotifications": "Notificaciones Push"
+  }
+}
