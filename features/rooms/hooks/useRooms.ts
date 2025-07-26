@@ -17,7 +17,10 @@ export function useRooms() {
     queryKey: queryKeys.rooms,
     queryFn: () => RoomService.getRooms(),
     options: {
-      staleTime: 2 * 60 * 1000, // 2 minutes
+      staleTime: 10 * 60 * 1000, // 10 minutes (increased)
+      gcTime: 20 * 60 * 1000, // 20 minutes
+      // Keep previous data while loading new data
+      placeholderData: (previousData: Room[] | undefined) => previousData,
     },
   });
 }

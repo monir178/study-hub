@@ -9,9 +9,15 @@ const queryClientConfig = {
   defaultOptions: {
     queries: {
       // Stale time: how long until data is considered stale
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 10 * 60 * 1000, // 10 minutes (increased from 5)
       // Cache time: how long to keep unused data in cache
-      gcTime: 10 * 60 * 1000, // 10 minutes (was cacheTime in v4)
+      gcTime: 30 * 60 * 1000, // 30 minutes (increased from 10)
+      // Refetch on window focus (good for data freshness)
+      refetchOnWindowFocus: false,
+      // Refetch on reconnect (good for offline scenarios)
+      refetchOnReconnect: true,
+      // Keep previous data while new data is loading
+      placeholderData: (previousData: unknown) => previousData,
       // Retry failed requests
       retry: (failureCount: number, error: unknown) => {
         // Don't retry on 4xx errors (client errors)
@@ -29,10 +35,6 @@ const queryClientConfig = {
       // Retry delay with exponential backoff
       retryDelay: (attemptIndex: number) =>
         Math.min(1000 * 2 ** attemptIndex, 30000),
-      // Refetch on window focus (useful for real-time data)
-      refetchOnWindowFocus: true,
-      // Refetch when coming back online
-      refetchOnReconnect: true,
     },
     mutations: {
       // Retry mutations once

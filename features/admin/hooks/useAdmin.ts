@@ -17,10 +17,15 @@ export function useAdminDashboardStats() {
     queryKey: queryKeys.adminDashboardStats(),
     queryFn: () => AdminService.getDashboardStats(),
     options: {
-      // Refetch every 30 seconds for real-time dashboard
-      refetchInterval: 30 * 1000,
+      // Refetch every 60 seconds for real-time dashboard (reduced frequency)
+      refetchInterval: 60 * 1000,
       // Show stale data while refetching
-      staleTime: 20 * 1000, // 20 seconds
+      staleTime: 30 * 1000, // 30 seconds
+      // Keep data in cache longer
+      gcTime: 5 * 60 * 1000, // 5 minutes
+      // Keep previous data while loading new data
+      placeholderData: (previousData: DashboardStats | undefined) =>
+        previousData,
     },
   });
 }

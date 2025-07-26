@@ -5,6 +5,16 @@ import { useTheme } from "next-themes";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/lib/hooks/useAuth";
 import {
   Sun,
   Moon,
@@ -14,11 +24,13 @@ import {
   MessageSquare,
   Settings,
   LogOut,
+  User,
+  Shield,
 } from "lucide-react";
 
 interface NavbarProps {
   locale?: string;
-  variant?: "landing" | "app";
+  _variant?: "landing" | "app"; // Mark as unused since we now use authentication state
 }
 
 interface NavItem {
@@ -62,14 +74,16 @@ const navbarAnimations = {
 
 export default function Navbar({
   locale = "en",
-  variant = "landing",
+  _variant = "landing", // Now unused since we determine from auth state
 }: NavbarProps) {
   const [mounted, setMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { user, isAuthenticated } = useAuth(); // Removed unused isLoading
 
-  const navItems = variant === "app" ? appNav : landingNav;
+  // Determine which nav items to show based on authentication
+  const navItems = isAuthenticated ? appNav : landingNav;
 
   // Handle mounting for SSR
   useEffect(() => {
@@ -106,7 +120,7 @@ export default function Navbar({
       animate={navbarAnimations.navbar.animate}
       transition={navbarAnimations.navbar.transition}
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        variant === "app" || isScrolled
+        isAuthenticated || isScrolled
           ? "bg-background/95 backdrop-blur-sm border-b border-border shadow-sm"
           : "bg-transparent"
       }`}
@@ -163,8 +177,8 @@ export default function Navbar({
               <span className="sr-only">Toggle theme</span>
             </Button>
 
-            {/* Auth Buttons */}
-            {variant === "landing" ? (
+            {/* Auth Buttons / User Menu */}
+            {!isAuthenticated ? (
               <>
                 <Button variant="ghost" size="sm" asChild>
                   <Link href={`/${locale}/auth/signin`}>Sign In</Link>
@@ -174,19 +188,70 @@ export default function Navbar({
                 </Button>
               </>
             ) : (
-              <>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href={`/${locale}/profile`}>
-                    <Settings className="h-4 w-4 mr-2" />
-                    Profile
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href={`/${locale}/auth/signout`}>
-                    <LogOut className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={user?.image || ""}
+                        alt={user?.name || "User"}
+                      />
+                      <AvatarFallback>
+                        {user?.name
+                          ? user.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase()
+                          : user?.email?.[0].toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {user?.name || "User"}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href={`/${locale}/profile`}>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href={`/${locale}/settings`}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  {user?.role === "admin" && (
+                    <DropdownMenuItem asChild>
+                      <Link href={`/${locale}/admin`}>
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Admin Panel</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href={`/${locale}/auth/signout`}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
 
@@ -294,7 +359,7 @@ export default function Navbar({
                     delay: navItems.length * 0.05,
                   }}
                 >
-                  {variant === "landing" ? (
+                  {!isAuthenticated ? (
                     <>
                       <Button
                         variant="ghost"
@@ -319,19 +384,68 @@ export default function Navbar({
                     </>
                   ) : (
                     <>
+                      {/* User Info */}
+                      <div className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage
+                            src={user?.image || ""}
+                            alt={user?.name || "User"}
+                          />
+                          <AvatarFallback>
+                            {user?.name
+                              ? user.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")
+                                  .toUpperCase()
+                              : user?.email?.[0].toUpperCase() || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <p className="text-sm font-medium">
+                            {user?.name || "User"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {user?.email}
+                          </p>
+                        </div>
+                      </div>
+
                       <Button
                         variant="ghost"
-                        className="w-full justify-center"
+                        className="w-full justify-start"
                         asChild
                       >
                         <Link href={`/${locale}/profile`} onClick={closeMenu}>
-                          <Settings className="h-4 w-4 mr-2" />
+                          <User className="h-4 w-4 mr-2" />
                           Profile
                         </Link>
                       </Button>
                       <Button
                         variant="ghost"
-                        className="w-full justify-center"
+                        className="w-full justify-start"
+                        asChild
+                      >
+                        <Link href={`/${locale}/settings`} onClick={closeMenu}>
+                          <Settings className="h-4 w-4 mr-2" />
+                          Settings
+                        </Link>
+                      </Button>
+                      {user?.role === "admin" && (
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start"
+                          asChild
+                        >
+                          <Link href={`/${locale}/admin`} onClick={closeMenu}>
+                            <Shield className="h-4 w-4 mr-2" />
+                            Admin Panel
+                          </Link>
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-destructive hover:text-destructive"
                         asChild
                       >
                         <Link

@@ -17,8 +17,12 @@ export function useUsers() {
     queryKey: queryKeys.users,
     queryFn: () => UserService.getUsers(),
     options: {
-      // Users data is fairly stable
-      staleTime: 2 * 60 * 1000, // 2 minutes
+      // Users data is fairly stable - increased stale time
+      staleTime: 15 * 60 * 1000, // 15 minutes
+      // Keep data in cache longer
+      gcTime: 30 * 60 * 1000, // 30 minutes
+      // Keep previous data while loading new data
+      placeholderData: (previousData: User[] | undefined) => previousData,
     },
   });
 }
@@ -31,10 +35,14 @@ export function useUser(id: string) {
     queryKey: queryKeys.user(id),
     queryFn: () => UserService.getUserById(id),
     options: {
-      // Individual user data doesn't change often
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      // Individual user data doesn't change often - increased stale time
+      staleTime: 20 * 60 * 1000, // 20 minutes
+      // Keep data in cache longer
+      gcTime: 45 * 60 * 1000, // 45 minutes
       // Only run query if ID is provided
       enabled: !!id,
+      // Keep previous data while loading new data
+      placeholderData: (previousData: User | undefined) => previousData,
     },
   });
 }
