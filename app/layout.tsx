@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning className="h-full">
       <body
-        className={`${inter.variable} font-sans antialiased h-full m-0 p-0 w-full overflow-x-hidden`}
+        className={`${inter.variable} font-sans antialiased h-full m-0 p-0 w-full overflow-x-hidden bg-background text-foreground`}
       >
         {children}
       </body>
