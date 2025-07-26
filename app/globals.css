@@ -1,22 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Global reset for full-width layouts */
-* {
-  box-sizing: border-box;
-}
-
-#__next {
-  width: 100%;
-  min-height: 100vh;
-}
-
-/* Canvas specific styles */
-canvas {
-  display: block;
-  max-width: none;
-}
-
 /* Smooth theme transitions */
 * {
   transition:

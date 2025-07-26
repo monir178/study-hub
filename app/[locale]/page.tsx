@@ -2,7 +2,6 @@ import {
   HeroSection,
   FeaturesSection,
   CTASection,
-  Footer,
 } from "@/features/landing/components";
 import { generateLandingPageMetadata } from "@/features/landing/utils/metadata";
 import {
@@ -45,16 +44,12 @@ export default async function Home({
       <HeroSection />
 
       {/* Main Content */}
-      <main className="relative z-10">
-        {/* Features Section */}
-        <FeaturesSection />
 
-        {/* CTA Section */}
-        <CTASection locale={locale} />
+      {/* Features Section */}
+      <FeaturesSection />
 
-        {/* Footer */}
-        <Footer locale={locale} />
-      </main>
+      {/* CTA Section */}
+      <CTASection locale={locale} />
     </div>
   );
 }

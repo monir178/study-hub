@@ -2,7 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { Sun, Moon, Monitor } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
@@ -16,29 +16,21 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <Button variant="outline" size="icon">
-        <Monitor className="h-4 w-4" />
+        <Sun className="h-4 w-4" />
       </Button>
     );
   }
 
-  const cycleTheme = () => {
-    if (theme === "light") {
-      setTheme("dark");
-    } else if (theme === "dark") {
-      setTheme("system");
-    } else {
-      setTheme("light");
-    }
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
   };
 
   return (
-    <Button variant="outline" size="icon" onClick={cycleTheme}>
+    <Button variant="outline" size="icon" onClick={toggleTheme}>
       {theme === "light" ? (
         <Sun className="h-4 w-4" />
-      ) : theme === "dark" ? (
-        <Moon className="h-4 w-4" />
       ) : (
-        <Monitor className="h-4 w-4" />
+        <Moon className="h-4 w-4" />
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>
