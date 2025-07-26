@@ -1,7 +1,8 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { Providers } from "@/lib/providers";
+import { MainLayout } from "@/components/layout/main-layout";
+import { Footer } from "@/components/layout/footer";
 import { ReactNode } from "react";
 
 const locales = ["en", "es"];
@@ -24,14 +25,9 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className="h-full">
-      <body className="min-h-full bg-background text-foreground m-0 p-0">
-        <Providers>
-          <NextIntlClientProvider messages={messages}>
-            {children}
-          </NextIntlClientProvider>
-        </Providers>
-      </body>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      <MainLayout locale={locale}>{children}</MainLayout>
+      <Footer />
+    </NextIntlClientProvider>
   );
 }

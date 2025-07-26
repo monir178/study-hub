@@ -15,10 +15,15 @@ export default async function middleware(request: NextRequest) {
   const session = await auth();
   const { pathname } = request.nextUrl;
 
-  // Protected routes
+  // Protected routes (handle locale prefixes)
   const protectedRoutes = ["/dashboard", "/rooms", "/profile"];
+  const pathWithoutLocale = pathname.startsWith("/en/")
+    ? pathname.slice(3)
+    : pathname.startsWith("/es/")
+      ? pathname.slice(3)
+      : pathname;
   const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route),
+    pathWithoutLocale.startsWith(route),
   );
 
   if (isProtectedRoute && !session) {

@@ -4,7 +4,6 @@ import {
   CTASection,
   Footer,
 } from "@/features/landing/components";
-import { Navbar } from "@/features/shared";
 import { generateLandingPageMetadata } from "@/features/landing/utils/metadata";
 import {
   landingPageStructuredData,
@@ -41,9 +40,6 @@ export default async function Home({
           ]),
         }}
       />
-
-      {/* Navbar - positioned absolutely over hero */}
-      <Navbar locale={locale} variant="landing" />
 
       {/* Hero Section - Full width, no container */}
       <HeroSection />
