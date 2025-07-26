@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,81 +11,63 @@ import {
   Settings,
   Activity,
   Shield,
+  RefreshCw,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { UserManagement } from "./UserManagement";
 import { PlatformAnalytics } from "./PlatformAnalytics";
 import { SystemSettings } from "./SystemSettings";
-
-interface DashboardStats {
-  users: {
-    total: number;
-    roles: Record<string, number>;
-    recentCount: number;
-  };
-  sessions: {
-    active: number;
-    total: number;
-  };
-  rooms: {
-    total: number;
-    active: number;
-  };
-  messages: {
-    total: number;
-    today: number;
-  };
-}
+import { AdminDashboardSkeleton } from "./AdminDashboardSkeleton";
+import { useAdminDashboardStats } from "../hooks/useAdmin";
 
 export function AdminDashboard() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Use TanStack Query hook instead of manual state management
+  const {
+    data: stats,
+    isLoading: loading,
+    error,
+    refetch,
+    isRefetching,
+  } = useAdminDashboardStats();
 
-  useEffect(() => {
-    fetchDashboardStats();
-  }, []);
-
-  const fetchDashboardStats = async () => {
-    try {
-      const response = await fetch("/api/admin/dashboard/stats");
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data.stats);
-      }
-    } catch (error) {
-      console.error("Failed to fetch dashboard stats:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  console.log("Admin Dashboard Stats:", stats);
 
   if (loading) {
+    return <AdminDashboardSkeleton />;
+  }
+
+  // Error state
+  if (error) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <Badge
-            variant="secondary"
-            className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-          >
+          <div>
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <p className="text-muted-foreground">
+              Failed to load dashboard data
+            </p>
+          </div>
+          <Badge variant="destructive">
             <Shield className="w-4 h-4 mr-1" />
-            Admin
+            Error
           </Badge>
         </div>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Loading...
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-8 bg-muted animate-pulse rounded"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Failed to fetch dashboard statistics:{" "}
+                {error?.message || "Unknown error"}
+              </p>
+              <button
+                onClick={() => refetch()}
+                className="text-sm text-primary hover:underline"
+              >
+                Try again
+              </button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -102,13 +83,26 @@ export function AdminDashboard() {
             settings
           </p>
         </div>
-        <Badge
-          variant="secondary"
-          className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-        >
-          <Shield className="w-4 h-4 mr-1" />
-          Admin Access
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            disabled={isRefetching}
+          >
+            <RefreshCw
+              className={`w-4 h-4 mr-2 ${isRefetching ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </Button>
+          <Badge
+            variant="secondary"
+            className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+          >
+            <Shield className="w-4 h-4 mr-1" />
+            Admin Access
+          </Badge>
+        </div>
       </div>
 
       {/* Stats Cards */}

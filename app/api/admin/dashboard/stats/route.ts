@@ -87,7 +87,7 @@ export const GET = withAdmin(async (_req) => {
 
     return NextResponse.json({
       success: true,
-      stats,
+      data: stats,
     });
   } catch (error) {
     console.error("Get dashboard stats error:", error);

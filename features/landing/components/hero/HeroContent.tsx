@@ -1,10 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Zap } from "lucide-react";
 
-const fadeUpVariants = {
+const fadeUpVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
     opacity: 1,
@@ -22,13 +22,13 @@ export function HeroContent() {
     <>
       <motion.div
         custom={1}
-        variants={fadeUpVariants as any}
+        variants={fadeUpVariants}
         initial="hidden"
         animate="visible"
       >
         <Badge
           variant="secondary"
-          className="mb-8 px-6 py-2 text-xs font-medium bg-white/10 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10 text-foreground hover:bg-white/20 dark:hover:bg-white/10 transition-all duration-300 md:text-sm"
+          className="mb-8 px-6 py-2 text-xs font-medium bg-black/5 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10 text-foreground  transition-all duration-300 md:text-sm"
         >
           <Zap className="w-4 h-4 mr-2 text-primary " />
           Join the Future of Collaborative Learning
@@ -37,7 +37,7 @@ export function HeroContent() {
 
       <motion.div
         custom={1.2}
-        variants={fadeUpVariants as any}
+        variants={fadeUpVariants}
         initial="hidden"
         animate="visible"
       >
@@ -54,7 +54,7 @@ export function HeroContent() {
 
       <motion.div
         custom={1.4}
-        variants={fadeUpVariants as any}
+        variants={fadeUpVariants}
         initial="hidden"
         animate="visible"
       >

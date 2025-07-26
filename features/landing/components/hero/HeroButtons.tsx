@@ -1,10 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const fadeUpVariants = {
+const fadeUpVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
     opacity: 1,
@@ -21,15 +22,14 @@ export function HeroButtons() {
   return (
     <motion.div
       custom={1.6}
-      variants={fadeUpVariants as any}
+      variants={fadeUpVariants}
       initial="hidden"
       animate="visible"
       className="flex flex-row gap-3 sm:gap-6 justify-center mb-8 sm:mb-12 px-4"
     >
-      {/* Primary Button - Solid background, white text */}
+      {/* Primary Button - Default variant */}
       <Link href="/auth/signup">
-        <motion.button
-          className="group relative px-4 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl overflow-hidden bg-primary text-white shadow-lg hover:shadow-xl transition-all duration-300"
+        <motion.div
           whileHover={{
             y: -1,
             transition: { duration: 0.2, ease: "easeOut" },
@@ -39,15 +39,7 @@ export function HeroButtons() {
             transition: { duration: 0.1 },
           }}
         >
-          {/* Hover brightness overlay */}
-          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg sm:rounded-xl" />
-
-          {/* Shimmer effect */}
-          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out">
-            <div className="h-full w-8 bg-gradient-to-r from-transparent via-white/20 to-transparent rotate-12 opacity-70" />
-          </div>
-
-          <div className="flex items-center justify-center gap-2 sm:gap-3 relative z-10">
+          <Button size="lg" className="gap-2 sm:gap-3">
             <motion.div
               animate={{
                 rotate: [0, 8, -8, 0],
@@ -77,14 +69,13 @@ export function HeroButtons() {
             >
               <ArrowRight className="w-3 sm:w-4 h-3 sm:h-4" />
             </motion.div>
-          </div>
-        </motion.button>
+          </Button>
+        </motion.div>
       </Link>
 
-      {/* Secondary Button - Transparent with border */}
+      {/* Secondary Button - Ghost variant */}
       <Link href="/demo">
-        <motion.button
-          className="group relative px-4 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl overflow-hidden border-2 border-border text-foreground hover:border-primary/50 hover:text-primary hover:bg-accent/20 transition-all duration-300"
+        <motion.div
           whileHover={{
             y: -1,
             transition: { duration: 0.2, ease: "easeOut" },
@@ -94,12 +85,7 @@ export function HeroButtons() {
             transition: { duration: 0.1 },
           }}
         >
-          {/* Subtle shimmer */}
-          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out">
-            <div className="h-full w-6 bg-gradient-to-r from-transparent via-primary/10 to-transparent rotate-12" />
-          </div>
-
-          <div className="flex items-center justify-center gap-2 sm:gap-3 relative z-10">
+          <Button variant="outline" size="lg" className="gap-2 sm:gap-3">
             <motion.div
               animate={{
                 scale: [1, 1.1, 1],
@@ -111,11 +97,11 @@ export function HeroButtons() {
                 repeatDelay: 4,
               }}
             >
-              <Play className="w-3 sm:w-4 h-3 sm:h-4 group-hover:text-primary transition-colors duration-300" />
+              <Play className="w-3 sm:w-4 h-3 sm:h-4" />
             </motion.div>
             <span className="font-semibold whitespace-nowrap">Watch Demo</span>
-          </div>
-        </motion.button>
+          </Button>
+        </motion.div>
       </Link>
     </motion.div>
   );

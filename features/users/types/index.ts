@@ -27,6 +27,16 @@ export interface UpdateUserData {
   image?: string;
   locale?: string;
   theme?: "LIGHT" | "DARK" | "SYSTEM";
+  role?: "USER" | "MODERATOR" | "ADMIN";
+}
+
+export interface CreateUserData {
+  name?: string;
+  email: string;
+  password: string;
+  role?: "USER" | "MODERATOR" | "ADMIN";
+  locale?: string;
+  theme?: "LIGHT" | "DARK" | "SYSTEM";
 }
 
 export interface UserStats {
