@@ -83,6 +83,7 @@ export default function Navbar({
   const { user, isAuthenticated } = useAuth(); // Removed unused isLoading
 
   // Determine which nav items to show based on authentication
+  // Fallback to landing nav if auth fails
   const navItems = isAuthenticated ? appNav : landingNav;
 
   // Handle mounting for SSR
@@ -235,7 +236,7 @@ export default function Navbar({
                       <span>Settings</span>
                     </Link>
                   </DropdownMenuItem>
-                  {user?.role === "admin" && (
+                  {user?.role === "ADMIN" && (
                     <DropdownMenuItem asChild>
                       <Link href={`/${locale}/admin`}>
                         <Shield className="mr-2 h-4 w-4" />
@@ -431,7 +432,7 @@ export default function Navbar({
                           Settings
                         </Link>
                       </Button>
-                      {user?.role === "admin" && (
+                      {user?.role === "ADMIN" && (
                         <Button
                           variant="ghost"
                           className="w-full justify-start"

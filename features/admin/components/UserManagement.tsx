@@ -1,13 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Search,
   UserPlus,
@@ -34,8 +29,9 @@ import {
   Edit,
   Trash2,
   Shield,
-  User,
   Crown,
+  User as UserIcon,
+  RefreshCw,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -45,79 +41,63 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-interface User {
-  id: string;
-  name: string | null;
-  email: string;
-  image: string | null;
-  role: "USER" | "MODERATOR" | "ADMIN";
-  createdAt: string;
-  updatedAt: string;
-  _count: {
-    createdRooms: number;
-    roomMembers: number;
-    messages: number;
-    studySessions: number;
-  };
-}
-
-interface UsersResponse {
-  success: boolean;
-  data: {
-    users: User[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      pages: number;
-    };
-    stats: {
-      total: number;
-      roles: Record<string, number>;
-    };
-  };
-}
+import {
+  useUsers,
+  useUpdateUserRole,
+  useDeleteUser,
+} from "@/features/users/hooks/useUsers";
+import { User } from "@/features/users/types";
 
 export function UserManagement() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
-  const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
-    total: 0,
-    pages: 0,
+
+  // Use TanStack Query hooks
+  const {
+    data: users = [],
+    isLoading: loading,
+    error,
+    refetch,
+    isRefetching,
+  } = useUsers();
+
+  // Mutation hooks
+  const updateUserRole = useUpdateUserRole();
+  const deleteUser = useDeleteUser();
+
+  // Filter users based on search and role filter
+  const filteredUsers = users.filter((user: User) => {
+    const matchesSearch =
+      search === "" ||
+      (user.name && user.name.toLowerCase().includes(search.toLowerCase())) ||
+      user.email.toLowerCase().includes(search.toLowerCase());
+
+    const matchesRole =
+      roleFilter === "" || roleFilter === "all" || user.role === roleFilter;
+
+    return matchesSearch && matchesRole;
   });
 
-  const fetchUsers = useCallback(async () => {
+  const handleRoleUpdate = async (
+    userId: string,
+    newRole: "USER" | "ADMIN" | "MODERATOR",
+  ) => {
     try {
-      setLoading(true);
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: "10",
-        ...(search && { search }),
-        ...(roleFilter && roleFilter !== "all" && { role: roleFilter }),
-      });
-
-      const response = await fetch(`/api/admin/users?${params}`);
-      if (response.ok) {
-        const data: UsersResponse = await response.json();
-        setUsers(data.data.users);
-        setPagination(data.data.pagination);
-      }
+      await updateUserRole.mutateAsync({ userId, role: newRole });
     } catch (error) {
-      console.error("Failed to fetch users:", error);
-    } finally {
-      setLoading(false);
+      console.error("Failed to update role:", error);
     }
-  }, [page, search, roleFilter]);
+  };
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+  const handleDeleteUser = async (userId: string) => {
+    if (confirm("Are you sure you want to delete this user?")) {
+      try {
+        await deleteUser.mutateAsync(userId);
+      } catch (error) {
+        console.error("Failed to delete user:", error);
+      }
+    }
+  };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -126,7 +106,7 @@ export function UserManagement() {
       case "MODERATOR":
         return <Shield className="w-4 h-4" />;
       default:
-        return <User className="w-4 h-4" />;
+        return <UserIcon className="w-4 h-4" />;
     }
   };
 
@@ -141,13 +121,105 @@ export function UserManagement() {
     }
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>User Management</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Skeleton className="h-10 flex-1" />
+            <Skeleton className="h-10 w-[180px]" />
+            <Skeleton className="h-10 w-[120px]" />
+          </div>
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Activity</TableHead>
+                  <TableHead>Joined</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <div className="flex items-center space-x-3">
+                        <Skeleton className="w-10 h-10 rounded-full" />
+                        <div className="space-y-1">
+                          <Skeleton className="w-24 h-4" />
+                          <Skeleton className="w-32 h-3" />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="w-16 h-6 rounded-full" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="w-20 h-4" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="w-24 h-4" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="w-8 h-8 rounded ml-auto" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-destructive">
+            Failed to Load Users
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center space-y-4">
+            <p className="text-sm text-muted-foreground">
+              {error?.message || "Failed to fetch users"}
+            </p>
+            <Button onClick={() => refetch()} variant="outline" size="sm">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Try Again
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>User Management</CardTitle>
-        <CardDescription>
-          Manage user accounts, roles, and permissions
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <CardTitle>User Management ({users.length})</CardTitle>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            disabled={isRefetching}
+          >
+            <RefreshCw
+              className={`w-4 h-4 mr-2 ${isRefetching ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Filters */}
@@ -185,50 +257,22 @@ export function UserManagement() {
               <TableRow>
                 <TableHead>User</TableHead>
                 <TableHead>Role</TableHead>
-                <TableHead>Activity</TableHead>
                 <TableHead>Joined</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading ? (
-                // Loading skeleton
-                Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-muted rounded-full animate-pulse"></div>
-                        <div className="space-y-1">
-                          <div className="w-24 h-4 bg-muted rounded animate-pulse"></div>
-                          <div className="w-32 h-3 bg-muted rounded animate-pulse"></div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="w-16 h-6 bg-muted rounded animate-pulse"></div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="w-20 h-4 bg-muted rounded animate-pulse"></div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="w-24 h-4 bg-muted rounded animate-pulse"></div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="w-8 h-8 bg-muted rounded animate-pulse ml-auto"></div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : users.length === 0 ? (
+              {filteredUsers.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={4}
                     className="text-center py-8 text-muted-foreground"
                   >
                     No users found
                   </TableCell>
                 </TableRow>
               ) : (
-                users.map((user) => (
+                filteredUsers.map((user: User) => (
                   <TableRow key={user.id}>
                     <TableCell>
                       <div className="flex items-center space-x-3">
@@ -261,14 +305,6 @@ export function UserManagement() {
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        <div>{user._count.messages} messages</div>
-                        <div className="text-muted-foreground">
-                          {user._count.studySessions} sessions
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </div>
                     </TableCell>
@@ -285,12 +321,42 @@ export function UserManagement() {
                             <Edit className="mr-2 h-4 w-4" />
                             Edit User
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleRoleUpdate(
+                                user.id,
+                                user.role === "ADMIN" ? "USER" : "ADMIN",
+                              )
+                            }
+                            disabled={updateUserRole.isPending}
+                          >
+                            <Crown className="mr-2 h-4 w-4" />
+                            {user.role === "ADMIN"
+                              ? "Remove Admin"
+                              : "Make Admin"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleRoleUpdate(
+                                user.id,
+                                user.role === "MODERATOR"
+                                  ? "USER"
+                                  : "MODERATOR",
+                              )
+                            }
+                            disabled={updateUserRole.isPending}
+                          >
                             <Shield className="mr-2 h-4 w-4" />
-                            Change Role
+                            {user.role === "MODERATOR"
+                              ? "Remove Moderator"
+                              : "Make Moderator"}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600">
+                          <DropdownMenuItem
+                            className="text-red-600"
+                            onClick={() => handleDeleteUser(user.id)}
+                            disabled={deleteUser.isPending}
+                          >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete User
                           </DropdownMenuItem>
@@ -304,34 +370,10 @@ export function UserManagement() {
           </Table>
         </div>
 
-        {/* Pagination */}
-        {pagination.pages > 1 && (
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-              {Math.min(pagination.page * pagination.limit, pagination.total)}{" "}
-              of {pagination.total} users
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage(page - 1)}
-                disabled={page === 1}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage(page + 1)}
-                disabled={page === pagination.pages}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        )}
+        {/* Summary */}
+        <div className="text-sm text-muted-foreground">
+          Showing {filteredUsers.length} of {users.length} users
+        </div>
       </CardContent>
     </Card>
   );
