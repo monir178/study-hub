@@ -35,7 +35,6 @@ export {
   useJoinRoom,
   useLeaveRoom,
   usePrefetchRoom,
-  useCachedRoom,
 } from "@/features/rooms/hooks/useRooms";
 
 // Export query keys for manual cache manipulation

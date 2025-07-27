@@ -47,7 +47,7 @@ const landingNav: NavItem[] = [
 
 const appNav: NavItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: BookOpen },
-  { name: "Rooms", href: "/rooms", icon: Users },
+  { name: "Rooms", href: "/dashboard/rooms", icon: Users },
   { name: "Timer", href: "/timer", icon: Clock },
   { name: "Chat", href: "/chat", icon: MessageSquare },
 ];

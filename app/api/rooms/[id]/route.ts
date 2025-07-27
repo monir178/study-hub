@@ -15,9 +15,10 @@ const updateRoomSchema = z.object({
 // GET /api/rooms/[id] - Get room details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params: paramsPromise }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const params = await paramsPromise;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -33,7 +34,7 @@ export async function GET(
       where: { id: params.id },
       include: {
         creator: {
-          select: { id: true, name: true, image: true },
+          select: { id: true, name: true, image: true, role: true },
         },
         members: {
           include: {
@@ -111,9 +112,10 @@ export async function GET(
 // PUT /api/rooms/[id] - Update room
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params: paramsPromise }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const params = await paramsPromise;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -169,7 +171,7 @@ export async function PUT(
       data: validatedData,
       include: {
         creator: {
-          select: { id: true, name: true, image: true },
+          select: { id: true, name: true, image: true, role: true },
         },
         members: {
           include: {
@@ -225,9 +227,10 @@ export async function PUT(
 // DELETE /api/rooms/[id] - Delete room
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params: paramsPromise }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const params = await paramsPromise;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(

@@ -43,7 +43,7 @@ interface NavItem {
 
 const userNavItems: NavItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Study Rooms", href: "/rooms", icon: Users },
+  { name: "Study Rooms", href: "/dashboard/rooms", icon: Users },
   { name: "My Notes", href: "/notes", icon: FileText },
   { name: "Timer", href: "/timer", icon: Clock },
   { name: "Chat", href: "/chat", icon: MessageSquare },
@@ -52,7 +52,7 @@ const userNavItems: NavItem[] = [
 const moderatorNavItems: NavItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Reports", href: "/dashboard?tab=reports", icon: Calendar },
-  { name: "Study Rooms", href: "/rooms", icon: Users },
+  { name: "Study Rooms", href: "/dashboard/rooms", icon: Users },
   { name: "Content", href: "/dashboard?tab=content", icon: FileText },
   { name: "Users", href: "/dashboard?tab=users", icon: BookOpen },
   { name: "Analytics", href: "/dashboard?tab=analytics", icon: BarChart3 },

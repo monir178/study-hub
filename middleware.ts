@@ -16,7 +16,7 @@ export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Protected routes (handle locale prefixes)
-  const protectedRoutes = ["/dashboard", "/rooms", "/profile"];
+  const protectedRoutes = ["/dashboard", "/profile"];
   const pathWithoutLocale = pathname.startsWith("/en/")
     ? pathname.slice(3)
     : pathname.startsWith("/es/")

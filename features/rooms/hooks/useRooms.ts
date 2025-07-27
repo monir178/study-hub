@@ -173,7 +173,7 @@ export function useDeleteRoom() {
         cache.invalidate(queryKeys.myRooms());
         cache.invalidate(queryKeys.publicRooms());
         // Navigate back to rooms list
-        router.push("/rooms");
+        router.push("/dashboard/rooms");
       },
     },
   });
@@ -210,22 +210,51 @@ export function useJoinRoom() {
 
 // Leave room
 export function useLeaveRoom() {
-  const cache = useCacheUtils();
+  const router = useRouter();
+  const { invalidate } = useCacheUtils();
 
-  return useApiMutation<void, string>({
-    mutationFn: async (roomId: string): Promise<void> => {
+  return useApiMutation<null, string>({
+    mutationFn: async (roomId: string): Promise<null> => {
       return apiClient.delete(`/rooms/${roomId}/join`);
     },
-    successMessage: "👋 You've left the room. You can rejoin anytime!",
     options: {
       onSuccess: (_, roomId) => {
-        // Invalidate room data to refresh member list
-        cache.invalidate(queryKeys.room(roomId));
-        cache.invalidate(queryKeys.roomMembers(roomId));
-        cache.invalidate(queryKeys.rooms);
-        cache.invalidate(queryKeys.myRooms());
-        cache.invalidate(queryKeys.publicRooms());
+        // Invalidate all room-related queries
+        invalidate(queryKeys.rooms);
+        invalidate(queryKeys.myRooms());
+        invalidate(queryKeys.publicRooms());
+        invalidate(queryKeys.room(roomId));
+
+        // Navigate to rooms list
+        router.push("/dashboard/rooms");
       },
     },
   });
+}
+
+// Convenience hooks for different types of rooms
+export function useMyRooms(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+}) {
+  return useRooms({ ...params, myRooms: true });
+}
+
+export function usePublicRooms(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+}) {
+  return useRooms({ ...params, myRooms: false });
+}
+
+// Prefetch room hook
+export function usePrefetchRoom() {
+  // Simple prefetch function - returns the room ID for now
+  return (roomId: string) => {
+    // This is a simplified version - just return the roomId
+    // In a full implementation, this would use queryClient.prefetchQuery
+    return roomId;
+  };
 }

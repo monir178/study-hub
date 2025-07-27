@@ -49,7 +49,7 @@ export function Footer({ locale: _locale = "en" }: FooterProps) {
   // Don't show footer on app pages (authenticated pages)
   const isAppPage =
     pathname.includes("/dashboard") ||
-    pathname.includes("/rooms") ||
+    pathname.includes("/dashboard/rooms") ||
     pathname.includes("/profile") ||
     pathname.includes("/settings") ||
     pathname.includes("/admin");

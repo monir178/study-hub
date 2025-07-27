@@ -11,9 +11,10 @@ const joinRoomSchema = z.object({
 // POST /api/rooms/[id]/join - Join a room
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params: paramsPromise }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const params = await paramsPromise;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -137,9 +138,10 @@ export async function POST(
 // DELETE /api/rooms/[id]/join - Leave a room
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params: paramsPromise }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const params = await paramsPromise;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(

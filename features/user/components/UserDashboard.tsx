@@ -82,7 +82,7 @@ export function UserDashboard() {
               </div>
               <div className="text-center py-4">
                 <Button variant="ghost" asChild>
-                  <Link href="/rooms">View All Rooms</Link>
+                  <Link href="/dashboard/rooms">View All Rooms</Link>
                 </Button>
               </div>
             </div>

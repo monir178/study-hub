@@ -109,7 +109,7 @@ export function MainLayout({ children, locale = "en" }: MainLayoutProps) {
   if (isPublicPage) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar locale={locale} variant="landing" />
+        <Navbar locale={locale} />
         <main className="pt-16">{children}</main>
       </div>
     );
@@ -128,14 +128,24 @@ export function MainLayout({ children, locale = "en" }: MainLayoutProps) {
               {breadcrumbs.length > 0 && (
                 <Breadcrumb>
                   <BreadcrumbList>
-                    <BreadcrumbItem className="hidden md:block">
-                      <BreadcrumbLink href="/dashboard">
-                        Dashboard
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    {breadcrumbs.map((breadcrumb, _index) => (
+                    {/* Only show Dashboard link if we're not on the dashboard page */}
+                    {pathname !== "/dashboard" &&
+                      pathname !== `/${locale}/dashboard` && (
+                        <>
+                          <BreadcrumbItem className="hidden md:block">
+                            <BreadcrumbLink href="/dashboard">
+                              Dashboard
+                            </BreadcrumbLink>
+                          </BreadcrumbItem>
+                          <BreadcrumbSeparator className="hidden md:block" />
+                        </>
+                      )}
+                    {breadcrumbs.map((breadcrumb, index) => (
                       <div key={breadcrumb.href} className="flex items-center">
-                        <BreadcrumbSeparator className="hidden md:block" />
+                        {/* Only show separator if it's not the first item or if Dashboard was shown */}
+                        {index > 0 && (
+                          <BreadcrumbSeparator className="hidden md:block" />
+                        )}
                         <BreadcrumbItem>
                           {breadcrumb.isLast ? (
                             <BreadcrumbPage>{breadcrumb.name}</BreadcrumbPage>
@@ -164,7 +174,7 @@ export function MainLayout({ children, locale = "en" }: MainLayoutProps) {
   // Fallback for unauthenticated users on protected pages
   return (
     <div className="min-h-screen bg-background">
-      <Navbar locale={locale} variant="landing" />
+      <Navbar locale={locale} />
       <main className="pt-16">{children}</main>
     </div>
   );

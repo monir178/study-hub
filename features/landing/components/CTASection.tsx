@@ -27,7 +27,7 @@ export default function CTASection({ locale = "en" }: CTASectionProps) {
             className="px-8 py-6 text-lg"
             asChild
           >
-            <Link href={`/${locale}/rooms`}>Explore Rooms</Link>
+            <Link href={`/${locale}/dashboard/rooms`}>Explore Rooms</Link>
           </Button>
         </div>
       </div>
