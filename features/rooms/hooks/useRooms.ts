@@ -3,6 +3,7 @@ import { useApiMutation } from "@/lib/api/hooks/use-api-mutation";
 import { useCacheUtils } from "@/lib/api/hooks/use-cache-utils";
 import { apiClient } from "@/lib/api/client";
 import { queryKeys } from "@/lib/query/keys";
+import { useRouter } from "next/navigation";
 
 export interface StudyRoom {
   id: string;
@@ -16,6 +17,7 @@ export interface StudyRoom {
     id: string;
     name?: string;
     image?: string;
+    role: "USER" | "MODERATOR" | "ADMIN";
   };
   members: Array<{
     id: string;
@@ -152,15 +154,16 @@ export function useUpdateRoom(roomId: string) {
   });
 }
 
-// Delete room
+// Delete room (with navigation)
 export function useDeleteRoom() {
   const cache = useCacheUtils();
+  const router = useRouter();
 
   return useApiMutation<void, string>({
     mutationFn: async (roomId: string): Promise<void> => {
       return apiClient.delete(`/rooms/${roomId}`);
     },
-    successMessage: "Room deleted successfully!",
+    successMessage: "Room deleted permanently! All data has been removed.",
     options: {
       onSuccess: (_, roomId) => {
         // Remove room from cache
@@ -169,6 +172,8 @@ export function useDeleteRoom() {
         cache.invalidate(queryKeys.rooms);
         cache.invalidate(queryKeys.myRooms());
         cache.invalidate(queryKeys.publicRooms());
+        // Navigate back to rooms list
+        router.push("/rooms");
       },
     },
   });
@@ -188,7 +193,8 @@ export function useJoinRoom() {
     }): Promise<void> => {
       return apiClient.post(`/rooms/${roomId}/join`, data);
     },
-    successMessage: "Successfully joined the room!",
+    successMessage:
+      "🎉 Welcome to the room! You can now participate in discussions and activities.",
     options: {
       onSuccess: (_, { roomId }) => {
         // Invalidate room data to refresh member list
@@ -210,7 +216,7 @@ export function useLeaveRoom() {
     mutationFn: async (roomId: string): Promise<void> => {
       return apiClient.delete(`/rooms/${roomId}/join`);
     },
-    successMessage: "Successfully left the room!",
+    successMessage: "👋 You've left the room. You can rejoin anytime!",
     options: {
       onSuccess: (_, roomId) => {
         // Invalidate room data to refresh member list

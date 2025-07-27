@@ -9,6 +9,24 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  // AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   ArrowLeft,
   Users,
   MessageSquare,
@@ -21,10 +39,19 @@ import {
   User as UserIcon,
   Clock,
   Calendar,
+  MoreVertical,
+  Trash2,
+  Edit,
 } from "lucide-react";
-import { useRoom, useJoinRoom, useLeaveRoom } from "../hooks/useRooms";
+import {
+  useRoom,
+  useJoinRoom,
+  useLeaveRoom,
+  useDeleteRoom,
+} from "../hooks/useRooms";
 import { formatDistanceToNow } from "date-fns";
 import { JoinRoomDialog } from "./JoinRoomDialog";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 interface RoomDetailViewProps {
   roomId: string;
@@ -33,10 +60,13 @@ interface RoomDetailViewProps {
 export function RoomDetailView({ roomId }: RoomDetailViewProps) {
   const router = useRouter();
   const [showJoinDialog, setShowJoinDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { user: currentUser } = useAuth();
 
   const { data: room, isLoading, error } = useRoom(roomId);
   const joinRoom = useJoinRoom();
   const leaveRoom = useLeaveRoom();
+  const deleteRoom = useDeleteRoom();
 
   const handleJoinRoom = async (password?: string) => {
     try {
@@ -64,6 +94,51 @@ export function RoomDetailView({ roomId }: RoomDetailViewProps) {
     } else {
       handleJoinRoom();
     }
+  };
+
+  const handleDeleteRoom = async () => {
+    try {
+      await deleteRoom.mutateAsync(roomId);
+      setShowDeleteDialog(false); // Close dialog after successful deletion
+    } catch {
+      // Error handled by mutation hook
+    }
+  };
+
+  // Check if current user can delete the room
+  const canDeleteRoom = () => {
+    if (!currentUser || !room) return false;
+
+    // Room owner can always delete
+    if (room.creator.id === currentUser.id) return true;
+
+    // Admin can delete any room
+    if (currentUser.role === "ADMIN") return true;
+
+    // Moderator can delete rooms except those created by Admin
+    if (currentUser.role === "MODERATOR") {
+      // For now, allow moderators to delete any room (we'd need creator role info to be more specific)
+      return true;
+    }
+
+    return false;
+  };
+
+  // Check if current user can edit the room
+  const canEditRoom = () => {
+    if (!currentUser || !room) return false;
+
+    // Room owner can edit
+    if (room.creator.id === currentUser.id) return true;
+
+    // Admin can edit any room
+    if (currentUser.role === "ADMIN") return true;
+
+    // Moderator can edit if they're a room member with MODERATOR role
+    if (currentUser.role === "MODERATOR" && room.userRole === "MODERATOR")
+      return true;
+
+    return false;
   };
 
   const getRoleIcon = (role: string) => {
@@ -177,15 +252,16 @@ export function RoomDetailView({ roomId }: RoomDetailViewProps) {
         <div className="flex items-center gap-3">
           {room.isJoined ? (
             <>
-              {room.userRole !== "ADMIN" && (
-                <Button
-                  variant="outline"
-                  onClick={handleLeaveRoom}
-                  disabled={leaveRoom.isPending}
-                >
-                  {leaveRoom.isPending ? "Leaving..." : "Leave Room"}
-                </Button>
-              )}
+              {room.userRole !== "ADMIN" &&
+                room.creator.id !== currentUser?.id && (
+                  <Button
+                    variant="outline"
+                    onClick={handleLeaveRoom}
+                    disabled={leaveRoom.isPending}
+                  >
+                    {leaveRoom.isPending ? "Leaving..." : "Leave Room"}
+                  </Button>
+                )}
               <Badge className={getRoleBadgeColor(room.userRole || "MEMBER")}>
                 {getRoleIcon(room.userRole || "MEMBER")}
                 <span className="ml-1">{room.userRole || "MEMBER"}</span>
@@ -200,6 +276,41 @@ export function RoomDetailView({ roomId }: RoomDetailViewProps) {
             >
               {joinRoom.isPending ? "Joining..." : "Join Room"}
             </Button>
+          )}
+
+          {/* Room Management Dropdown */}
+          {(canEditRoom() || canDeleteRoom()) && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {canEditRoom() && (
+                  <DropdownMenuItem>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Room
+                  </DropdownMenuItem>
+                )}
+
+                {canDeleteRoom() && (
+                  <>
+                    {canEditRoom() && <DropdownMenuSeparator />}
+                    <DropdownMenuItem
+                      className="text-red-600 focus:text-red-600"
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setShowDeleteDialog(true);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Room
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>
@@ -428,6 +539,32 @@ export function RoomDetailView({ roomId }: RoomDetailViewProps) {
         roomName={room.name}
         isLoading={joinRoom.isPending}
       />
+
+      {/* Delete Room Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Room</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to permanently delete "{room.name}"? This
+              action cannot be undone and will remove all messages, notes, and
+              member data associated with this room.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteRoom.isPending}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteRoom}
+              disabled={deleteRoom.isPending}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteRoom.isPending ? "Deleting..." : "Delete Room"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

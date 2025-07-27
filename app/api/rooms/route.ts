@@ -39,10 +39,7 @@ export async function GET(request: NextRequest) {
 
     const where = myRooms
       ? {
-          OR: [
-            { creatorId: session.user.id },
-            { members: { some: { userId: session.user.id } } },
-          ],
+          creatorId: session.user.id, // Only rooms created by the current user
         }
       : {
           isPublic: true,
@@ -61,7 +58,7 @@ export async function GET(request: NextRequest) {
         where,
         include: {
           creator: {
-            select: { id: true, name: true, image: true },
+            select: { id: true, name: true, image: true, role: true },
           },
           members: {
             include: {

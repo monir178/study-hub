@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
         name?: { contains: string; mode: "insensitive" };
         email?: { contains: string; mode: "insensitive" };
       }>;
-      role?: string;
+      role?: "USER" | "MODERATOR" | "ADMIN";
     } = {};
 
     // Add search conditions
@@ -48,7 +48,10 @@ export async function GET(request: NextRequest) {
 
     // Add role filter
     if (roleFilter && roleFilter !== "all") {
-      whereClause.role = roleFilter;
+      // Validate that roleFilter is a valid role
+      if (["USER", "MODERATOR", "ADMIN"].includes(roleFilter)) {
+        whereClause.role = roleFilter as "USER" | "MODERATOR" | "ADMIN";
+      }
     }
 
     const users = await prisma.user.findMany({
