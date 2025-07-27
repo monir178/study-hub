@@ -1,5 +1,4 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
-import { auth } from "@/lib/auth";
 import { ApiResponse, ApiError, ApiRequestConfig } from "./types";
 
 class ApiClient {
@@ -22,16 +21,6 @@ class ApiClient {
     this.client.interceptors.request.use(
       async (config) => {
         try {
-          // Get session from NextAuth v5
-          const session = await auth();
-
-          if (session?.user) {
-            // Add user information to headers
-            config.headers["X-User-Id"] = session.user.id;
-            config.headers["X-User-Email"] = session.user.email;
-            config.headers["X-User-Role"] = session.user.role;
-          }
-
           // Add timestamp for request tracking
           config.headers["X-Request-Time"] = new Date().toISOString();
 

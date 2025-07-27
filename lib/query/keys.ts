@@ -45,9 +45,17 @@ export const queryKeys = {
   userSessions: (userId: string) =>
     [...queryKeys.sessions, "user", userId] as const,
   activeSessions: () => [...queryKeys.sessions, "active"] as const,
-} as const;
 
-// Query key factory functions for dynamic keys
+  // Moderator
+  moderator: ["moderator"] as const,
+  moderatorStats: () => [...queryKeys.moderator, "stats"] as const,
+  moderatorActivity: () => [...queryKeys.moderator, "activity"] as const,
+  reports: (status?: string) =>
+    status
+      ? ([...queryKeys.moderator, "reports", status] as const)
+      : ([...queryKeys.moderator, "reports"] as const),
+  report: (id: string) => [...queryKeys.reports(), id] as const,
+} as const; // Query key factory functions for dynamic keys
 export const createQueryKeys = {
   // Paginated queries
   usersPaginated: (
@@ -57,8 +65,8 @@ export const createQueryKeys = {
   ) => [...queryKeys.users, "paginated", { page, limit, filters }] as const,
 
   // Search queries
-  usersSearch: (searchTerm: string) =>
-    [...queryKeys.users, "search", searchTerm] as const,
+  usersSearch: (searchTerm: string, role?: string) =>
+    [...queryKeys.users, "search", searchTerm, role || ""] as const,
 
   // Filtered queries
   usersFiltered: (filters: Record<string, unknown>) =>

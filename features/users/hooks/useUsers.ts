@@ -3,7 +3,7 @@ import { useApiMutation } from "@/lib/api/hooks/use-api-mutation";
 import { useCacheUtils } from "@/lib/api/hooks/use-cache-utils";
 import { UserService } from "../services/user.service";
 import { User, CreateUserData, UpdateUserData } from "../types";
-import { queryKeys } from "@/lib/query/keys";
+import { queryKeys, createQueryKeys } from "@/lib/query/keys";
 
 // ===============================================
 // QUERIES
@@ -12,7 +12,7 @@ import { queryKeys } from "@/lib/query/keys";
 /**
  * Hook to fetch all users (admin only)
  */
-export function useUsers() {
+export function useUsers(options?: { enabled?: boolean }) {
   return useApiQuery<User[]>({
     queryKey: queryKeys.users,
     queryFn: () => UserService.getUsers(),
@@ -23,6 +23,8 @@ export function useUsers() {
       gcTime: 30 * 60 * 1000, // 30 minutes
       // Keep previous data while loading new data
       placeholderData: (previousData: User[] | undefined) => previousData,
+      // Conditional enabling
+      enabled: options?.enabled !== false,
     },
   });
 }
@@ -59,6 +61,34 @@ export function useUserProfile() {
       staleTime: 30 * 1000, // 30 seconds
       // Retry on failure since profile is critical
       retry: 3,
+    },
+  });
+}
+
+/**
+ * Hook to search users
+ */
+export function useSearchUsers(
+  query: string,
+  role?: string,
+  options?: { enabled?: boolean },
+) {
+  const hasQuery = query && query.trim().length > 0;
+  const hasRoleFilter = role && role !== "all";
+  const shouldEnable = Boolean(
+    options?.enabled !== false && (hasQuery || hasRoleFilter),
+  );
+
+  return useApiQuery<User[]>({
+    queryKey: createQueryKeys.usersSearch(query, role),
+    queryFn: () => UserService.searchUsers(query, role),
+    options: {
+      // Search results should be fresh
+      staleTime: 2 * 60 * 1000, // 2 minutes
+      // Only search if enabled and has query or role filter
+      enabled: shouldEnable,
+      // Keep previous data while loading new data
+      placeholderData: (previousData: User[] | undefined) => previousData,
     },
   });
 }

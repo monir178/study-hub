@@ -1,0 +1,119 @@
+"use client";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Lock } from "lucide-react";
+
+const joinRoomSchema = z.object({
+  password: z.string().min(1, "Password is required"),
+});
+
+type JoinRoomFormData = z.infer<typeof joinRoomSchema>;
+
+interface JoinRoomDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onJoin: (password: string) => void;
+  roomName: string;
+  isLoading?: boolean;
+}
+
+export function JoinRoomDialog({
+  open,
+  onOpenChange,
+  onJoin,
+  roomName,
+  isLoading = false,
+}: JoinRoomDialogProps) {
+  const form = useForm<JoinRoomFormData>({
+    resolver: zodResolver(joinRoomSchema),
+    defaultValues: {
+      password: "",
+    },
+  });
+
+  const onSubmit = (data: JoinRoomFormData) => {
+    onJoin(data.password);
+  };
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!isLoading) {
+      onOpenChange(newOpen);
+      if (!newOpen) {
+        form.reset();
+      }
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Lock className="w-5 h-5 text-orange-600" />
+            Join Private Room
+          </DialogTitle>
+          <DialogDescription>
+            "{roomName}" is a private room. Please enter the password to join.
+          </DialogDescription>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Room Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter room password"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleOpenChange(false)}
+                disabled={isLoading}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading} className="flex-1">
+                {isLoading ? "Joining..." : "Join Room"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}

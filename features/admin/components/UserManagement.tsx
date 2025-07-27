@@ -23,10 +23,21 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Search,
   UserPlus,
   MoreHorizontal,
-  Edit,
+  // Edit,
   Trash2,
   Shield,
   Crown,
@@ -37,46 +48,119 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   useUsers,
+  useSearchUsers,
   useUpdateUserRole,
   useDeleteUser,
 } from "@/features/users/hooks/useUsers";
 import { User } from "@/features/users/types";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 
 export function UserManagement() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
+  const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
 
-  // Use TanStack Query hooks
+  // Debounce search query for better performance
+  const debouncedSearch = useDebounce(search, 500);
+
+  // Get current user to check permissions
+  const { user: currentUser } = useAuth();
+
+  // Use database search when there's a query, otherwise get all users
+  const shouldUseSearch =
+    debouncedSearch.trim().length > 0 || (roleFilter && roleFilter !== "all");
+
   const {
-    data: users = [],
-    isLoading: loading,
-    error,
-    refetch,
-    isRefetching,
-  } = useUsers();
+    data: allUsers = [],
+    isLoading: loadingAll,
+    error: errorAll,
+    refetch: refetchAll,
+    isRefetching: isRefetchingAll,
+  } = useUsers({ enabled: !shouldUseSearch });
+
+  const {
+    data: searchUsers = [],
+    isLoading: loadingSearch,
+    error: errorSearch,
+    refetch: refetchSearch,
+    isRefetching: isRefetchingSearch,
+  } = useSearchUsers(debouncedSearch, roleFilter, {
+    enabled: Boolean(shouldUseSearch),
+  });
+
+  // Use the appropriate data source
+  const users = shouldUseSearch ? searchUsers : allUsers;
+  const loading = shouldUseSearch ? loadingSearch : loadingAll;
+  const error = shouldUseSearch ? errorSearch : errorAll;
+  const refetch = shouldUseSearch ? refetchSearch : refetchAll;
+  const isRefetching = shouldUseSearch ? isRefetchingSearch : isRefetchingAll;
 
   // Mutation hooks
   const updateUserRole = useUpdateUserRole();
   const deleteUser = useDeleteUser();
 
-  // Filter users based on search and role filter
-  const filteredUsers = users.filter((user: User) => {
-    const matchesSearch =
-      search === "" ||
-      (user.name && user.name.toLowerCase().includes(search.toLowerCase())) ||
-      user.email.toLowerCase().includes(search.toLowerCase());
+  // Permission checking functions
+  const canDeleteUser = (user: User) => {
+    // Admin cannot be deleted by anyone, including themselves
+    if (user.role === "ADMIN") return false;
+    // Only admin can delete users
+    return currentUser?.role === "ADMIN";
+  };
 
-    const matchesRole =
-      roleFilter === "" || roleFilter === "all" || user.role === roleFilter;
+  // const canChangeRole = (user: User, targetRole: string) => {
+  //   // Admin role cannot be changed by anyone except themselves
+  //   if (user.role === "ADMIN" && currentUser?.id !== user.id) return false;
 
-    return matchesSearch && matchesRole;
-  });
+  //   // Only admin can assign admin role
+  //   if (targetRole === "ADMIN") return currentUser?.role === "ADMIN";
+
+  //   // Admin can change any role
+  //   if (currentUser?.role === "ADMIN") return true;
+
+  //   // Moderator can only make users moderators, or demote themselves to user
+  //   if (currentUser?.role === "MODERATOR") {
+  //     if (currentUser.id === user.id && targetRole === "USER") return true; // Allow self-demotion
+  //     return targetRole === "MODERATOR" && user.role === "USER";
+  //   }
+
+  //   return false;
+  // };
+
+  const shouldShowActionDropdown = (user: User) => {
+    // Don't show dropdown for admin users (even for admin themselves)
+    if (user.role === "ADMIN") return false;
+
+    // Show if there are available roles or if user can be deleted
+    return getAvailableRoles(user).length > 0 || canDeleteUser(user);
+  };
+
+  const getAvailableRoles = (user: User) => {
+    const roles = [];
+
+    if (currentUser?.role === "ADMIN") {
+      // Admin can assign any role to any user (except changing other admins)
+      if (user.role === "ADMIN" && currentUser.id !== user.id) {
+        // Can't change other admin's role
+        return [];
+      }
+      roles.push("USER", "MODERATOR", "ADMIN");
+    } else if (currentUser?.role === "MODERATOR") {
+      // Moderator can promote users to moderator or demote themselves to user
+      if (user.role === "USER") {
+        roles.push("USER", "MODERATOR");
+      } else if (currentUser.id === user.id && user.role === "MODERATOR") {
+        roles.push("USER", "MODERATOR"); // Allow self-demotion
+      }
+    }
+
+    return roles.filter((role) => role !== user.role);
+  };
 
   const handleRoleUpdate = async (
     userId: string,
@@ -90,12 +174,19 @@ export function UserManagement() {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (confirm("Are you sure you want to delete this user?")) {
-      try {
-        await deleteUser.mutateAsync(userId);
-      } catch (error) {
-        console.error("Failed to delete user:", error);
-      }
+    try {
+      await deleteUser.mutateAsync(userId);
+      setDeleteUserId(null); // Close the dialog
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+    }
+  };
+
+  const handleRefresh = () => {
+    if (shouldUseSearch) {
+      refetchSearch();
+    } else {
+      refetchAll();
     }
   };
 
@@ -211,7 +302,7 @@ export function UserManagement() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => refetch()}
+            onClick={handleRefresh}
             disabled={isRefetching}
           >
             <RefreshCw
@@ -262,7 +353,7 @@ export function UserManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.length === 0 ? (
+              {users.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={4}
@@ -272,7 +363,7 @@ export function UserManagement() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredUsers.map((user: User) => (
+                users.map((user: User) => (
                   <TableRow key={user.id}>
                     <TableCell>
                       <div className="flex items-center space-x-3">
@@ -301,6 +392,9 @@ export function UserManagement() {
                       >
                         {getRoleIcon(user.role)}
                         {user.role}
+                        {user.role === "ADMIN" && (
+                          <Shield className="w-3 h-3 ml-1 opacity-60" />
+                        )}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -309,59 +403,112 @@ export function UserManagement() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit User
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleRoleUpdate(
-                                user.id,
-                                user.role === "ADMIN" ? "USER" : "ADMIN",
-                              )
-                            }
-                            disabled={updateUserRole.isPending}
-                          >
-                            <Crown className="mr-2 h-4 w-4" />
-                            {user.role === "ADMIN"
-                              ? "Remove Admin"
-                              : "Make Admin"}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleRoleUpdate(
-                                user.id,
-                                user.role === "MODERATOR"
-                                  ? "USER"
-                                  : "MODERATOR",
-                              )
-                            }
-                            disabled={updateUserRole.isPending}
-                          >
-                            <Shield className="mr-2 h-4 w-4" />
-                            {user.role === "MODERATOR"
-                              ? "Remove Moderator"
-                              : "Make Moderator"}
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-red-600"
-                            onClick={() => handleDeleteUser(user.id)}
-                            disabled={deleteUser.isPending}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete User
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      {shouldShowActionDropdown(user) ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {/* Role Management */}
+                            {getAvailableRoles(user).length > 0 && (
+                              <>
+                                {getAvailableRoles(user).map((role) => (
+                                  <DropdownMenuItem
+                                    key={role}
+                                    onClick={() =>
+                                      handleRoleUpdate(
+                                        user.id,
+                                        role as "USER" | "ADMIN" | "MODERATOR",
+                                      )
+                                    }
+                                    disabled={updateUserRole.isPending}
+                                  >
+                                    {role === "ADMIN" && (
+                                      <Crown className="mr-2 h-4 w-4" />
+                                    )}
+                                    {role === "MODERATOR" && (
+                                      <Shield className="mr-2 h-4 w-4" />
+                                    )}
+                                    {role === "USER" && (
+                                      <UserIcon className="mr-2 h-4 w-4" />
+                                    )}
+                                    Make{" "}
+                                    {role === "USER"
+                                      ? "User"
+                                      : role === "ADMIN"
+                                        ? "Admin"
+                                        : "Moderator"}
+                                  </DropdownMenuItem>
+                                ))}
+                              </>
+                            )}
+
+                            {/* Delete User - Only if allowed */}
+                            {canDeleteUser(user) && (
+                              <>
+                                {getAvailableRoles(user).length > 0 && (
+                                  <DropdownMenuSeparator />
+                                )}
+                                <AlertDialog
+                                  open={deleteUserId === user.id}
+                                  onOpenChange={(open) =>
+                                    !open && setDeleteUserId(null)
+                                  }
+                                >
+                                  <AlertDialogTrigger asChild>
+                                    <DropdownMenuItem
+                                      className="text-red-600"
+                                      onSelect={(e) => {
+                                        e.preventDefault();
+                                        setDeleteUserId(user.id);
+                                      }}
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      Delete User
+                                    </DropdownMenuItem>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>
+                                        Delete User
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to delete{" "}
+                                        <strong>
+                                          {user.name || user.email}
+                                        </strong>
+                                        ? This action cannot be undone and will
+                                        permanently remove the user and all
+                                        their data.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>
+                                        Cancel
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() =>
+                                          handleDeleteUser(user.id)
+                                        }
+                                        disabled={deleteUser.isPending}
+                                        className="bg-red-600 hover:bg-red-700"
+                                      >
+                                        {deleteUser.isPending
+                                          ? "Deleting..."
+                                          : "Delete User"}
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <div className="text-muted-foreground text-sm">-</div>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
@@ -372,7 +519,13 @@ export function UserManagement() {
 
         {/* Summary */}
         <div className="text-sm text-muted-foreground">
-          Showing {filteredUsers.length} of {users.length} users
+          Showing {users.length} users
+          {shouldUseSearch && debouncedSearch && (
+            <span> • Search: "{debouncedSearch}"</span>
+          )}
+          {roleFilter && roleFilter !== "all" && (
+            <span> • Role: {roleFilter}</span>
+          )}
         </div>
       </CardContent>
     </Card>

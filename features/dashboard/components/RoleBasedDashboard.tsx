@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { AdminDashboard } from "@/features/admin/components/AdminDashboard";
-import { UserDashboard } from "@/features/user/components/UserDashboard";
 import { ModeratorDashboard } from "@/features/moderator/components/ModeratorDashboard";
+import { UserDashboard } from "@/features/user/components/UserDashboard";
 
 interface User {
   id: string;
@@ -49,11 +50,51 @@ export function RoleBasedDashboard({ user }: RoleBasedDashboardProps) {
   // Render dashboard based on user role
   switch (user.role) {
     case "ADMIN":
-      return <AdminDashboard />;
+      return (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+              <p className="text-muted-foreground">
+                Manage users, monitor platform activity, and configure system
+                settings
+              </p>
+            </div>
+          </div>
+          <AdminDashboard />
+        </div>
+      );
     case "MODERATOR":
-      return <ModeratorDashboard />;
+      return (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">Moderator Dashboard</h1>
+              <p className="text-muted-foreground">
+                Handle reports, moderate content, and maintain community
+                standards
+              </p>
+            </div>
+          </div>
+          <ModeratorDashboard />
+        </div>
+      );
     case "USER":
     default:
-      return <UserDashboard />;
+      return (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">
+                Welcome back, {user.name || "Student"}!
+              </h1>
+              <p className="text-muted-foreground">
+                Track your progress and achieve your learning goals
+              </p>
+            </div>
+          </div>
+          <UserDashboard />
+        </div>
+      );
   }
 }

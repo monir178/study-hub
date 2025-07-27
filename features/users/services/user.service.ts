@@ -9,6 +9,20 @@ export class UserService {
     return apiClient.get<User[]>(this.BASE_PATH);
   }
 
+  // Search users (admin/moderator only)
+  static async searchUsers(query: string, role?: string): Promise<User[]> {
+    const params = new URLSearchParams();
+    if (query) params.append("q", query);
+    if (role && role !== "all") params.append("role", role);
+
+    const queryString = params.toString();
+    const url = queryString
+      ? `${this.BASE_PATH}/search?${queryString}`
+      : `${this.BASE_PATH}/search`;
+
+    return apiClient.get<User[]>(url);
+  }
+
   // Get user by ID
   static async getUserById(id: string): Promise<User> {
     return apiClient.get<User>(`${this.BASE_PATH}/${id}`);
@@ -26,7 +40,7 @@ export class UserService {
 
   // Update user
   static async updateUser(id: string, userData: UpdateUserData): Promise<User> {
-    return apiClient.put<User>(`${this.BASE_PATH}/${id}`, userData);
+    return apiClient.patch<User>(`${this.BASE_PATH}/${id}`, userData);
   }
 
   // Update current user profile

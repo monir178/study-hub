@@ -10,6 +10,11 @@ export async function GET(_request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Only admin and moderator can view all users
+    if (session.user.role !== "ADMIN" && session.user.role !== "MODERATOR") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -21,6 +26,9 @@ export async function GET(_request: NextRequest) {
         theme: true,
         createdAt: true,
         updatedAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
