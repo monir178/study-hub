@@ -1,11 +1,16 @@
 "use client";
 
 import { DashboardStats } from "@/features/dashboard/components/DashboardStats";
-import { UserManagement } from "./UserManagement";
-import { useAdminDashboardStats } from "../hooks/useAdmin";
+import { UserManagement } from "../components/user-management.component";
+import { useAdminDashboardStats } from "../../hooks/useAdmin";
+import { AdminDashboardSkeleton } from "./";
 
 export function AdminDashboard() {
   const { data: stats, isLoading: loading, error } = useAdminDashboardStats();
+
+  if (loading) {
+    return <AdminDashboardSkeleton />;
+  }
 
   if (error) {
     return (
@@ -25,7 +30,7 @@ export function AdminDashboard() {
           totalStudyTime: stats?.sessions.total,
           messagesCount: stats?.messages.total,
         }}
-        loading={loading}
+        loading={false} // Already handled by skeleton above
       />
       <UserManagement />
     </div>

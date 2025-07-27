@@ -1,0 +1,1 @@
+export { AdminDashboardSkeleton } from "./AdminDashboardSkeleton";

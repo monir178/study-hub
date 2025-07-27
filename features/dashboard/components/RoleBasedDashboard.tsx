@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-import { AdminDashboard } from "@/features/admin/components/AdminDashboard";
-import { ModeratorDashboard } from "@/features/moderator/components/ModeratorDashboard";
-import { UserDashboard } from "@/features/user/components/UserDashboard";
+import { AdminDashboard } from "@/features/admin/dashboard/components/admin-dashboard.component";
+import { ModeratorDashboard } from "@/features/moderator/dashboard/components/moderator-dashboard.component";
+import { UserDashboard } from "@/features/users/dashboard/components/user-dashboard.component";
 
 interface User {
   id: string;

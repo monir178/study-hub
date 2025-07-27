@@ -11,8 +11,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Users, FileText, Plus, Timer } from "lucide-react";
 import Link from "next/link";
+import { UserDashboardSkeleton } from "./";
 
-export function UserDashboard() {
+interface UserDashboardProps {
+  loading?: boolean;
+}
+
+export function UserDashboard({ loading }: UserDashboardProps) {
+  if (loading) {
+    return <UserDashboardSkeleton />;
+  }
   return (
     <div className="space-y-6">
       <DashboardStats role="USER" />
