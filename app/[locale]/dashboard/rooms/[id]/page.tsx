@@ -15,7 +15,8 @@ export async function generateMetadata({
   const params = await paramsPromise;
   return {
     title: `Study Room ${params.id} | StudyHub`,
-    description: "Join collaborative study sessions with other learners",
+    description:
+      "Collaborative study room with Pomodoro timer, notes, and chat",
   };
 }
 
@@ -28,9 +29,5 @@ export default async function RoomPage({
     notFound();
   }
 
-  return (
-    <div className="container mx-auto py-8">
-      <RoomDetailView roomId={params.id} />
-    </div>
-  );
+  return <RoomDetailView roomId={params.id} />;
 }

@@ -72,7 +72,12 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   // Don't render sidebar on public pages or if not authenticated
-  if (!session || pathname === "/" || pathname.includes("/auth/")) {
+  if (
+    !session ||
+    !pathname ||
+    pathname === "/" ||
+    pathname.includes("/auth/")
+  ) {
     return null;
   }
 
