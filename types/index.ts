@@ -90,6 +90,8 @@ export interface SocketEvents {
   // Room events
   "room:join": { roomId: string; userId: string };
   "room:leave": { roomId: string; userId: string };
+  "room:member-joined": { userId: string };
+  "room:member-left": { userId: string };
   "room:member-status": {
     roomId: string;
     userId: string;
@@ -104,13 +106,74 @@ export interface SocketEvents {
   "timer:sync": {
     roomId: string;
     remainingTime: number;
+    phase: string;
+    session: number;
+    totalSessions: number;
     isActive: boolean;
-    type: string;
+    isPaused: boolean;
   };
-  "timer:start": { roomId: string; duration: number; type: string };
-  "timer:pause": { roomId: string };
-  "timer:resume": { roomId: string };
-  "timer:stop": { roomId: string };
+  "timer:start": { roomId: string; userId: string };
+  "timer:pause": { roomId: string; userId: string };
+  "timer:stop": { roomId: string; userId: string };
+  "timer:reset": { roomId: string; userId: string };
+  "timer:request-sync": { roomId: string };
+  "timer:started": {
+    roomId: string;
+    remainingTime: number;
+    phase: string;
+    session: number;
+    totalSessions: number;
+    isActive: boolean;
+    isPaused: boolean;
+    startedBy: string;
+  };
+  "timer:paused": {
+    roomId: string;
+    remainingTime: number;
+    phase: string;
+    session: number;
+    totalSessions: number;
+    isActive: boolean;
+    isPaused: boolean;
+    pausedBy: string;
+  };
+  "timer:stopped": {
+    roomId: string;
+    remainingTime: number;
+    phase: string;
+    session: number;
+    totalSessions: number;
+    isActive: boolean;
+    isPaused: boolean;
+    stoppedBy: string;
+  };
+  "timer:reset-complete": {
+    roomId: string;
+    remainingTime: number;
+    phase: string;
+    session: number;
+    totalSessions: number;
+    isActive: boolean;
+    isPaused: boolean;
+    resetBy: string;
+  };
+  "timer:tick": {
+    roomId: string;
+    remainingTime: number;
+    phase: string;
+    session: number;
+    totalSessions: number;
+    isActive: boolean;
+    isPaused: boolean;
+  };
+  "timer:complete": {
+    roomId: string;
+    completedPhase: string;
+    nextPhase: string;
+    session: number;
+    totalSessions: number;
+  };
+  "timer:error": { message: string };
 
   // Notes events
   "notes:update": { roomId: string; noteId: string; content: string };

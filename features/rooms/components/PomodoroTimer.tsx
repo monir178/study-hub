@@ -1,184 +1,229 @@
-/* eslint-disable */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Play,
   Pause,
   RotateCcw,
-  Settings,
+  Square,
   Clock,
   Coffee,
   Target,
   Users,
+  Volume2,
+  VolumeX,
+  Wifi,
+  AlertCircle,
+  Crown,
+  Shield,
 } from "lucide-react";
+// import { Howl } from "howler"; // Not using Howl, using custom Web Audio API
+import { useTimerPolling } from "@/hooks/useTimerPolling";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 interface PomodoroTimerProps {
   roomId: string;
+  roomCreatorId?: string;
 }
 
-interface TimerState {
-  minutes: number;
-  seconds: number;
-  isRunning: boolean;
-  mode: "work" | "shortBreak" | "longBreak";
-  session: number;
-  totalSessions: number;
-}
+export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
+  const { user } = useAuth();
+  const { timer, actions, loading, error, canControl, lastAction } =
+    useTimerPolling({ roomId, roomCreatorId });
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const tickSoundRef = useRef<{ play: () => void; unload: () => void } | null>(
+    null,
+  );
+  const completionSoundRef = useRef<{
+    play: () => void;
+    unload: () => void;
+  } | null>(null);
+  const [lastRemainingTime, setLastRemainingTime] = useState<number | null>(
+    null,
+  );
 
-export function PomodoroTimer({ roomId }: PomodoroTimerProps) {
-  const [timer, setTimer] = useState<TimerState>({
-    minutes: 25,
-    seconds: 0,
-    isRunning: false,
-    mode: "work",
-    session: 1,
-    totalSessions: 4,
-  });
-
-  const [settings, setSettings] = useState({
-    workDuration: 25,
-    shortBreakDuration: 5,
-    longBreakDuration: 15,
-    sessionsUntilLongBreak: 4,
-  });
-
-  // Timer logic
+  // Initialize sounds using Web Audio API
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    if (typeof window !== "undefined") {
+      // Create tick sound using Web Audio API (programmatic sound generation)
+      const createTickSound = () => {
+        const AudioContextClass =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext })
+            .webkitAudioContext;
+        const audioContext = new AudioContextClass();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
 
-    if (timer.isRunning) {
-      interval = setInterval(() => {
-        setTimer((prev) => {
-          if (prev.seconds > 0) {
-            return { ...prev, seconds: prev.seconds - 1 };
-          } else if (prev.minutes > 0) {
-            return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-          } else {
-            // Timer finished
-            handleTimerComplete();
-            return { ...prev, isRunning: false };
-          }
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.type = "sine";
+
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(
+          0.1,
+          audioContext.currentTime + 0.01,
+        );
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.001,
+          audioContext.currentTime + 0.1,
+        );
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.1);
+      };
+
+      // Create completion sound
+      const createCompletionSound = () => {
+        const AudioContextClass =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext })
+            .webkitAudioContext;
+        const audioContext = new AudioContextClass();
+
+        // Create a pleasant completion chime
+        const frequencies = [523.25, 659.25, 783.99]; // C5, E5, G5 chord
+
+        frequencies.forEach((freq, index) => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+          oscillator.type = "sine";
+
+          const startTime = audioContext.currentTime + index * 0.1;
+          gainNode.gain.setValueAtTime(0, startTime);
+          gainNode.gain.linearRampToValueAtTime(0.2, startTime + 0.05);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.8);
+
+          oscillator.start(startTime);
+          oscillator.stop(startTime + 0.8);
         });
-      }, 1000);
+      };
+
+      // Wrap in Howl-like interface for consistency
+      tickSoundRef.current = {
+        play: () => {
+          try {
+            createTickSound();
+          } catch {
+            console.log("Audio context not available");
+          }
+        },
+        unload: () => {},
+      };
+
+      completionSoundRef.current = {
+        play: () => {
+          try {
+            createCompletionSound();
+          } catch {
+            console.log("Audio context not available");
+          }
+        },
+        unload: () => {},
+      };
     }
 
-    return () => clearInterval(interval);
-  }, [timer.isRunning]);
+    return () => {
+      // Cleanup sounds
+      tickSoundRef.current?.unload();
+      completionSoundRef.current?.unload();
+    };
+  }, []);
 
-  const handleTimerComplete = () => {
-    // Play notification sound (placeholder)
-    console.log("Timer completed!");
-
-    // Auto-switch to next mode
-    setTimer((prev) => {
-      let nextMode: "work" | "shortBreak" | "longBreak";
-      let nextSession = prev.session;
-      let duration: number;
-
-      if (prev.mode === "work") {
-        if (prev.session % settings.sessionsUntilLongBreak === 0) {
-          nextMode = "longBreak";
-          duration = settings.longBreakDuration;
-        } else {
-          nextMode = "shortBreak";
-          duration = settings.shortBreakDuration;
-        }
-      } else {
-        nextMode = "work";
-        duration = settings.workDuration;
-        if (prev.mode === "shortBreak" || prev.mode === "longBreak") {
-          nextSession = prev.session + 1;
-        }
+  // Play tick sound every second when timer is active
+  useEffect(() => {
+    if (
+      timer?.isActive &&
+      !timer.isPaused &&
+      soundEnabled &&
+      tickSoundRef.current
+    ) {
+      // Only play tick if time actually changed (to avoid multiple sounds)
+      if (
+        lastRemainingTime !== null &&
+        timer.remainingTime !== lastRemainingTime
+      ) {
+        tickSoundRef.current.play();
       }
+      setLastRemainingTime(timer.remainingTime);
+    }
+  }, [
+    timer?.remainingTime,
+    timer?.isActive,
+    timer?.isPaused,
+    soundEnabled,
+    lastRemainingTime,
+  ]);
 
-      return {
-        ...prev,
-        mode: nextMode,
-        session: nextSession,
-        minutes: duration,
-        seconds: 0,
-        isRunning: false,
-      };
-    });
-  };
+  // Play completion sound when timer reaches zero
+  useEffect(() => {
+    if (
+      timer &&
+      timer.remainingTime === 0 &&
+      lastRemainingTime &&
+      lastRemainingTime > 0 &&
+      soundEnabled
+    ) {
+      completionSoundRef.current?.play();
 
-  const handleStart = () => {
-    setTimer((prev) => ({ ...prev, isRunning: true }));
-  };
+      // Show browser notification
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(`${getPhaseLabel(timer.phase)} completed!`, {
+          body: "Time for the next phase",
+          icon: "/favicon.ico",
+        });
+      }
+    }
+  }, [
+    timer?.remainingTime,
+    lastRemainingTime,
+    soundEnabled,
+    timer?.phase,
+    timer,
+  ]);
 
-  const handlePause = () => {
-    setTimer((prev) => ({ ...prev, isRunning: false }));
-  };
-
-  const handleReset = () => {
-    const duration =
-      timer.mode === "work"
-        ? settings.workDuration
-        : timer.mode === "shortBreak"
-          ? settings.shortBreakDuration
-          : settings.longBreakDuration;
-
-    setTimer((prev) => ({
-      ...prev,
-      minutes: duration,
-      seconds: 0,
-      isRunning: false,
-    }));
-  };
-
-  const handleModeChange = (mode: "work" | "shortBreak" | "longBreak") => {
-    const duration =
-      mode === "work"
-        ? settings.workDuration
-        : mode === "shortBreak"
-          ? settings.shortBreakDuration
-          : settings.longBreakDuration;
-
-    setTimer((prev) => ({
-      ...prev,
-      mode,
-      minutes: duration,
-      seconds: 0,
-      isRunning: false,
-    }));
-  };
-
-  const getTotalSeconds = () => {
-    const duration =
-      timer.mode === "work"
-        ? settings.workDuration
-        : timer.mode === "shortBreak"
-          ? settings.shortBreakDuration
-          : settings.longBreakDuration;
-    return duration * 60;
-  };
-
-  const getCurrentSeconds = () => {
-    return timer.minutes * 60 + timer.seconds;
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   };
 
   const getProgress = () => {
-    const total = getTotalSeconds();
-    const current = getCurrentSeconds();
-    return ((total - current) / total) * 100;
+    if (!timer) return 0;
+    const totalTime = getTotalTimeForPhase(timer.phase);
+    return ((totalTime - timer.remainingTime) / totalTime) * 100;
   };
 
-  const getModeIcon = (mode: string) => {
-    switch (mode) {
-      case "work":
+  const getTotalTimeForPhase = (phase: string) => {
+    switch (phase) {
+      case "focus":
+        return 25 * 60; // 25 minutes
+      case "shortBreak":
+        return 5 * 60; // 5 minutes
+      case "longBreak":
+        return 15 * 60; // 15 minutes
+      default:
+        return 25 * 60;
+    }
+  };
+
+  const getPhaseIcon = (phase: string) => {
+    switch (phase) {
+      case "focus":
         return <Target className="w-4 h-4" />;
       case "shortBreak":
       case "longBreak":
@@ -188,9 +233,9 @@ export function PomodoroTimer({ roomId }: PomodoroTimerProps) {
     }
   };
 
-  const getModeColor = (mode: string) => {
-    switch (mode) {
-      case "work":
+  const getPhaseColor = (phase: string) => {
+    switch (phase) {
+      case "focus":
         return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
       case "shortBreak":
         return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
@@ -201,29 +246,73 @@ export function PomodoroTimer({ roomId }: PomodoroTimerProps) {
     }
   };
 
+  const getPhaseLabel = (phase: string) => {
+    switch (phase) {
+      case "focus":
+        return "Focus Time";
+      case "shortBreak":
+        return "Short Break";
+      case "longBreak":
+        return "Long Break";
+      default:
+        return "Focus Time";
+    }
+  };
+
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case "ADMIN":
+        return <Crown className="w-3 h-3" />;
+      case "MODERATOR":
+        return <Shield className="w-3 h-3" />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Permission Alert */}
+      {!canControl && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Only moderators and admins can control the timer. You can view the
+            current session.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Timer Display */}
       <Card>
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Badge className={getModeColor(timer.mode)}>
-              {getModeIcon(timer.mode)}
-              <span className="ml-1 capitalize">
-                {timer.mode === "shortBreak"
-                  ? "Short Break"
-                  : timer.mode === "longBreak"
-                    ? "Long Break"
-                    : timer.mode}
+            <Badge className={getPhaseColor(timer?.phase || "focus")}>
+              {getPhaseIcon(timer?.phase || "focus")}
+              <span className="ml-1">
+                {getPhaseLabel(timer?.phase || "focus")}
               </span>
             </Badge>
+            {timer?.isActive && (
+              <Badge variant="outline" className="text-green-600">
+                <Wifi className="w-3 h-3 mr-1" />
+                Live
+              </Badge>
+            )}
           </div>
           <CardTitle className="text-6xl font-mono">
-            {String(timer.minutes).padStart(2, "0")}:
-            {String(timer.seconds).padStart(2, "0")}
+            {timer ? formatTime(timer.remainingTime) : "25:00"}
           </CardTitle>
           <p className="text-muted-foreground">
-            Session {timer.session} of {timer.totalSessions}
+            Session {timer?.session || 1} of {timer?.totalSessions || 4}
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -232,56 +321,80 @@ export function PomodoroTimer({ roomId }: PomodoroTimerProps) {
 
           {/* Control Buttons */}
           <div className="flex justify-center gap-3">
-            {!timer.isRunning ? (
-              <Button onClick={handleStart} size="lg">
-                <Play className="w-4 h-4 mr-2" />
-                Start
-              </Button>
+            {canControl ? (
+              <>
+                {!timer?.isActive || timer?.isPaused ? (
+                  <Button
+                    onClick={actions.startTimer}
+                    size="lg"
+                    disabled={loading}
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    {loading
+                      ? "Starting..."
+                      : timer?.isPaused
+                        ? "Resume"
+                        : "Start"}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={actions.pauseTimer}
+                    variant="outline"
+                    size="lg"
+                    disabled={loading}
+                  >
+                    <Pause className="w-4 h-4 mr-2" />
+                    {loading ? "Pausing..." : "Pause"}
+                  </Button>
+                )}
+
+                <Button
+                  onClick={actions.stopTimer}
+                  variant="outline"
+                  size="lg"
+                  disabled={loading || (!timer?.isActive && !timer?.isPaused)}
+                >
+                  <Square className="w-4 h-4 mr-2" />
+                  Stop
+                </Button>
+
+                <Button
+                  onClick={actions.resetTimer}
+                  variant="outline"
+                  size="lg"
+                  disabled={loading}
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  {loading ? "Resetting..." : "Reset"}
+                </Button>
+              </>
             ) : (
-              <Button onClick={handlePause} variant="outline" size="lg">
-                <Pause className="w-4 h-4 mr-2" />
-                Pause
-              </Button>
+              <div className="text-center text-muted-foreground">
+                <p className="text-sm">
+                  Timer is controlled by room moderators
+                </p>
+                {lastAction && (
+                  <p className="text-xs mt-1">
+                    Last {lastAction.type} by {lastAction.by}
+                  </p>
+                )}
+              </div>
             )}
-            <Button onClick={handleReset} variant="outline" size="lg">
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Reset
-            </Button>
           </div>
 
-          {/* Mode Selector */}
-          <div className="flex justify-center">
-            <Select
-              value={timer.mode}
-              onValueChange={(value: "work" | "shortBreak" | "longBreak") =>
-                handleModeChange(value)
-              }
-              disabled={timer.isRunning}
-            >
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="work">
-                  <div className="flex items-center gap-2">
-                    <Target className="w-4 h-4" />
-                    Work Session
-                  </div>
-                </SelectItem>
-                <SelectItem value="shortBreak">
-                  <div className="flex items-center gap-2">
-                    <Coffee className="w-4 h-4" />
-                    Short Break
-                  </div>
-                </SelectItem>
-                <SelectItem value="longBreak">
-                  <div className="flex items-center gap-2">
-                    <Coffee className="w-4 h-4" />
-                    Long Break
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Sound Toggle */}
+          <div className="flex items-center justify-center gap-2">
+            {soundEnabled ? (
+              <Volume2 className="w-4 h-4 text-muted-foreground" />
+            ) : (
+              <VolumeX className="w-4 h-4 text-muted-foreground" />
+            )}
+            <Switch
+              checked={soundEnabled}
+              onCheckedChange={setSoundEnabled}
+              aria-label="Toggle tick sound"
+            />
+            <span className="text-sm text-muted-foreground">Tick Sound</span>
           </div>
         </CardContent>
       </Card>
@@ -297,26 +410,50 @@ export function PomodoroTimer({ roomId }: PomodoroTimerProps) {
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Status</span>
+              <span className="text-sm text-muted-foreground">Connection</span>
               <Badge variant="outline" className="text-green-600">
+                <Wifi className="w-3 h-3 mr-1" />
                 Connected
               </Badge>
             </div>
+
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">
-                Participants
+                Timer Status
               </span>
-              <span className="text-sm font-medium">3 active</span>
+              <Badge
+                variant={timer?.isActive ? "default" : "outline"}
+                className={timer?.isActive ? "text-green-600" : ""}
+              >
+                {timer?.isActive
+                  ? timer.isPaused
+                    ? "Paused"
+                    : "Running"
+                  : "Stopped"}
+              </Badge>
             </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Your Role</span>
+              <div className="flex items-center gap-1">
+                {getRoleIcon(user?.role || "USER")}
+                <span className="text-sm font-medium">
+                  {user?.role || "USER"}
+                </span>
+              </div>
+            </div>
+
             <Separator />
+
             <div className="text-center">
               <p className="text-sm text-muted-foreground mb-2">
-                Timer will sync with room members when started
+                Timer syncs automatically with all room members
               </p>
-              <Button variant="outline" size="sm" disabled>
-                <Settings className="w-4 h-4 mr-2" />
-                Sync Settings
-              </Button>
+              {timer?.isActive && (
+                <p className="text-xs text-muted-foreground">
+                  All participants see the same countdown
+                </p>
+              )}
             </div>
           </div>
         </CardContent>
@@ -325,18 +462,35 @@ export function PomodoroTimer({ roomId }: PomodoroTimerProps) {
       {/* Statistics */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Today's Progress</CardTitle>
+          <CardTitle className="text-lg">Session Progress</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-3 bg-muted/50 rounded-lg">
-              <div className="text-2xl font-bold">4</div>
-              <div className="text-xs text-muted-foreground">Completed</div>
+              <div className="text-2xl font-bold">{timer?.session || 1}</div>
+              <div className="text-xs text-muted-foreground">Current</div>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
-              <div className="text-2xl font-bold">100m</div>
-              <div className="text-xs text-muted-foreground">Focus Time</div>
+              <div className="text-2xl font-bold">
+                {timer?.totalSessions || 4}
+              </div>
+              <div className="text-xs text-muted-foreground">Total</div>
             </div>
+          </div>
+
+          <div className="mt-4">
+            <div className="flex justify-between text-sm text-muted-foreground mb-2">
+              <span>Progress</span>
+              <span>
+                {timer?.session || 1}/{timer?.totalSessions || 4}
+              </span>
+            </div>
+            <Progress
+              value={
+                ((timer?.session || 1) / (timer?.totalSessions || 4)) * 100
+              }
+              className="h-2"
+            />
           </div>
         </CardContent>
       </Card>

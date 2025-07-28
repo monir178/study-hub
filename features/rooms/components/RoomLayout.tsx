@@ -203,7 +203,10 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
 
                   <div className="px-6 pb-6">
                     <TabsContent value="timer" className="mt-0 h-full">
-                      <PomodoroTimer roomId={roomId} />
+                      <PomodoroTimer
+                        roomId={roomId}
+                        roomCreatorId={room.creator.id}
+                      />
                     </TabsContent>
 
                     <TabsContent value="notes" className="mt-0 h-full">
