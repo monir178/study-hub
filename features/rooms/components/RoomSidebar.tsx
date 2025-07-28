@@ -14,6 +14,7 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { StudyRoom } from "../hooks/useRooms";
+import { useRoomSocket } from "@/hooks/useRoomSocket";
 import { formatDistanceToNow } from "date-fns";
 
 interface RoomSidebarProps {
@@ -21,6 +22,8 @@ interface RoomSidebarProps {
 }
 
 export function RoomSidebar({ room }: RoomSidebarProps) {
+  // Use real-time socket data for member updates
+  const { members, stats, isConnected } = useRoomSocket(room.id);
   const getRoleIcon = (role: string) => {
     switch (role) {
       case "ADMIN":
@@ -69,14 +72,18 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
               <div className="flex items-center justify-center gap-1 mb-1">
                 <Users className="w-4 h-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold">{room.memberCount}</div>
+              <div className="text-2xl font-bold">
+                {stats.memberCount || room.memberCount}
+              </div>
               <div className="text-xs text-muted-foreground">Members</div>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center justify-center gap-1 mb-1">
                 <MessageSquare className="w-4 h-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold">{room.messageCount}</div>
+              <div className="text-2xl font-bold">
+                {stats.messageCount || room.messageCount}
+              </div>
               <div className="text-xs text-muted-foreground">Messages</div>
             </div>
           </div>
@@ -86,22 +93,34 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Online</span>
-              <span className="font-medium">{room.onlineMembers}</span>
+              <span className="font-medium">
+                {stats.onlineMembers || room.onlineMembers}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Capacity</span>
               <span className="font-medium">
-                {room.memberCount}/{room.maxMembers}
+                {stats.memberCount || room.memberCount}/{room.maxMembers}
               </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Notes</span>
-              <span className="font-medium">{room.noteCount || 0}</span>
+              <span className="font-medium">
+                {stats.noteCount || room.noteCount || 0}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Visibility</span>
               <span className="font-medium">
                 {room.isPublic ? "Public" : "Private"}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Connection</span>
+              <span
+                className={`font-medium ${isConnected ? "text-green-600" : "text-red-600"}`}
+              >
+                {isConnected ? "Connected" : "Disconnected"}
               </span>
             </div>
           </div>
@@ -158,13 +177,14 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
           <CardTitle className="flex items-center justify-between text-lg">
             <span>Members</span>
             <Badge variant="outline" className="text-xs">
-              {room.onlineMembers} online
+              {stats.onlineMembers || room.onlineMembers} online
             </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3 max-h-96 overflow-y-auto">
-            {room.members.map((member) => (
+            {/* Show real-time members if available, otherwise fallback to room.members */}
+            {(members.length > 0 ? members : room.members).map((member) => (
               <div
                 key={member.id}
                 className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
@@ -205,6 +225,13 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
                 </Badge>
               </div>
             ))}
+
+            {/* Show connection status if no real-time members */}
+            {members.length === 0 && !isConnected && (
+              <div className="text-center py-4 text-muted-foreground">
+                <p className="text-sm">Connecting to real-time updates...</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

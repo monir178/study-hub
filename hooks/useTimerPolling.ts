@@ -56,10 +56,11 @@ export function useTimerPolling(
   } | null>(null);
 
   // Check if user can control timer (Moderator/Admin or room owner)
-  const canControl =
+  const canControl = Boolean(
     user?.role === "MODERATOR" ||
-    user?.role === "ADMIN" ||
-    (roomCreatorId && user?.id === roomCreatorId);
+      user?.role === "ADMIN" ||
+      (roomCreatorId && user?.id === roomCreatorId),
+  );
 
   // Fetch timer state
   const fetchTimerState = useCallback(async () => {

@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { ApiResponse, ApiError } from "@/lib/api/types";
 
+// Using HTTP polling instead of broadcasting for better reliability
+
 const joinRoomSchema = z.object({
   password: z.string().optional(),
 });
@@ -58,6 +60,8 @@ export async function POST(
         data: { status: "ONLINE" },
       });
 
+      // Room data will be updated via HTTP polling
+
       return NextResponse.json({
         success: true,
         data: null,
@@ -106,6 +110,8 @@ export async function POST(
         roomId: params.id,
       },
     });
+
+    // Room data will be updated via HTTP polling
 
     return NextResponse.json({
       success: true,
@@ -210,6 +216,8 @@ export async function DELETE(
         roomId: params.id,
       },
     });
+
+    // Room data will be updated via HTTP polling
 
     return NextResponse.json({
       success: true,
