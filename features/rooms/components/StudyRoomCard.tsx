@@ -49,8 +49,8 @@ import { useAuth } from "@/lib/hooks/useAuth";
 
 interface StudyRoomCardProps {
   room: StudyRoom;
-  onJoin?: (roomId: string) => void;
-  onLeave?: (roomId: string) => void;
+  onJoin?: (roomId: string) => Promise<void>;
+  onLeave?: (roomId: string) => Promise<void>;
   onView?: (roomId: string) => void;
   loading?: boolean;
 }
@@ -66,6 +66,8 @@ export function StudyRoomCard({
   const { user: currentUser } = useAuth();
   const deleteRoom = useDeleteRoom();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
   const getRoleIcon = (role: string) => {
     switch (role) {
       case "ADMIN":
@@ -88,18 +90,40 @@ export function StudyRoomCard({
     }
   };
 
-  const handleAction = () => {
+  const handleAction = async () => {
     if (room.isJoined) {
       // Navigate to room detail page using Next.js router
-      router.push(`/rooms/${room.id}`);
+      router.push(`/dashboard/rooms/${room.id}`);
     } else {
-      if (onJoin) onJoin(room.id);
+      // Join room and navigate immediately
+      if (onJoin) {
+        setIsJoining(true);
+        try {
+          await onJoin(room.id);
+          // Navigate to room after successful join
+          router.push(`/dashboard/rooms/${room.id}`);
+        } catch (error) {
+          // Error is handled by the mutation hook
+          console.error("Failed to join room:", error);
+        } finally {
+          setIsJoining(false);
+        }
+      }
     }
   };
 
-  const handleLeave = (e: React.MouseEvent) => {
+  const handleLeave = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onLeave) onLeave(room.id);
+    if (onLeave) {
+      setIsLeaving(true);
+      try {
+        await onLeave(room.id);
+      } catch (error) {
+        console.error("Failed to leave room:", error);
+      } finally {
+        setIsLeaving(false);
+      }
+    }
   };
 
   const handleDeleteRoom = async () => {
@@ -304,12 +328,14 @@ export function StudyRoomCard({
         <div className="flex gap-2 pt-2">
           <Button
             onClick={handleAction}
-            disabled={loading}
+            disabled={loading || isJoining}
             className="flex-1"
             variant={room.isJoined ? "outline" : "default"}
           >
-            {loading
-              ? "Loading..."
+            {loading || isJoining
+              ? room.isJoined
+                ? "Loading..."
+                : "Joining..."
               : room.isJoined
                 ? "Enter Room"
                 : "Join Room"}
@@ -318,11 +344,11 @@ export function StudyRoomCard({
           {room.isJoined && room.userRole !== "ADMIN" && (
             <Button
               onClick={handleLeave}
-              disabled={loading}
+              disabled={loading || isLeaving}
               variant="outline"
               size="sm"
             >
-              Leave
+              {isLeaving ? "Leaving..." : "Leave"}
             </Button>
           )}
         </div>

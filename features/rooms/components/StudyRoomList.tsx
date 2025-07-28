@@ -51,19 +51,19 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
   const handleJoinRoom = async (roomId: string) => {
     try {
       await joinRoom.mutateAsync({ roomId, data: {} });
-      if (onRoomSelect) {
-        onRoomSelect(roomId);
-      }
-    } catch {
-      // Error handled by mutation hook
+      // Don't call onRoomSelect here since StudyRoomCard will handle navigation
+    } catch (error) {
+      // Error handled by mutation hook, but re-throw for StudyRoomCard to handle
+      throw error;
     }
   };
 
   const handleLeaveRoom = async (roomId: string) => {
     try {
       await leaveRoom.mutateAsync(roomId);
-    } catch {
-      // Error handled by mutation hook
+    } catch (error) {
+      // Error handled by mutation hook, but re-throw for StudyRoomCard to handle
+      throw error;
     }
   };
 
