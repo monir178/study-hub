@@ -31,11 +31,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Users,
-  MessageSquare,
+  // Users,
+  // MessageSquare,
   Lock,
   Globe,
-  Calendar,
+  // Calendar,
   Crown,
   Shield,
   User as UserIcon,
@@ -44,7 +44,7 @@ import {
   Edit,
 } from "lucide-react";
 import { StudyRoom, useDeleteRoom } from "../hooks/useRooms";
-import { formatDistanceToNow } from "date-fns";
+// import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/lib/hooks/useAuth";
 
 interface StudyRoomCardProps {
@@ -62,10 +62,18 @@ export function StudyRoomCard({
   onView: _onView,
   loading = false,
 }: StudyRoomCardProps) {
+  console.log("room details =>", room);
   const router = useRouter();
   const { user: currentUser } = useAuth();
+  console.log("current User =>", currentUser);
   const deleteRoom = useDeleteRoom();
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteDialogState, setDeleteDialogState] = useState<{
+    isOpen: boolean;
+    isDeleting: boolean;
+  }>({
+    isOpen: false,
+    isDeleting: false,
+  });
   const [isJoining, setIsJoining] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const getRoleIcon = (role: string) => {
@@ -127,11 +135,18 @@ export function StudyRoomCard({
   };
 
   const handleDeleteRoom = async () => {
+    setDeleteDialogState((prev) => ({ ...prev, isDeleting: true }));
     try {
       await deleteRoom.mutateAsync(room.id);
-      setShowDeleteDialog(false); // Close dialog after successful deletion
+      // Dialog will be closed by navigation, but reset state just in case
+      setDeleteDialogState((prev) => ({
+        ...prev,
+        isOpen: false,
+        isDeleting: false,
+      }));
     } catch {
       // Error handled by mutation hook
+      setDeleteDialogState((prev) => ({ ...prev, isDeleting: false }));
     }
   };
 
@@ -147,8 +162,8 @@ export function StudyRoomCard({
 
     // Moderator can delete rooms except those created by Admin
     if (currentUser.role === "MODERATOR") {
-      // For now, allow moderators to delete any room (we'd need creator role info to be more specific)
-      return true;
+      // Moderators cannot delete rooms created by admins
+      return room.creator.role !== "ADMIN";
     }
 
     return false;
@@ -228,7 +243,10 @@ export function StudyRoomCard({
                         className="text-red-600 focus:text-red-600"
                         onSelect={(e) => {
                           e.preventDefault();
-                          setShowDeleteDialog(true);
+                          setDeleteDialogState((prev) => ({
+                            ...prev,
+                            isOpen: true,
+                          }));
                         }}
                       >
                         <Trash2 className="w-4 h-4 mr-2" />
@@ -270,7 +288,7 @@ export function StudyRoomCard({
         </div>
 
         {/* Room Stats */}
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+        {/* <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1">
               <Users className="w-4 h-4" />
@@ -292,7 +310,7 @@ export function StudyRoomCard({
               })}
             </span>
           </div>
-        </div>
+        </div> */}
 
         {/* Member Avatars */}
         {room.members.length > 0 && (
@@ -364,7 +382,14 @@ export function StudyRoomCard({
       </CardContent>
 
       {/* Delete Room Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      <AlertDialog
+        open={deleteDialogState.isOpen}
+        onOpenChange={(open) => {
+          if (!deleteDialogState.isDeleting) {
+            setDeleteDialogState((prev) => ({ ...prev, isOpen: open }));
+          }
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Room</AlertDialogTitle>
@@ -375,15 +400,15 @@ export function StudyRoomCard({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteRoom.isPending}>
+            <AlertDialogCancel disabled={deleteDialogState.isDeleting}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteRoom}
-              disabled={deleteRoom.isPending}
+              disabled={deleteDialogState.isDeleting}
               className="bg-red-600 hover:bg-red-700"
             >
-              {deleteRoom.isPending ? "Deleting..." : "Delete Room"}
+              {deleteDialogState.isDeleting ? "Deleting..." : "Delete Room"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

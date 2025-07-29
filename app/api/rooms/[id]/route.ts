@@ -4,6 +4,50 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { ApiResponse, ApiError } from "@/lib/api/types";
 
+// Helper function to check if user can delete a room
+async function checkDeletePermission(
+  userId: string,
+  roomId: string,
+): Promise<boolean> {
+  try {
+    // Get user's role
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+
+    if (!user) return false;
+
+    // Admin can delete any room
+    if (user.role === "ADMIN") return true;
+
+    // Get room details with creator info
+    const room = await prisma.studyRoom.findUnique({
+      where: { id: roomId },
+      include: {
+        creator: {
+          select: { role: true },
+        },
+      },
+    });
+
+    if (!room) return false;
+
+    // Room creator can always delete
+    if (room.creatorId === userId) return true;
+
+    // Moderator can delete rooms except those created by Admin
+    if (user.role === "MODERATOR") {
+      return room.creator.role !== "ADMIN";
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error checking delete permission:", error);
+    return false;
+  }
+}
+
 const updateRoomSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   description: z.string().max(500).optional(),
@@ -257,8 +301,9 @@ export async function DELETE(
       );
     }
 
-    // Only room creator can delete the room
-    if (room.creatorId !== session.user.id) {
+    // Check if user can delete the room
+    const canDelete = await checkDeletePermission(session.user.id, params.id);
+    if (!canDelete) {
       return NextResponse.json(
         {
           success: false,
