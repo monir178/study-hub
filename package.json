@@ -69,6 +69,7 @@
     "pusher-js": "^8.4.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-draggable": "^4.5.0",
     "react-hook-form": "^7.61.1",
     "react-redux": "^9.2.0",
     "react-sounds": "^1.0.25",

@@ -158,6 +158,11 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Fixed Pomodoro Timer - Desktop Only */}
+      <div className="hidden lg:block fixed top-12 right-4 z-50">
+        <PomodoroTimer roomId={roomId} roomCreatorId={room.creator.id} />
+      </div>
+
       <div className="container mx-auto py-6">
         {/* Room Header */}
         <RoomHeader room={room} />
@@ -166,28 +171,10 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
         <div className="grid gap-6 lg:grid-cols-4 mt-6">
           {/* Main Content Panel */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Pomodoro Timer - Minimalistic Top Bar */}
-            <Card className="border-0 shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <Timer className="w-5 h-5 text-blue-600" />
-                      <span className="font-medium text-sm">Study Timer</span>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {room.onlineMembers} online
-                    </Badge>
-                  </div>
-
-                  {/* Minimal Timer Display */}
-                  <PomodoroTimer
-                    roomId={roomId}
-                    roomCreatorId={room.creator.id}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+            {/* Mobile Timer - Above Chat */}
+            <div className="block lg:hidden">
+              <PomodoroTimer roomId={roomId} roomCreatorId={room.creator.id} />
+            </div>
 
             {/* Chat Panel - Main Content */}
             <Card className="max-h-[calc(100vh-200px)] flex flex-col">

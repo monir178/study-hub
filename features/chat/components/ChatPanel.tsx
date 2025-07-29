@@ -11,7 +11,6 @@ import { useVoiceRecorder } from "@/features/chat/hooks/useVoiceRecorder";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChatInput } from "@/components/ui/chat/chat-input";
 import Image from "next/image";
 import {
