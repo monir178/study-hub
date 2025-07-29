@@ -39,6 +39,16 @@ export const unsubscribeFromRoomMembers = (roomId: string) => {
   pusherClient.unsubscribe(`room-${roomId}-members`);
 };
 
+// Helper function to subscribe to room chat channel
+export const subscribeToRoomChat = (roomId: string) => {
+  return pusherClient.subscribe(`room-${roomId}-chat`);
+};
+
+// Helper function to unsubscribe from room chat channel
+export const unsubscribeFromRoomChat = (roomId: string) => {
+  pusherClient.unsubscribe(`room-${roomId}-chat`);
+};
+
 // Server-side helper to trigger timer updates
 export const triggerTimerUpdate = async (
   roomId: string,
@@ -55,5 +65,20 @@ export const triggerTimerUpdate = async (
     });
   } catch (error) {
     console.error("Error triggering timer update:", error);
+  }
+};
+
+// Server-side helper to trigger chat message updates
+export const triggerChatMessage = async (
+  roomId: string,
+  message: Record<string, unknown>,
+) => {
+  try {
+    await pusherServer.trigger(`room-${roomId}-chat`, "new-message", {
+      message,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Error triggering chat message:", error);
   }
 };

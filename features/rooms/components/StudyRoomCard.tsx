@@ -46,6 +46,7 @@ import {
 import { StudyRoom, useDeleteRoom } from "../hooks/useRooms";
 // import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { Progress } from "@/components/ui/progress";
 
 interface StudyRoomCardProps {
   room: StudyRoom;
@@ -62,20 +63,21 @@ export function StudyRoomCard({
   onView: _onView,
   loading = false,
 }: StudyRoomCardProps) {
-  console.log("room details =>", room);
   const router = useRouter();
   const { user: currentUser } = useAuth();
-  console.log("current User =>", currentUser);
   const deleteRoom = useDeleteRoom();
   const [deleteDialogState, setDeleteDialogState] = useState<{
     isOpen: boolean;
     isDeleting: boolean;
+    progress: number;
   }>({
     isOpen: false,
     isDeleting: false,
+    progress: 0,
   });
   const [isJoining, setIsJoining] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
+
   const getRoleIcon = (role: string) => {
     switch (role) {
       case "ADMIN":
@@ -135,35 +137,73 @@ export function StudyRoomCard({
   };
 
   const handleDeleteRoom = async () => {
-    setDeleteDialogState((prev) => ({ ...prev, isDeleting: true }));
-    try {
-      await deleteRoom.mutateAsync(room.id);
-      // Dialog will be closed by navigation, but reset state just in case
+    setDeleteDialogState((prev) => ({
+      ...prev,
+      isDeleting: true,
+      progress: 0,
+    }));
+
+    // Simulate progress updates
+    const progressInterval = setInterval(() => {
       setDeleteDialogState((prev) => ({
         ...prev,
-        isOpen: false,
-        isDeleting: false,
+        progress: Math.min(prev.progress + 10, 90), // Cap at 90% until completion
       }));
-    } catch {
-      // Error handled by mutation hook
-      setDeleteDialogState((prev) => ({ ...prev, isDeleting: false }));
+    }, 500);
+
+    try {
+      await deleteRoom.mutateAsync(room.id);
+
+      // Complete the progress
+      setDeleteDialogState((prev) => ({ ...prev, progress: 100 }));
+
+      // Wait a moment to show completion, then close
+      setTimeout(() => {
+        setDeleteDialogState((prev) => ({
+          ...prev,
+          isOpen: false,
+          isDeleting: false,
+          progress: 0,
+        }));
+      }, 1000);
+    } catch (error) {
+      console.error("Delete failed with error:", error);
+      clearInterval(progressInterval);
+      setDeleteDialogState((prev) => ({
+        ...prev,
+        isDeleting: false,
+        progress: 0,
+      }));
+    } finally {
+      clearInterval(progressInterval);
     }
   };
 
   // Check if current user can delete the room
   const canDeleteRoom = () => {
-    if (!currentUser || !room) return false;
+    if (!currentUser || !room) {
+      return false;
+    }
 
     // Room owner can always delete
-    if (room.creator.id === currentUser.id) return true;
+    const isRoomCreator = room.creator.id === currentUser.id;
+    if (isRoomCreator) {
+      return true;
+    }
 
     // Admin can delete any room
-    if (currentUser.role === "ADMIN") return true;
+    const isAdmin = currentUser.role === "ADMIN";
+    if (isAdmin) {
+      return true;
+    }
 
     // Moderator can delete rooms except those created by Admin
-    if (currentUser.role === "MODERATOR") {
-      // Moderators cannot delete rooms created by admins
-      return room.creator.role !== "ADMIN";
+    const isModerator = currentUser.role === "MODERATOR";
+    const creatorIsAdmin = room.creator.role === "ADMIN";
+
+    if (isModerator) {
+      const canDelete = !creatorIsAdmin;
+      return canDelete;
     }
 
     return false;
@@ -185,6 +225,8 @@ export function StudyRoomCard({
 
     return false;
   };
+
+  const deletePermission = canDeleteRoom();
 
   return (
     <Card className="hover:shadow-md transition-shadow cursor-pointer group">
@@ -216,7 +258,7 @@ export function StudyRoomCard({
             )}
 
             {/* Room Management Dropdown */}
-            {(canEditRoom() || canDeleteRoom()) && (
+            {(canEditRoom() || deletePermission) && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -236,7 +278,7 @@ export function StudyRoomCard({
                     </DropdownMenuItem>
                   )}
 
-                  {canDeleteRoom() && (
+                  {deletePermission && (
                     <>
                       {canEditRoom() && <DropdownMenuSeparator />}
                       <DropdownMenuItem
@@ -397,6 +439,21 @@ export function StudyRoomCard({
               Are you sure you want to permanently delete "{room.name}"? This
               action cannot be undone and will remove all messages, notes, and
               member data associated with this room.
+              {deleteDialogState.isDeleting && (
+                <div className="mt-2 space-y-2">
+                  <div className="text-sm text-muted-foreground">
+                    This may take a moment due to the amount of data being
+                    removed...
+                  </div>
+                  <Progress
+                    value={deleteDialogState.progress}
+                    className="h-2"
+                  />
+                  <div className="text-xs text-muted-foreground text-center">
+                    {deleteDialogState.progress}% complete
+                  </div>
+                </div>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -408,7 +465,14 @@ export function StudyRoomCard({
               disabled={deleteDialogState.isDeleting}
               className="bg-red-600 hover:bg-red-700"
             >
-              {deleteDialogState.isDeleting ? "Deleting..." : "Delete Room"}
+              {deleteDialogState.isDeleting ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Deleting...
+                </div>
+              ) : (
+                "Delete Room"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

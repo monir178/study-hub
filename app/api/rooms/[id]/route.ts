@@ -74,7 +74,8 @@ export async function GET(
       );
     }
 
-    const room = await prisma.studyRoom.findUnique({
+    // Add diagnostic information for debugging
+    const diagnostic = await prisma.studyRoom.findUnique({
       where: { id: params.id },
       include: {
         creator: {
@@ -93,13 +94,28 @@ export async function GET(
           orderBy: { updatedAt: "desc" },
           take: 5,
         },
+        studySessions: {
+          select: { id: true, status: true, startedAt: true },
+          orderBy: { startedAt: "desc" },
+          take: 10,
+        },
+        messages: {
+          select: { id: true, type: true, createdAt: true },
+          orderBy: { createdAt: "desc" },
+          take: 10,
+        },
         _count: {
-          select: { members: true, messages: true, notes: true },
+          select: {
+            members: true,
+            messages: true,
+            notes: true,
+            studySessions: true,
+          },
         },
       },
     });
 
-    if (!room) {
+    if (!diagnostic) {
       return NextResponse.json(
         {
           success: false,
@@ -110,10 +126,10 @@ export async function GET(
     }
 
     // Check if user has access to this room
-    const isMember = room.members.some(
+    const isMember = diagnostic.members.some(
       (member) => member.userId === session.user.id,
     );
-    if (!room.isPublic && !isMember) {
+    if (!diagnostic.isPublic && !isMember) {
       return NextResponse.json(
         {
           success: false,
@@ -124,16 +140,17 @@ export async function GET(
     }
 
     const roomWithStatus = {
-      ...room,
-      memberCount: room._count.members,
-      messageCount: room._count.messages,
-      noteCount: room._count.notes,
+      ...diagnostic,
+      memberCount: diagnostic._count.members,
+      messageCount: diagnostic._count.messages,
+      noteCount: diagnostic._count.notes,
       isJoined: isMember,
-      onlineMembers: room.members.filter(
+      onlineMembers: diagnostic.members.filter(
         (member) => member.status === "ONLINE" || member.status === "STUDYING",
       ).length,
       userRole: isMember
-        ? room.members.find((member) => member.userId === session.user.id)?.role
+        ? diagnostic.members.find((member) => member.userId === session.user.id)
+            ?.role
         : null,
     };
 
@@ -286,22 +303,7 @@ export async function DELETE(
       );
     }
 
-    const room = await prisma.studyRoom.findUnique({
-      where: { id: params.id },
-      select: { creatorId: true },
-    });
-
-    if (!room) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Room not found",
-        } satisfies ApiError,
-        { status: 404 },
-      );
-    }
-
-    // Check if user can delete the room
+    // Check if user can delete the room first
     const canDelete = await checkDeletePermission(session.user.id, params.id);
     if (!canDelete) {
       return NextResponse.json(
@@ -313,8 +315,53 @@ export async function DELETE(
       );
     }
 
-    await prisma.studyRoom.delete({
+    // Verify room exists before attempting deletion
+    const roomExists = await prisma.studyRoom.findUnique({
       where: { id: params.id },
+      select: { id: true },
+    });
+
+    if (!roomExists) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Room not found",
+        } satisfies ApiError,
+        { status: 404 },
+      );
+    }
+
+    // Use a transaction to ensure atomic deletion
+    await prisma.$transaction(async (tx) => {
+      // Delete related records first to avoid cascade issues
+      await tx.studySession.deleteMany({
+        where: { roomId: params.id },
+      });
+
+      await tx.noteEdit.deleteMany({
+        where: {
+          note: {
+            roomId: params.id,
+          },
+        },
+      });
+
+      await tx.note.deleteMany({
+        where: { roomId: params.id },
+      });
+
+      await tx.message.deleteMany({
+        where: { roomId: params.id },
+      });
+
+      await tx.roomMember.deleteMany({
+        where: { roomId: params.id },
+      });
+
+      // Finally delete the room
+      await tx.studyRoom.delete({
+        where: { id: params.id },
+      });
     });
 
     return NextResponse.json({
@@ -324,10 +371,34 @@ export async function DELETE(
     } satisfies ApiResponse<null>);
   } catch (error) {
     console.error("Error deleting room:", error);
+
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes("timeout")) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Delete operation timed out. Please try again.",
+          } satisfies ApiError,
+          { status: 408 },
+        );
+      }
+
+      if (error.message.includes("foreign key")) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Cannot delete room due to existing references.",
+          } satisfies ApiError,
+          { status: 409 },
+        );
+      }
+    }
+
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to delete room",
+        error: "Failed to delete room. Please try again.",
       } satisfies ApiError,
       { status: 500 },
     );

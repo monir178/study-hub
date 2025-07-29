@@ -251,7 +251,7 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
             </Alert>
 
             {/* Action Buttons */}
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-3 pt-4 w-fit ml-auto">
               <Button
                 type="submit"
                 disabled={createRoom.isPending}

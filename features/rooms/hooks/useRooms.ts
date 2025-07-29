@@ -161,7 +161,7 @@ export function useDeleteRoom() {
 
   return useApiMutation<void, string>({
     mutationFn: async (roomId: string): Promise<void> => {
-      return apiClient.delete(`/rooms/${roomId}`);
+      await apiClient.delete(`/rooms/${roomId}`);
     },
     successMessage: "Room deleted permanently! All data has been removed.",
     options: {

@@ -12,6 +12,7 @@ export interface TimerData {
   controlledBy: string; // userId
   session: number;
   totalSessions: number;
+  [key: string]: unknown; // Add index signature
 }
 
 // In-memory timer store

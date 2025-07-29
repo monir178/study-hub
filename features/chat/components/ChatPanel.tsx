@@ -11,6 +11,7 @@ import { useVoiceRecorder } from "@/features/chat/hooks/useVoiceRecorder";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChatInput } from "@/components/ui/chat/chat-input";
 import Image from "next/image";
 import {
@@ -31,11 +32,11 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
-interface GroupChatProps {
+interface ChatPanelProps {
   roomId: string;
 }
 
-export function GroupChat({ roomId }: GroupChatProps) {
+export function ChatPanel({ roomId }: ChatPanelProps) {
   const { user } = useAuth();
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);

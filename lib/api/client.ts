@@ -7,7 +7,7 @@ class ApiClient {
   constructor(baseURL: string = "/api") {
     this.client = axios.create({
       baseURL,
-      timeout: 10000,
+      timeout: 30000, // Increased from 10000 to 30000 (30 seconds)
       headers: {
         "Content-Type": "application/json",
       },
@@ -162,7 +162,12 @@ class ApiClient {
     url: string,
     config?: AxiosRequestConfig & ApiRequestConfig,
   ): Promise<T> {
-    return this.request<T>("delete", url, undefined, config);
+    // Use a longer timeout for DELETE operations due to cascade deletions
+    const deleteConfig = {
+      ...config,
+      timeout: config?.timeout || 45000, // 45 seconds for DELETE operations
+    };
+    return this.request<T>("delete", url, undefined, deleteConfig);
   }
 
   // Utility methods
