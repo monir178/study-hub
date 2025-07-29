@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { ApiResponse, ApiError } from "@/lib/api/types";
+import { TimerStore } from "@/lib/timer-store";
 
 const createRoomSchema = z.object({
   name: z
@@ -103,7 +104,12 @@ export async function GET(request: NextRequest) {
       },
     } satisfies ApiResponse<{
       rooms: typeof roomsWithStatus;
-      pagination: { page: number; limit: number; total: number; pages: number };
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        pages: number;
+      };
     }>);
   } catch (error) {
     console.error("Error fetching rooms:", error);
@@ -177,6 +183,18 @@ export async function POST(request: NextRequest) {
           select: { members: true, messages: true },
         },
       },
+    });
+
+    // Initialize default timer for the new room
+    await TimerStore.setTimer(room.id, {
+      roomId: room.id,
+      phase: "focus",
+      remaining: 25 * 60, // 25 minutes
+      isRunning: false,
+      isPaused: false,
+      controlledBy: "",
+      session: 1,
+      totalSessions: 4,
     });
 
     const roomWithStatus = {

@@ -12,18 +12,30 @@ import {
   Crown,
   Shield,
   User as UserIcon,
+  Loader2,
+  Check,
+  UserPlus,
+  UserMinus,
 } from "lucide-react";
 import { StudyRoom } from "../hooks/useRooms";
-import { useRoomSocket } from "@/hooks/useRoomSocket";
+import { useRoomMembers } from "../hooks/useRoomMembers";
 import { formatDistanceToNow } from "date-fns";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 
 interface RoomSidebarProps {
   room: StudyRoom;
 }
 
 export function RoomSidebar({ room }: RoomSidebarProps) {
-  // Use real-time socket data for member updates
-  const { members, stats, isConnected } = useRoomSocket(room.id);
+  const { user } = useAuth();
+  // Use real-time member data
+  const { members, memberCount, onlineMembers, loading, error, actions } =
+    useRoomMembers({
+      roomId: room.id,
+      initialRoom: room,
+    });
+
   const getRoleIcon = (role: string) => {
     switch (role) {
       case "ADMIN":
@@ -59,6 +71,9 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
     }
   };
 
+  // Check if current user is a member
+  const isCurrentUserMember = members.some((m) => m.userId === user?.id);
+
   return (
     <div className="space-y-6">
       {/* Room Stats */}
@@ -72,18 +87,14 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
               <div className="flex items-center justify-center gap-1 mb-1">
                 <Users className="w-4 h-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold">
-                {stats.memberCount || room.memberCount}
-              </div>
+              <div className="text-2xl font-bold">{memberCount}</div>
               <div className="text-xs text-muted-foreground">Members</div>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center justify-center gap-1 mb-1">
                 <MessageSquare className="w-4 h-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold">
-                {stats.messageCount || room.messageCount}
-              </div>
+              <div className="text-2xl font-bold">{room.messageCount}</div>
               <div className="text-xs text-muted-foreground">Messages</div>
             </div>
           </div>
@@ -93,21 +104,17 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Online</span>
-              <span className="font-medium">
-                {stats.onlineMembers || room.onlineMembers}
-              </span>
+              <span className="font-medium">{onlineMembers}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Capacity</span>
               <span className="font-medium">
-                {stats.memberCount || room.memberCount}/{room.maxMembers}
+                {memberCount}/{room.maxMembers}
               </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Notes</span>
-              <span className="font-medium">
-                {stats.noteCount || room.noteCount || 0}
-              </span>
+              <span className="font-medium">{room.noteCount || 0}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Visibility</span>
@@ -117,11 +124,7 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Connection</span>
-              <span
-                className={`font-medium ${isConnected ? "text-green-600" : "text-red-600"}`}
-              >
-                {isConnected ? "Connected" : "Disconnected"}
-              </span>
+              <span className="font-medium text-green-600">Connected</span>
             </div>
           </div>
 
@@ -171,20 +174,75 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
         </CardContent>
       </Card>
 
+      {/* Join/Leave Room */}
+      {user && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Your Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isCurrentUserMember ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-green-600">
+                  <Check className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    You're a member of this room
+                  </span>
+                </div>
+                <Button
+                  onClick={actions.leaveRoom}
+                  disabled={loading.join || loading.leave}
+                  variant="outline"
+                  size="sm"
+                  className="w-full transition-all duration-200 hover:scale-105"
+                >
+                  {loading.leave ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <UserMinus className="w-4 h-4 mr-2" />
+                  )}
+                  {loading.leave ? "Leaving..." : "Leave Room"}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <UserIcon className="w-4 h-4" />
+                  <span className="text-sm">You're not a member yet</span>
+                </div>
+                <Button
+                  onClick={actions.joinRoom}
+                  disabled={loading.join || loading.leave}
+                  size="sm"
+                  className="w-full transition-all duration-200 hover:scale-105"
+                >
+                  {loading.join ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <UserPlus className="w-4 h-4 mr-2" />
+                  )}
+                  {loading.join ? "Joining..." : "Join Room"}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Members List */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-lg">
             <span>Members</span>
             <Badge variant="outline" className="text-xs">
-              {stats.onlineMembers || room.onlineMembers} online
+              {onlineMembers} online
             </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3 max-h-96 overflow-y-auto">
-            {/* Show real-time members if available, otherwise fallback to room.members */}
-            {(members.length > 0 ? members : room.members).map((member) => (
+            {/* Show real-time members */}
+            {members.map((member) => (
               <div
                 key={member.id}
                 className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
@@ -226,10 +284,27 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
               </div>
             ))}
 
-            {/* Show connection status if no real-time members */}
-            {members.length === 0 && !isConnected && (
+            {/* Show message if no members */}
+            {members.length === 0 && (
               <div className="text-center py-4 text-muted-foreground">
-                <p className="text-sm">Connecting to real-time updates...</p>
+                <p className="text-sm">No members in this room</p>
+              </div>
+            )}
+
+            {/* Show loading state */}
+            {(loading.join || loading.leave) && (
+              <div className="text-center py-4 text-muted-foreground">
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <p className="text-sm">Updating members...</p>
+                </div>
+              </div>
+            )}
+
+            {/* Show error state */}
+            {error && (
+              <div className="text-center py-4 text-red-600">
+                <p className="text-sm">{error}</p>
               </div>
             )}
           </div>

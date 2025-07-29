@@ -1,7 +1,7 @@
 /* eslint-disable */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,9 +28,10 @@ import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { RoomHeader } from "./RoomHeader";
 import { RoomSidebar } from "./RoomSidebar";
-import { PomodoroTimer } from "./PomodoroTimer";
+import { PomodoroTimer } from "@/features/timer/components/PomodoroTimer";
 import { CollaborativeNotes } from "./CollaborativeNotes";
 import { GroupChat } from "./GroupChat";
+import { useRoomMembers } from "../hooks/useRoomMembers";
 
 interface RoomLayoutProps {
   roomId: string;
@@ -42,6 +43,42 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
   const [activeTab, setActiveTab] = useState("timer");
 
   const { data: room, isLoading, error } = useRoom(roomId);
+
+  // Auto-join room when component mounts
+  const { actions: memberActions } = useRoomMembers({
+    roomId,
+    initialRoom: room || {
+      id: roomId,
+      name: "",
+      description: "",
+      isPublic: true,
+      maxMembers: 10,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      creator: { id: "", name: "", role: "USER" },
+      members: [],
+      memberCount: 0,
+      messageCount: 0,
+      noteCount: 0,
+      isJoined: false,
+      onlineMembers: 0,
+    },
+  });
+
+  // Auto-join room when user enters
+  useEffect(() => {
+    if (room && currentUser?.id) {
+      // Check if user is already a member
+      const isMember = room.members.some(
+        (member) => member.user.id === currentUser.id,
+      );
+
+      if (!isMember) {
+        // Auto-join the room
+        memberActions.joinRoom();
+      }
+    }
+  }, [room, currentUser?.id, memberActions]);
 
   if (isLoading) {
     return (
@@ -104,31 +141,10 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
               Back
             </Button>
           </div>
+
           <Alert variant="destructive">
             <AlertDescription>
-              {error?.message ||
-                "Room not found or you don't have access to this room."}
-            </AlertDescription>
-          </Alert>
-        </div>
-      </div>
-    );
-  }
-
-  // Check if user has joined the room
-  if (!room.isJoined) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto py-6">
-          <div className="flex items-center gap-4 mb-6">
-            <Button variant="ghost" size="sm" onClick={() => router.back()}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-          </div>
-          <Alert>
-            <AlertDescription>
-              You need to join this room to access its features.
+              {error?.message || "Failed to load room"}
             </AlertDescription>
           </Alert>
         </div>
