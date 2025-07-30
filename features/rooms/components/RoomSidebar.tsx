@@ -81,7 +81,7 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
       {/* Room Stats */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Room Overview</CardTitle>
+          <CardTitle className="text-lg">{room.name}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">

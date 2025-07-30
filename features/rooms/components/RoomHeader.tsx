@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,16 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  ArrowLeft,
-  Crown,
-  Shield,
-  User as UserIcon,
-  MoreVertical,
-  Trash2,
-  Edit,
-  Settings,
-} from "lucide-react";
+import { ArrowLeft, MoreVertical, Trash2, Edit, Settings } from "lucide-react";
 import { StudyRoom, useLeaveRoom, useDeleteRoom } from "../hooks/useRooms";
 import { useAuth } from "@/lib/hooks/useAuth";
 
@@ -84,28 +75,6 @@ export function RoomHeader({ room }: RoomHeaderProps) {
     return false;
   };
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case "ADMIN":
-        return <Crown className="w-4 h-4" />;
-      case "MODERATOR":
-        return <Shield className="w-4 h-4" />;
-      default:
-        return <UserIcon className="w-4 h-4" />;
-    }
-  };
-
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case "ADMIN":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
-      case "MODERATOR":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
-      default:
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-    }
-  };
-
   return (
     <>
       <div className="flex items-center justify-between">
@@ -118,12 +87,12 @@ export function RoomHeader({ room }: RoomHeaderProps) {
 
         <div className="flex items-center gap-3">
           {/* User Role Badge */}
-          {room.userRole && (
+          {/* {room.userRole && (
             <Badge className={getRoleBadgeColor(room.userRole)}>
               {getRoleIcon(room.userRole)}
               <span className="ml-1">{room.userRole}</span>
             </Badge>
-          )}
+          )} */}
 
           {/* Leave Room Button */}
           {room.userRole !== "ADMIN" && room.creator.id !== currentUser?.id && (

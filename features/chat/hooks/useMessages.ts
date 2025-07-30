@@ -106,7 +106,6 @@ export function useSendMessage() {
     mutationFn: async (data: SendMessageData): Promise<Message> => {
       return apiClient.post("/messages", data);
     },
-    successMessage: "Message sent successfully",
     options: {
       onSuccess: (_, { roomId }) => {
         // Invalidate messages cache
@@ -148,6 +147,5 @@ export function useUploadFile() {
         },
       });
     },
-    successMessage: "File uploaded successfully",
   });
 }

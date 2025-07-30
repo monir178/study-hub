@@ -63,7 +63,17 @@ export async function POST(request: NextRequest) {
       }
 
       // Upload file using our enhanced Cloudinary utils
-      const result = await uploadFile(file, roomId);
+      const result = (await uploadFile(file, roomId)) as {
+        url: string;
+        publicId: string;
+        format: string;
+        size: number;
+        fileName: string;
+        resourceType: string;
+        width?: number;
+        height?: number;
+        duration?: number;
+      };
 
       return NextResponse.json({
         success: true,

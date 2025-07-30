@@ -50,7 +50,9 @@ export function GroupChat({ roomId }: GroupChatProps) {
   const { user } = useAuth();
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [isSending, setIsSending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -88,8 +90,20 @@ export function GroupChat({ roomId }: GroupChatProps) {
     }
   }, [messages]);
 
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (filePreviewUrl) {
+        URL.revokeObjectURL(filePreviewUrl);
+      }
+    };
+  }, [filePreviewUrl]);
+
   const handleSendMessage = async () => {
     if (!message.trim() && !selectedFile) return;
+
+    // Set loading state immediately when user clicks send
+    setIsSending(true);
 
     try {
       let messageContent = message.trim();
@@ -120,18 +134,72 @@ export function GroupChat({ roomId }: GroupChatProps) {
 
       // Reset form
       setMessage("");
-      setSelectedFile(null);
+      handleRemoveFile();
       setUploadProgress(0);
     } catch (error) {
       console.error("Failed to send message:", error);
+
+      // Import toast dynamically to avoid SSR issues
+      const { toast } = await import("sonner");
+
+      // Show meaningful error message
+      if (error instanceof Error) {
+        if (error.message.includes("timeout")) {
+          toast.error("Upload timeout - file too large or connection too slow");
+        } else if (error.message.includes("File size")) {
+          toast.error("File size exceeds 50MB limit");
+        } else if (error.message.includes("format")) {
+          toast.error("File format not supported");
+        } else {
+          toast.error(`Upload failed: ${error.message}`);
+        }
+      } else {
+        toast.error("Failed to send message. Please try again.");
+      }
+    } finally {
+      // Always reset loading state when done (success or error)
+      setIsSending(false);
     }
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Clean up previous preview URL if exists
+      if (filePreviewUrl) {
+        URL.revokeObjectURL(filePreviewUrl);
+      }
+
       setSelectedFile(file);
+
+      // Create preview URL for images (including SVG)
+      if (
+        file.type.startsWith("image/") ||
+        file.type === "image/svg+xml" ||
+        file.name.toLowerCase().endsWith(".svg")
+      ) {
+        const previewUrl = URL.createObjectURL(file);
+        setFilePreviewUrl(previewUrl);
+      } else {
+        setFilePreviewUrl(null);
+      }
     }
+  };
+
+  const handleRemoveFile = () => {
+    // Clean up preview URL
+    if (filePreviewUrl) {
+      URL.revokeObjectURL(filePreviewUrl);
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    // Clear state
+    setSelectedFile(null);
+    setFilePreviewUrl(null);
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
@@ -184,9 +252,15 @@ export function GroupChat({ roomId }: GroupChatProps) {
   };
 
   const isImageUrl = (url: string): boolean => {
-    return (
-      /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url) || url.includes("image/")
-    );
+    console.log("Checking URL for image:", url);
+    const isImage =
+      /\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff|ico)$/i.test(url) ||
+      url.includes("image/") ||
+      url.includes("/image/") ||
+      url.includes("svg") ||
+      url.includes(".svg");
+    console.log("Is image result:", isImage);
+    return isImage;
   };
 
   const isVideoUrl = (url: string): boolean => {
@@ -212,6 +286,17 @@ export function GroupChat({ roomId }: GroupChatProps) {
     fileType?: string;
   }) => {
     const isFileMessage = msg.type === "FILE";
+
+    // Debug logging for SVG files
+    if (isFileMessage) {
+      console.log("File message data:", {
+        content: msg.content,
+        fileUrl: msg.fileUrl,
+        fileName: msg.fileName,
+        fileType: msg.fileType,
+        type: msg.type,
+      });
+    }
 
     // Handle both old and new file message formats
     const getFileUrl = () => {
@@ -251,7 +336,22 @@ export function GroupChat({ roomId }: GroupChatProps) {
     if (!fileUrl) return { content: null, hasWrapper: true };
 
     // Image Display - No wrapper padding
-    if (isImageUrl(fileUrl)) {
+    // Also check if it's an SVG based on file type or file name
+    const isSvgFile =
+      msg.fileType === "image/svg+xml" ||
+      msg.fileName?.toLowerCase().endsWith(".svg") ||
+      fileUrl.toLowerCase().includes(".svg") ||
+      fileUrl.toLowerCase().includes("svg");
+
+    console.log("SVG check:", {
+      fileType: msg.fileType,
+      fileName: msg.fileName,
+      fileUrl: fileUrl,
+      isSvgFile: isSvgFile,
+      isImageUrl: isImageUrl(fileUrl),
+    });
+
+    if (isImageUrl(fileUrl) || isSvgFile) {
       return {
         content: (
           <div className="relative max-w-xs">
@@ -336,6 +436,17 @@ export function GroupChat({ roomId }: GroupChatProps) {
     fileName?: string;
     fileType?: string;
   }) => {
+    // Handle SYSTEM messages differently
+    if (msg.type === "SYSTEM") {
+      return (
+        <div key={msg.id} className="flex justify-center my-2">
+          <Badge variant="secondary" className="text-sm">
+            {msg.content}
+          </Badge>
+        </div>
+      );
+    }
+
     const isOwnMessage = msg.author.id === user?.id;
     const timestamp = formatDistanceToNow(new Date(msg.createdAt), {
       addSuffix: true,
@@ -370,7 +481,7 @@ export function GroupChat({ roomId }: GroupChatProps) {
         key={msg.id}
         variant={isOwnMessage ? "sent" : "received"}
         className={`max-w-[75%] sm:max-w-[65%] lg:max-w-[55%] ${
-          isAudioMessage ? "mb-1" : "mb-4"
+          isAudioMessage ? "mb-0" : "mb-4"
         }`}
       >
         <ChatBubbleAvatar
@@ -379,51 +490,81 @@ export function GroupChat({ roomId }: GroupChatProps) {
           className="w-8 h-8 flex-shrink-0"
         />
 
-        <div className="flex flex-col space-y-1 min-w-0">
-          {/* User info and role badge */}
-          <div
-            className={`flex items-center gap-2 ${isOwnMessage ? "justify-end" : "justify-start"} ${
-              isAudioMessage ? "mb-1" : ""
-            }`}
-          >
-            <span className="text-xs font-medium text-muted-foreground truncate">
-              {msg.author.name || "Unknown"}
-            </span>
-            <Badge
-              variant="outline"
-              className={`text-xs flex-shrink-0 ${getRoleBadgeColor(msg.author.role || "USER")}`}
+        {isAudioMessage ? (
+          // Special compact layout for audio messages
+          <div className="flex flex-col min-w-0">
+            {/* User info and role badge - positioned directly above audio */}
+            <div
+              className={`flex items-center gap-2 ${isOwnMessage ? "justify-end" : "justify-start"} -mb-20`}
             >
-              {getRoleIcon(msg.author.role || "USER")}
-              <span className="ml-1">{msg.author.role || "USER"}</span>
-            </Badge>
+              <span className="text-xs font-medium text-muted-foreground truncate">
+                {msg.author.name || "Unknown"}
+              </span>
+              <Badge
+                variant="outline"
+                className={`text-xs flex-shrink-0 ${getRoleBadgeColor(msg.author.role || "USER")}`}
+              >
+                {getRoleIcon(msg.author.role || "USER")}
+                <span className="ml-1">{msg.author.role || "USER"}</span>
+              </Badge>
+            </div>
+
+            {/* Audio player with minimal spacing */}
+            <div className="-mt-2">
+              {(() => {
+                const fileContent = renderFileContent(msg);
+                return fileContent.content;
+              })()}
+            </div>
+
+            <ChatBubbleTimestamp timestamp={timestamp} />
           </div>
+        ) : (
+          // Normal layout for other messages
+          <div className="flex flex-col space-y-1 min-w-0">
+            {/* User info and role badge */}
+            <div
+              className={`flex items-center gap-2 ${isOwnMessage ? "justify-end" : "justify-start"}`}
+            >
+              <span className="text-xs font-medium text-muted-foreground truncate">
+                {msg.author.name || "Unknown"}
+              </span>
+              <Badge
+                variant="outline"
+                className={`text-xs flex-shrink-0 ${getRoleBadgeColor(msg.author.role || "USER")}`}
+              >
+                {getRoleIcon(msg.author.role || "USER")}
+                <span className="ml-1">{msg.author.role || "USER"}</span>
+              </Badge>
+            </div>
 
-          {(() => {
-            const fileContent = renderFileContent(msg);
-            console.log(
-              "File content hasWrapper:",
-              fileContent.hasWrapper,
-              "Content type:",
-              typeof fileContent.content,
-            );
+            {(() => {
+              const fileContent = renderFileContent(msg);
+              console.log(
+                "File content hasWrapper:",
+                fileContent.hasWrapper,
+                "Content type:",
+                typeof fileContent.content,
+              );
 
-            // For media files (images, videos, audio) without wrapper
-            if (!fileContent.hasWrapper) {
-              console.log("Rendering without wrapper");
-              return fileContent.content;
-            }
+              // For media files (images, videos) without wrapper
+              if (!fileContent.hasWrapper) {
+                console.log("Rendering without wrapper");
+                return fileContent.content;
+              }
 
-            // For text messages and files with wrapper
-            console.log("Rendering with wrapper");
-            return (
-              <ChatBubbleMessage variant={isOwnMessage ? "sent" : "received"}>
-                {fileContent.content}
-              </ChatBubbleMessage>
-            );
-          })()}
+              // For text messages and files with wrapper
+              console.log("Rendering with wrapper");
+              return (
+                <ChatBubbleMessage variant={isOwnMessage ? "sent" : "received"}>
+                  {fileContent.content}
+                </ChatBubbleMessage>
+              );
+            })()}
 
-          <ChatBubbleTimestamp timestamp={timestamp} />
-        </div>
+            <ChatBubbleTimestamp timestamp={timestamp} />
+          </div>
+        )}
 
         <ChatBubbleActionWrapper variant={isOwnMessage ? "sent" : "received"}>
           <ChatBubbleAction
@@ -464,7 +605,7 @@ export function GroupChat({ roomId }: GroupChatProps) {
         <div className="flex flex-col h-full">
           {/* Messages Area with Auto-scroll */}
           <div className="flex-1 min-h-0">
-            <ChatMessageList smooth className="h-full [&>div>div]:space-y-2">
+            <ChatMessageList smooth className="h-full [&>div>div]:space-y-1">
               {messages.length === 0 ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center py-8">
@@ -486,19 +627,59 @@ export function GroupChat({ roomId }: GroupChatProps) {
           <div className="border-t p-3 sm:p-4 space-y-3  flex-shrink-0">
             {/* File Preview */}
             {selectedFile && (
-              <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
-                {getFileIcon(selectedFile.type)}
-                <span className="text-sm flex-1 truncate">
-                  {selectedFile.name}
-                </span>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setSelectedFile(null)}
-                  className="h-6 w-6 p-0 flex-shrink-0"
-                >
-                  <X className="w-3 h-3" />
-                </Button>
+              <div className="p-2 bg-muted/50 rounded-lg">
+                {filePreviewUrl ? (
+                  // Image Preview
+                  <div className="flex items-start gap-2">
+                    <div className="relative">
+                      <Image
+                        src={filePreviewUrl}
+                        alt={selectedFile.name}
+                        width={80}
+                        height={80}
+                        className="rounded-lg object-cover"
+                        style={{ maxHeight: "80px", maxWidth: "80px" }}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm font-medium truncate block">
+                        {selectedFile.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleRemoveFile}
+                      className="h-6 w-6 p-0 flex-shrink-0"
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  // Non-image File Preview
+                  <div className="flex items-center gap-2">
+                    {getFileIcon(selectedFile.type)}
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm font-medium truncate block">
+                        {selectedFile.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleRemoveFile}
+                      className="h-6 w-6 p-0 flex-shrink-0"
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -549,7 +730,7 @@ export function GroupChat({ roomId }: GroupChatProps) {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Type a message..."
-                disabled={sendMessage.isPending}
+                disabled={isSending}
                 className="flex-1 min-w-0"
               />
 
@@ -558,7 +739,7 @@ export function GroupChat({ roomId }: GroupChatProps) {
                 size="sm"
                 variant="ghost"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={sendMessage.isPending}
+                disabled={isSending}
                 className="h-10 w-10 p-0 flex-shrink-0"
               >
                 <Paperclip className="w-4 h-4" />
@@ -575,7 +756,7 @@ export function GroupChat({ roomId }: GroupChatProps) {
                     voiceRecorder.startRecording();
                   }
                 }}
-                disabled={sendMessage.isPending || voiceRecorder.isUploading}
+                disabled={isSending || voiceRecorder.isUploading}
                 className={`h-10 w-10 p-0 flex-shrink-0 ${
                   voiceRecorder.isRecording ? "bg-red-100 text-red-600" : ""
                 }`}
@@ -594,14 +775,14 @@ export function GroupChat({ roomId }: GroupChatProps) {
                 size="sm"
                 onClick={handleSendMessage}
                 disabled={
-                  sendMessage.isPending ||
+                  isSending ||
                   voiceRecorder.isRecording ||
                   voiceRecorder.isUploading ||
                   (!message.trim() && !selectedFile)
                 }
                 className="h-10 px-3 sm:px-4 flex-shrink-0"
               >
-                {sendMessage.isPending ? (
+                {isSending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <Send className="w-4 h-4" />
@@ -614,7 +795,7 @@ export function GroupChat({ roomId }: GroupChatProps) {
               ref={fileInputRef}
               type="file"
               onChange={handleFileSelect}
-              accept="image/*,video/*,audio/*,.pdf,.doc,.docx"
+              accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.rtf,.xls,.xlsx,.ppt,.pptx,.csv,.zip,.rar,.7z,.tar,.gz,.js,.ts,.jsx,.tsx,.html,.css,.json,.xml,.md,.epub,.mobi"
               className="hidden"
             />
           </div>

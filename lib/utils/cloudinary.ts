@@ -17,21 +17,52 @@ export { cloudinary };
 // File type detection and folder mapping
 const getFileTypeAndFolder = (file: File) => {
   const type = file.type.toLowerCase();
+  const extension = file.name.split(".").pop()?.toLowerCase() || "";
 
-  if (type.startsWith("image/")) {
+  // SVG files need special handling - upload as raw
+  if (type === "image/svg+xml" || extension === "svg") {
+    return { resourceType: "raw", folder: "studyhub/images" };
+  } else if (
+    type.startsWith("image/") ||
+    ["jpg", "jpeg", "png", "gif", "webp", "bmp", "tiff", "ico"].includes(
+      extension,
+    )
+  ) {
     return { resourceType: "image", folder: "studyhub/images" };
-  } else if (type.startsWith("audio/")) {
+  } else if (
+    type.startsWith("audio/") ||
+    ["mp3", "wav", "ogg", "m4a", "aac", "flac", "wma"].includes(extension)
+  ) {
     return { resourceType: "video", folder: "studyhub/audio" };
-  } else if (type.startsWith("video/")) {
+  } else if (
+    type.startsWith("video/") ||
+    ["mp4", "mov", "avi", "webm", "mkv", "wmv", "flv", "3gp"].includes(
+      extension,
+    )
+  ) {
     return { resourceType: "video", folder: "studyhub/videos" };
   } else if (
     type.includes("pdf") ||
     type.includes("document") ||
-    type.includes("text")
+    type.includes("text") ||
+    type.includes("spreadsheet") ||
+    type.includes("presentation") ||
+    [
+      "pdf",
+      "doc",
+      "docx",
+      "txt",
+      "rtf",
+      "xls",
+      "xlsx",
+      "ppt",
+      "pptx",
+      "csv",
+    ].includes(extension)
   ) {
     return { resourceType: "raw", folder: "studyhub/documents" };
   } else {
-    return { resourceType: "auto", folder: "studyhub/files" };
+    return { resourceType: "raw", folder: "studyhub/files" };
   }
 };
 
@@ -46,72 +77,84 @@ export const uploadFile = async (file: File, roomId?: string) => {
 
   // Use upload_stream for better memory management with large files
   return new Promise((resolve, reject) => {
+    // Build upload options based on resource type
+    const uploadOptions: {
+      folder: string;
+      resource_type: "image" | "video" | "raw" | "auto";
+      max_bytes: number;
+      timeout: number;
+      allowed_formats?: string[];
+      transformation?: Array<{
+        width?: number;
+        height?: number;
+        crop?: string;
+        quality?: string;
+      }>;
+    } = {
+      folder: uploadFolder,
+      resource_type: resourceType as "image" | "video" | "raw" | "auto",
+      max_bytes: 50 * 1024 * 1024, // 50MB limit
+      timeout: 120000, // 2 minutes timeout
+    };
+
+    // Only add allowed_formats for image and video types, not for raw
+    if (resourceType === "image") {
+      uploadOptions.allowed_formats = [
+        "jpg",
+        "jpeg",
+        "png",
+        "gif",
+        "webp",
+        "bmp",
+        "tiff",
+        "ico",
+      ];
+      uploadOptions.transformation = [
+        { width: 1200, height: 1200, crop: "limit" },
+        { quality: "auto:good" },
+      ];
+    } else if (resourceType === "video") {
+      uploadOptions.allowed_formats = [
+        "mp3",
+        "wav",
+        "ogg",
+        "m4a",
+        "aac",
+        "flac",
+        "wma",
+        "mp4",
+        "mov",
+        "avi",
+        "webm",
+        "mkv",
+        "wmv",
+        "flv",
+        "3gp",
+      ];
+    }
+    // For raw files (SVG, documents, etc.), don't specify allowed_formats
+
     cloudinary.uploader
-      .upload_stream(
-        {
-          folder: uploadFolder,
-          resource_type: resourceType as "image" | "video" | "raw" | "auto",
-          allowed_formats: [
-            // Images
-            "jpg",
-            "jpeg",
-            "png",
-            "gif",
-            "webp",
-            "svg",
-            // Audio
-            "mp3",
-            "wav",
-            "ogg",
-            "m4a",
-            "aac",
-            // Video
-            "mp4",
-            "mov",
-            "avi",
-            "webm",
-            "mkv",
-            // Documents
-            "pdf",
-            "doc",
-            "docx",
-            "txt",
-            "rtf",
-            // Other
-            "zip",
-            "rar",
-          ],
-          max_bytes: 50 * 1024 * 1024, // 50MB limit
-          transformation:
-            resourceType === "image"
-              ? [
-                  { width: 1200, height: 1200, crop: "limit" },
-                  { quality: "auto:good" },
-                ]
-              : undefined,
-          timeout: 120000, // 2 minutes timeout
-        },
-        (error, result) => {
-          if (error) {
-            console.error("Cloudinary upload error:", error);
-            reject(error);
-          } else if (result) {
-            resolve({
-              url: result.secure_url,
-              publicId: result.public_id,
-              format: result.format,
-              size: result.bytes,
-              fileName: file.name,
-              resourceType: result.resource_type,
-              width: result.width,
-              height: result.height,
-              duration: result.duration,
-            });
-          } else {
-            reject(new Error("Upload failed - no result"));
-          }
-        },
-      )
+      .upload_stream(uploadOptions, (error, result) => {
+        if (error) {
+          console.error("Cloudinary upload error:", error);
+          reject(error);
+        } else if (result) {
+          resolve({
+            url: result.secure_url,
+            publicId: result.public_id,
+            format: result.format,
+            size: result.bytes,
+            fileName: file.name,
+            resourceType: result.resource_type,
+            width: result.width,
+            height: result.height,
+            duration: result.duration,
+          });
+        } else {
+          reject(new Error("Upload failed - no result"));
+        }
+      })
       .end(buffer);
   });
 };
