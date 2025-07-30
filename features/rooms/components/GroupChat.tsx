@@ -599,7 +599,7 @@ export function GroupChat({ roomId }: GroupChatProps) {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full ">
       {/* Messages and Input Area - All in one container */}
       <div className="flex-1 min-h-0 rounded-lg overflow-hidden">
         <div className="flex flex-col h-full">

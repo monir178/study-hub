@@ -77,7 +77,7 @@
 .dark {
   --background: rgb(8, 13, 22);
   --foreground: rgb(226, 232, 240);
-  --card: rgb(30, 41, 59);
+  --card: #171f2b;
   --card-foreground: rgb(226, 232, 240);
   --popover: rgb(30, 41, 59);
   --popover-foreground: rgb(226, 232, 240);
@@ -102,7 +102,7 @@
   --sidebar: rgb(30, 41, 59);
   --sidebar-foreground: rgb(226, 232, 240);
   --sidebar-primary: rgb(129, 140, 248);
-  --sidebar-primary-foreground: rgb(8, 13, 22);
+  --sidebar-primary-foreground: rgb(22, 13, 8);
   --sidebar-accent: rgb(55, 65, 81);
   --sidebar-accent-foreground: rgb(209, 213, 219);
   --sidebar-border: rgb(75, 85, 99);

@@ -194,7 +194,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
 
           setPosition({
             x: middleX,
-            y: 80, // Below room header (approximately)
+            y: 40, // Moved higher up from 80px to 40px
           });
         } else if (isMediumDevice) {
           // Top-right for medium devices
@@ -298,7 +298,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
             }}
           >
             <div className="w-32 h-32 rounded-full flex items-center justify-center">
-              <Clock className="w-12 h-12 text-muted-foreground animate-pulse" />
+              <Clock className="w-12 h-12 text-muted-foreground animate-pulse " />
             </div>
           </div>
         </div>
@@ -321,7 +321,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
   return (
     <>
       {/* Desktop - Fixed Circular Timer */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:block ">
         <div
           className="fixed z-50"
           style={{
@@ -378,7 +378,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
 
               {/* Inner Content - Clean Circle */}
               <div
-                className="absolute inset-4 rounded-full bg-background/98 backdrop-blur-sm border border-border/20 shadow-lg flex flex-col items-center justify-center cursor-move hover:shadow-xl transition-all duration-300"
+                className="absolute inset-4 rounded-full bg-primary/15 dark:bg-secondary backdrop-blur-sm border border-border/20 shadow-lg flex flex-col items-center justify-center cursor-move hover:shadow-xl transition-all duration-300"
                 onMouseDown={handleMouseDown}
               >
                 {/* Phase Icon */}

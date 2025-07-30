@@ -157,18 +157,18 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen ">
       {/* Fixed Pomodoro Timer - Desktop Only */}
-      <div className="hidden lg:block fixed top-12 right-4 z-50">
+      <div className="hidden lg:block">
         <PomodoroTimer roomId={roomId} roomCreatorId={room.creator.id} />
       </div>
 
-      <div className="container mx-auto py-6">
+      <div className="container mx-auto ">
         {/* Room Header */}
         <RoomHeader room={room} />
 
         {/* Main Layout */}
-        <div className="grid gap-6 lg:grid-cols-4 mt-6">
+        <div className="grid gap-6 lg:grid-cols-4 mt-4">
           {/* Main Content Panel */}
           <div className="lg:col-span-3 space-y-6">
             {/* Mobile Timer - Above Chat */}
@@ -182,7 +182,7 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="w-5 h-5" />
-                    Chat
+                    {room.name}
                   </CardTitle>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className="text-xs">
