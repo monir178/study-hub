@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { TimerStore } from "@/lib/timer-store";
+import { TimerStore } from "@/lib/timer/server/timer-store";
 
 // POST - Pause timer
 export async function POST(
@@ -63,7 +63,7 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      timer,
+      data: timer,
     });
   } catch (error) {
     console.error("Error pausing timer:", error);

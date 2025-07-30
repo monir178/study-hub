@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { TimerData } from "@/lib/timer-store";
+import { TimerData } from "@/features/timer/types";
 
 export class TimerDatabase {
   // Save timer state to database with aggressive conflict prevention

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { subscribeToRoomTimer, unsubscribeFromRoomTimer } from "@/lib/pusher";
-import { TimerData } from "@/lib/timer-store";
+import { TimerData } from "@/features/timer/types";
 
 interface UsePomodoroTimerProps {
   roomId: string;

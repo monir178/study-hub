@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { ApiResponse, ApiError } from "@/lib/api/types";
-import { TimerStore } from "@/lib/timer-store";
+import { TimerStore } from "@/lib/timer/server/timer-store";
 
 const createRoomSchema = z.object({
   name: z

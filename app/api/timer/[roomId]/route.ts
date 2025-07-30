@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { timerManager } from "@/lib/timer-manager";
+import { TimerStore } from "@/lib/timer/server/timer-store";
 
 // GET - Get current timer state
 export async function GET(
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { roomId } = await params;
-    const timerState = timerManager.getTimerState(roomId);
+    const timerState = await TimerStore.getTimer(roomId);
 
     return Response.json({
       success: true,
@@ -36,16 +36,13 @@ export async function POST(
 
     switch (action) {
       case "start":
-        timerState = timerManager.startTimer(roomId, userId, null);
+        timerState = await TimerStore.startTimer(roomId, userId);
         break;
       case "pause":
-        timerState = timerManager.pauseTimer(roomId);
-        break;
-      case "stop":
-        timerState = timerManager.stopTimer(roomId);
+        timerState = await TimerStore.pauseTimer(roomId, userId);
         break;
       case "reset":
-        timerState = timerManager.resetTimer(roomId, userId);
+        timerState = await TimerStore.resetTimer(roomId, userId);
         break;
       default:
         return Response.json(

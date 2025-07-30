@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { TimerDatabase } from "@/lib/timer-database";
+import { TimerDatabase } from "@/lib/timer/server/timer-database";
 
 // GET - Get user session statistics
 export async function GET(_request: NextRequest) {

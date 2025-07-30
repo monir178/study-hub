@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { TimerStore } from "@/lib/timer-store";
+import { TimerStore } from "@/lib/timer/server/timer-store";
 import Pusher from "pusher";
 
 const pusher = new Pusher({

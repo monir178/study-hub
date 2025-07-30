@@ -46,6 +46,9 @@ export const queryKeys = {
     [...queryKeys.sessions, "user", userId] as const,
   activeSessions: () => [...queryKeys.sessions, "active"] as const,
 
+  // Timer
+  timer: (roomId: string) => [...queryKeys.rooms, roomId, "timer"] as const,
+
   // Moderator
   moderator: ["moderator"] as const,
   moderatorStats: () => [...queryKeys.moderator, "stats"] as const,

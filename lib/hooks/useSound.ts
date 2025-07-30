@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { soundManager } from "@/lib/sounds";
+import { soundManager } from "@/features/timer/utils/sounds";
 
 export function useSound() {
   const [isEnabled, setIsEnabled] = useState(false);

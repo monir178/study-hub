@@ -41,7 +41,7 @@ import {
   User as UserIcon,
   MoreVertical,
   Trash2,
-  Edit,
+  // Edit,
 } from "lucide-react";
 import { StudyRoom, useDeleteRoom } from "../hooks/useRooms";
 // import { formatDistanceToNow } from "date-fns";
@@ -271,12 +271,12 @@ export function StudyRoomCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {canEditRoom() && (
+                  {/* {canEditRoom() && (
                     <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
                       <Edit className="w-4 h-4 mr-2" />
                       Edit Room
                     </DropdownMenuItem>
-                  )}
+                  )} */}
 
                   {deletePermission && (
                     <>
@@ -440,19 +440,19 @@ export function StudyRoomCard({
               action cannot be undone and will remove all messages, notes, and
               member data associated with this room.
               {deleteDialogState.isDeleting && (
-                <div className="mt-2 space-y-2">
-                  <div className="text-sm text-muted-foreground">
+                <span className="mt-2 space-y-2">
+                  <span className="text-sm text-muted-foreground">
                     This may take a moment due to the amount of data being
                     removed...
-                  </div>
+                  </span>
                   <Progress
                     value={deleteDialogState.progress}
                     className="h-2"
                   />
-                  <div className="text-xs text-muted-foreground text-center">
+                  <span className="text-xs text-muted-foreground text-center">
                     {deleteDialogState.progress}% complete
-                  </div>
-                </div>
+                  </span>
+                </span>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -466,10 +466,10 @@ export function StudyRoomCard({
               className="bg-red-600 hover:bg-red-700"
             >
               {deleteDialogState.isDeleting ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Deleting...
-                </div>
+                </span>
               ) : (
                 "Delete Room"
               )}

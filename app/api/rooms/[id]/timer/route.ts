@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { TimerStore } from "@/lib/timer-store";
+import { TimerStore } from "@/lib/timer/server/timer-store";
 
 // GET - Get current timer state
 export async function GET(
@@ -36,7 +36,7 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      timer,
+      data: timer,
     });
   } catch (error) {
     console.error("Error getting timer state:", error);

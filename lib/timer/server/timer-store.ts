@@ -1,19 +1,7 @@
 // Server-side timer store for real-time Pomodoro timer
 import { TimerDatabase } from "./timer-database";
-import { triggerTimerUpdate } from "./pusher";
-
-export interface TimerData {
-  roomId: string;
-  phase: "focus" | "break" | "long_break";
-  remaining: number; // in seconds
-  isRunning: boolean;
-  isPaused: boolean;
-  updatedAt: Date;
-  controlledBy: string; // userId
-  session: number;
-  totalSessions: number;
-  [key: string]: unknown; // Add index signature
-}
+import { triggerTimerUpdate } from "@/lib/pusher";
+import { TimerData } from "@/features/timer/types";
 
 // In-memory timer store
 const timerStore = new Map<string, TimerData>();

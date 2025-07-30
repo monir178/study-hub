@@ -1,27 +1,34 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
+import { useTimer } from "../hooks/useTimer";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useSound } from "@/lib/hooks/useSound";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
-  Play,
-  Pause,
-  RotateCcw,
   Volume2,
   VolumeX,
   Clock,
-  Coffee,
-  Timer,
-  Loader2,
   Check,
   Settings,
+  // Timer,
+  // Coffee,
+  // Play,
+  // Pause,
+  // RotateCcw,
+  // Loader2,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  TimerDisplay,
+  TimerControls,
+  TimerProgress,
+  TimerIcons,
+} from "./index";
+import { formatTime, getCircularProgress } from "../utils/timer.utils";
 
 interface PomodoroTimerProps {
   roomId: string;
@@ -29,7 +36,7 @@ interface PomodoroTimerProps {
 }
 
 export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
-  const { timer, loading, error, canControl, actions } = usePomodoroTimer({
+  const { timer, loading, error, canControl, actions } = useTimer({
     roomId,
     roomCreatorId,
   });
@@ -43,6 +50,39 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
     playTimerReset,
     playPhaseChange,
   } = useSound();
+
+  // Wrap actions with sound effects
+  const actionsWithSound = {
+    startTimer: async () => {
+      if (soundEnabled) {
+        playTimerStart();
+      }
+      await actions.startTimer();
+    },
+    pauseTimer: async () => {
+      if (soundEnabled) {
+        playTimerPause();
+      }
+      await actions.pauseTimer();
+    },
+    resetTimer: async () => {
+      if (soundEnabled) {
+        playTimerReset();
+      }
+      await actions.resetTimer();
+    },
+  };
+
+  // Enhanced toggle with test sound
+  const handleToggleSound = () => {
+    toggleSound();
+    // Play a test sound to confirm the toggle worked
+    setTimeout(() => {
+      if (!soundEnabled) {
+        playTimerStart(); // Play start sound when enabling
+      }
+    }, 100);
+  };
   const [lastRemainingTime, setLastRemainingTime] = useState<number | null>(
     null,
   );
@@ -244,103 +284,6 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
   }, [loading.start, loading.pause, loading.reset, actionSuccess]);
 
   // Enhanced action handlers with success feedback
-  const handleStartTimer = async () => {
-    await actions.startTimer();
-    if (!error) {
-      setActionSuccess("Timer started!");
-      playTimerStart();
-    }
-  };
-
-  const handlePauseTimer = async () => {
-    await actions.pauseTimer();
-    if (!error) {
-      setActionSuccess("Timer paused!");
-      playTimerPause();
-    }
-  };
-
-  const handleResetTimer = async () => {
-    await actions.resetTimer();
-    if (!error) {
-      setActionSuccess("Timer reset!");
-      playTimerReset();
-    }
-  };
-
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const getProgress = (): number => {
-    if (!timer) return 0;
-    const total =
-      timer.phase === "focus"
-        ? 25 * 60
-        : timer.phase === "break"
-          ? 5 * 60
-          : 15 * 60;
-    const progress = ((total - timer.remaining) / total) * 100;
-    return Math.max(0, Math.min(progress, 100)); // Clamp between 0 and 100
-  };
-
-  const getPhaseLabel = (phase: string): string => {
-    switch (phase) {
-      case "focus":
-        return "Focus";
-      case "break":
-        return "Break";
-      case "long_break":
-        return "Long Break";
-      default:
-        return "Focus";
-    }
-  };
-
-  const getPhaseIcon = (phase: string, size: "sm" | "md" | "lg" = "md") => {
-    const sizeClasses = {
-      sm: "w-3 h-3",
-      md: "w-4 h-4 sm:w-5 sm:h-5",
-      lg: "w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7",
-    };
-
-    switch (phase) {
-      case "focus":
-        return <Timer className={sizeClasses[size]} />;
-      case "break":
-      case "long_break":
-        return <Coffee className={sizeClasses[size]} />;
-      default:
-        return <Timer className={sizeClasses[size]} />;
-    }
-  };
-
-  const getPhaseColor = (phase: string): string => {
-    switch (phase) {
-      case "focus":
-        return "bg-destructive/10 text-destructive border-destructive/20";
-      case "break":
-        return "bg-green-500/10 text-green-600 border-green-500/20 dark:text-green-400";
-      case "long_break":
-        return "bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400";
-      default:
-        return "bg-muted text-muted-foreground border-border";
-    }
-  };
-
-  // Circular progress calculation
-  const getCircularProgress = (): number => {
-    if (!timer) return 0;
-    const total =
-      timer.phase === "focus"
-        ? 25 * 60
-        : timer.phase === "break"
-          ? 5 * 60
-          : 15 * 60;
-    return ((total - timer.remaining) / total) * 360; // Convert to degrees
-  };
 
   if (!timer) {
     return (
@@ -429,7 +372,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
                         ? "stroke-green-500 dark:stroke-green-400"
                         : "stroke-blue-500 dark:stroke-blue-400"
                   }`}
-                  strokeDasharray={`${(getCircularProgress() / 360) * 264} 264`}
+                  strokeDasharray={`${(getCircularProgress(timer) / 360) * 264} 264`}
                 />
               </svg>
 
@@ -439,7 +382,9 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
                 onMouseDown={handleMouseDown}
               >
                 {/* Phase Icon */}
-                <div className="mb-2">{getPhaseIcon(timer.phase, "lg")}</div>
+                <div className="mb-2">
+                  <TimerIcons phase={timer.phase} size="lg" />
+                </div>
 
                 {/* Timer Display */}
                 <div className="text-base font-mono font-bold leading-none tracking-tight">
@@ -481,111 +426,38 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
               >
                 <div className="space-y-4">
                   {/* Phase Info */}
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                      {getPhaseIcon(timer.phase, "md")}
-                      <span className="text-sm font-semibold">
-                        {getPhaseLabel(timer.phase)}
-                      </span>
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className={`text-xs px-3 py-1 ${getPhaseColor(timer.phase)}`}
-                    >
-                      {timer.isRunning
-                        ? "Running"
-                        : timer.isPaused
-                          ? "Paused"
-                          : "Stopped"}
-                    </Badge>
-                  </div>
+                  <TimerDisplay timer={timer} variant="desktop" />
 
                   {/* Controls */}
-                  {canControl && (
-                    <div className="space-y-3">
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={handleStartTimer}
-                          disabled={
-                            loading.start ||
-                            loading.pause ||
-                            loading.reset ||
-                            timer.isRunning
-                          }
-                          size="sm"
-                          className="flex-1 h-9 font-medium transition-all duration-200 hover:scale-105"
-                        >
-                          {loading.start ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Play className="w-4 h-4" />
-                          )}
-                        </Button>
-                        <Button
-                          onClick={handlePauseTimer}
-                          disabled={
-                            loading.start ||
-                            loading.pause ||
-                            loading.reset ||
-                            !timer.isRunning
-                          }
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 h-9 font-medium transition-all duration-200 hover:scale-105"
-                        >
-                          {loading.pause ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Pause className="w-4 h-4" />
-                          )}
-                        </Button>
-                        <Button
-                          onClick={handleResetTimer}
-                          disabled={
-                            loading.start || loading.pause || loading.reset
-                          }
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 h-9 font-medium transition-all duration-200 hover:scale-105"
-                        >
-                          {loading.reset ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <RotateCcw className="w-4 h-4" />
-                          )}
-                        </Button>
-                      </div>
+                  <TimerControls
+                    actions={actionsWithSound}
+                    loading={loading}
+                    canControl={canControl}
+                    isRunning={timer?.isRunning || false}
+                    _isPaused={timer?.isPaused || false}
+                    variant="desktop"
+                  />
 
-                      {/* Sound Toggle */}
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-muted/20 border border-border/30">
-                        <Label
-                          htmlFor="sound-toggle"
-                          className="text-sm flex items-center gap-2 font-medium cursor-pointer"
-                        >
-                          {soundEnabled ? (
-                            <Volume2 className="w-4 h-4 text-green-600" />
-                          ) : (
-                            <VolumeX className="w-4 h-4 text-muted-foreground" />
-                          )}
-                          Sound Effects
-                        </Label>
-                        <Switch
-                          id="sound-toggle"
-                          checked={soundEnabled}
-                          onCheckedChange={toggleSound}
-                          className="scale-90"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {!canControl && (
-                    <div className="text-center p-3 rounded-lg bg-muted/20 border border-border/30">
-                      <p className="text-sm text-muted-foreground">
-                        Only moderators can control the timer
-                      </p>
-                    </div>
-                  )}
+                  {/* Sound Toggle */}
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-muted/20 border border-border/30">
+                    <Label
+                      htmlFor="sound-toggle"
+                      className="text-sm flex items-center gap-2 font-medium cursor-pointer"
+                    >
+                      {soundEnabled ? (
+                        <Volume2 className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <VolumeX className="w-4 h-4 text-muted-foreground" />
+                      )}
+                      Sound Effects
+                    </Label>
+                    <Switch
+                      id="sound-toggle"
+                      checked={soundEnabled}
+                      onCheckedChange={handleToggleSound}
+                      className="scale-90"
+                    />
+                  </div>
 
                   {/* Error Display */}
                   {error && (
@@ -625,32 +497,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
         <div className="bg-background/95 backdrop-blur-sm border rounded-lg p-3 shadow-lg">
           <div className="flex items-center justify-between">
             {/* Left: Phase Info & Timer */}
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              {/* Phase Icon & Label */}
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {getPhaseIcon(timer.phase, "sm")}
-                <div className="hidden sm:block">
-                  <div className="text-sm mb-1.5 font-medium leading-none">
-                    {getPhaseLabel(timer.phase)}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {timer.session}/{timer.totalSessions}
-                  </div>
-                </div>
-              </div>
-
-              {/* Timer Display - Centered on mobile & tablet */}
-              <div className="flex-1 min-w-0 flex justify-center lg:justify-start">
-                <div className="text-center lg:text-left">
-                  <div className="text-xl font-mono font-bold tracking-tight">
-                    {formatTime(timer.remaining)}
-                  </div>
-                  <div className="text-xs text-muted-foreground sm:hidden">
-                    {timer.session}/{timer.totalSessions}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <TimerDisplay timer={timer} variant="mobile" />
 
             {/* Right: Status & Controls */}
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -666,93 +513,33 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
               ></div>
 
               {/* Compact Controls */}
-              {canControl && (
-                <div className="flex gap-1">
-                  <Button
-                    onClick={handleStartTimer}
-                    disabled={
-                      loading.start ||
-                      loading.pause ||
-                      loading.reset ||
-                      timer.isRunning
-                    }
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                  >
-                    {loading.start ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : (
-                      <Play className="w-3 h-3" />
-                    )}
-                  </Button>
-                  <Button
-                    onClick={handlePauseTimer}
-                    disabled={
-                      loading.start ||
-                      loading.pause ||
-                      loading.reset ||
-                      !timer.isRunning
-                    }
-                    variant="outline"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                  >
-                    {loading.pause ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : (
-                      <Pause className="w-3 h-3" />
-                    )}
-                  </Button>
-                  <Button
-                    onClick={handleResetTimer}
-                    disabled={loading.start || loading.pause || loading.reset}
-                    variant="outline"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                  >
-                    {loading.reset ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : (
-                      <RotateCcw className="w-3 h-3" />
-                    )}
-                  </Button>
+              <TimerControls
+                actions={actionsWithSound}
+                loading={loading}
+                canControl={canControl}
+                isRunning={timer?.isRunning || false}
+                _isPaused={timer?.isPaused || false}
+                variant="mobile"
+              />
 
-                  {/* Sound Toggle - Compact */}
-                  <Button
-                    onClick={toggleSound}
-                    variant="outline"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                  >
-                    {soundEnabled ? (
-                      <Volume2 className="w-3 h-3 text-green-600" />
-                    ) : (
-                      <VolumeX className="w-3 h-3 text-muted-foreground" />
-                    )}
-                  </Button>
-                </div>
-              )}
+              {/* Sound Toggle - Compact */}
+              <Button
+                onClick={handleToggleSound}
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0"
+              >
+                {soundEnabled ? (
+                  <Volume2 className="w-3 h-3 text-green-600" />
+                ) : (
+                  <VolumeX className="w-3 h-3 text-muted-foreground" />
+                )}
+              </Button>
             </div>
           </div>
 
           {/* Progress Bar - Compact */}
-          <div className="mt-3">
-            <div className="w-full bg-muted/20 rounded-full h-1.5">
-              <div
-                className={`h-1.5 rounded-full transition-all duration-1000 ${
-                  timer.phase === "focus"
-                    ? "bg-red-500"
-                    : timer.phase === "break"
-                      ? "bg-green-500"
-                      : "bg-blue-500"
-                }`}
-                style={{
-                  width: `${getProgress()}%`,
-                  boxShadow: timer.isRunning ? `0 0 4px currentColor` : "none",
-                }}
-              ></div>
-            </div>
-          </div>
+          <TimerProgress timer={timer} variant="mobile" />
 
           {/* Error Display - Compact */}
           {error && (
