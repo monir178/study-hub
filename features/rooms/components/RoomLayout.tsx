@@ -33,7 +33,7 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { RoomHeader } from "./RoomHeader";
 import { RoomSidebar } from "./RoomSidebar";
 import { PomodoroTimer } from "@/features/timer/components/PomodoroTimer";
-// import { CollaborativeNotes } from "./CollaborativeNotes";
+import { CollaborativeNotes } from "./CollaborativeNotes";
 import { GroupChat } from "./GroupChat";
 // import { ChatPanel } from "@/features/chat/components/ChatPanel";
 import { useRoomMembers } from "../hooks/useRoomMembers";
@@ -198,20 +198,18 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
               </CardContent>
             </Card>
 
-            {/* Notes Panel - Commented out for now */}
-            {/* 
-            <Card>
-              <CardHeader className="pb-4">
+            {/* Notes Panel */}
+            <Card className="h-[calc(100vh-280px)] lg:h-[calc(100vh-200px)] flex flex-col">
+              <CardHeader className="pb-4 border-b flex-shrink-0">
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="w-5 h-5" />
                   Collaborative Notes
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-1 p-0 min-h-0">
                 <CollaborativeNotes roomId={roomId} />
               </CardContent>
             </Card>
-            */}
           </div>
 
           {/* Sidebar Panel */}
