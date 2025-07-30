@@ -35,7 +35,7 @@ import { RoomSidebar } from "./RoomSidebar";
 import { PomodoroTimer } from "@/features/timer/components/PomodoroTimer";
 // import { CollaborativeNotes } from "./CollaborativeNotes";
 import { GroupChat } from "./GroupChat";
-import { ChatPanel } from "@/features/chat/components/ChatPanel";
+// import { ChatPanel } from "@/features/chat/components/ChatPanel";
 import { useRoomMembers } from "../hooks/useRoomMembers";
 
 interface RoomLayoutProps {
@@ -177,8 +177,8 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
             </div>
 
             {/* Chat Panel - Main Content */}
-            <Card className="max-h-[calc(100vh-200px)] flex flex-col">
-              <CardHeader className="pb-4 border-b">
+            <Card className="h-[calc(100vh-280px)] lg:h-[calc(100vh-200px)] flex flex-col">
+              <CardHeader className="pb-4 border-b flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="w-5 h-5" />
@@ -193,7 +193,7 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
                 </div>
               </CardHeader>
 
-              <CardContent className="flex-1 p-0">
+              <CardContent className="flex-1 p-0 min-h-0">
                 <GroupChat roomId={roomId} />
               </CardContent>
             </Card>

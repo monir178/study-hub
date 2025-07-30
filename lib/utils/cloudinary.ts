@@ -37,68 +37,83 @@ const getFileTypeAndFolder = (file: File) => {
 
 // Upload any file type with proper folder organization
 export const uploadFile = async (file: File, roomId?: string) => {
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const base64 = buffer.toString("base64");
-  const dataUrl = `data:${file.type};base64,${base64}`;
-
   const { resourceType, folder } = getFileTypeAndFolder(file);
   const uploadFolder = roomId ? `${folder}/${roomId}` : folder;
 
-  const result = await cloudinary.uploader.upload(dataUrl, {
-    folder: uploadFolder,
-    resource_type: resourceType as "image" | "video" | "raw" | "auto",
-    allowed_formats: [
-      // Images
-      "jpg",
-      "jpeg",
-      "png",
-      "gif",
-      "webp",
-      "svg",
-      // Audio
-      "mp3",
-      "wav",
-      "ogg",
-      "m4a",
-      "aac",
-      // Video
-      "mp4",
-      "mov",
-      "avi",
-      "webm",
-      "mkv",
-      // Documents
-      "pdf",
-      "doc",
-      "docx",
-      "txt",
-      "rtf",
-      // Other
-      "zip",
-      "rar",
-    ],
-    max_bytes: 50 * 1024 * 1024, // 50MB limit
-    transformation:
-      resourceType === "image"
-        ? [
-            { width: 1200, height: 1200, crop: "limit" },
-            { quality: "auto:good" },
-          ]
-        : undefined,
-  });
+  // For large files, use stream upload instead of base64 to reduce memory usage
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
 
-  return {
-    url: result.secure_url,
-    publicId: result.public_id,
-    format: result.format,
-    size: result.bytes,
-    fileName: file.name,
-    resourceType: result.resource_type,
-    width: result.width,
-    height: result.height,
-    duration: result.duration, // For audio/video files
-  };
+  // Use upload_stream for better memory management with large files
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream(
+        {
+          folder: uploadFolder,
+          resource_type: resourceType as "image" | "video" | "raw" | "auto",
+          allowed_formats: [
+            // Images
+            "jpg",
+            "jpeg",
+            "png",
+            "gif",
+            "webp",
+            "svg",
+            // Audio
+            "mp3",
+            "wav",
+            "ogg",
+            "m4a",
+            "aac",
+            // Video
+            "mp4",
+            "mov",
+            "avi",
+            "webm",
+            "mkv",
+            // Documents
+            "pdf",
+            "doc",
+            "docx",
+            "txt",
+            "rtf",
+            // Other
+            "zip",
+            "rar",
+          ],
+          max_bytes: 50 * 1024 * 1024, // 50MB limit
+          transformation:
+            resourceType === "image"
+              ? [
+                  { width: 1200, height: 1200, crop: "limit" },
+                  { quality: "auto:good" },
+                ]
+              : undefined,
+          timeout: 120000, // 2 minutes timeout
+        },
+        (error, result) => {
+          if (error) {
+            console.error("Cloudinary upload error:", error);
+            reject(error);
+          } else if (result) {
+            resolve({
+              url: result.secure_url,
+              publicId: result.public_id,
+              format: result.format,
+              size: result.bytes,
+              fileName: file.name,
+              resourceType: result.resource_type,
+              width: result.width,
+              height: result.height,
+              duration: result.duration,
+            });
+          } else {
+            reject(new Error("Upload failed - no result"));
+          }
+        },
+      )
+      .end(buffer);
+  });
 };
 
 // Upload image with specific optimizations

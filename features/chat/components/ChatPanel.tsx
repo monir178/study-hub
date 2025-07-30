@@ -30,6 +30,7 @@ import {
   FileText,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { AudioPlayer } from "@/components/ui/audio-player";
 
 interface ChatPanelProps {
   roomId: string;
@@ -294,15 +295,7 @@ export function ChatPanel({ roomId }: ChatPanelProps) {
 
                   {/* Audio Display */}
                   {isAudioUrl(fileUrl) && (
-                    <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
-                      <Music className="w-4 h-4 text-green-500" />
-                      <audio
-                        src={fileUrl}
-                        controls
-                        className="flex-1"
-                        preload="metadata"
-                      />
-                    </div>
+                    <AudioPlayer src={fileUrl} fileName={msg.fileName} />
                   )}
 
                   {/* File Display (non-media) */}

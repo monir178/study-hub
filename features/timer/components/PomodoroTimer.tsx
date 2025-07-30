@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useSound } from "@/lib/hooks/useSound";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -33,10 +34,19 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
     roomCreatorId,
   });
   const {} = useAuth();
-  const [soundEnabled, setSoundEnabled] = useState(false);
+  const {
+    isEnabled: soundEnabled,
+    toggleSound,
+    playTimerComplete,
+    playTimerStart,
+    playTimerPause,
+    playTimerReset,
+    playPhaseChange,
+  } = useSound();
   const [lastRemainingTime, setLastRemainingTime] = useState<number | null>(
     null,
   );
+  const [lastPhase, setLastPhase] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
   // Draggable state - start at top-right corner
@@ -53,6 +63,49 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
       y: e.clientY - position.y,
     });
   };
+
+  // Smart dropdown positioning
+  const getDropdownPosition = () => {
+    if (typeof window === "undefined") return "bottom";
+
+    const viewportWidth = window.innerWidth;
+    // const viewportHeight = window.innerHeight;
+    const timerWidth = 128; // w-32
+    const dropdownWidth = 220; // min-w-[220px]
+    const dropdownHeight = 300; // approximate height
+
+    // Check available space in each direction
+    const spaceRight = viewportWidth - (position.x + timerWidth + 20);
+    const spaceLeft = position.x - dropdownWidth - 20;
+    const spaceTop = position.y - dropdownHeight - 20;
+    // const spaceBottom = viewportHeight - (position.y + timerWidth + 20);
+
+    // Priority: right > left > top > bottom
+    if (spaceRight >= dropdownWidth) return "right";
+    if (spaceLeft >= dropdownWidth) return "left";
+    if (spaceTop >= dropdownHeight) return "top";
+    return "bottom";
+  };
+
+  // Click outside handler
+  const handleClickOutside = (e: MouseEvent) => {
+    const target = e.target as Element;
+    if (
+      !target.closest(".timer-container") &&
+      !target.closest(".settings-button")
+    ) {
+      setIsExpanded(false);
+    }
+  };
+
+  // Add click outside listener
+  useEffect(() => {
+    if (isExpanded) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isExpanded]);
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
@@ -137,48 +190,48 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
     }
   }, [isDragging, dragStart, handleMouseMove]);
 
-  // Web Audio API for sounds
-  const audioContextRef = useRef<AudioContext | null>(null);
-
-  // Initialize Web Audio API
-  useEffect(() => {
-    if (typeof window !== "undefined" && !audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext })
-          .webkitAudioContext)();
-    }
-  }, []);
-
   // Play completion sound when timer finishes
   useEffect(() => {
     if (
       timer?.remaining === 0 &&
       lastRemainingTime &&
       lastRemainingTime > 0 &&
-      soundEnabled &&
-      audioContextRef.current
+      soundEnabled
     ) {
-      const completionOscillator = audioContextRef.current.createOscillator();
-      const completionGain = audioContextRef.current.createGain();
-      completionOscillator.connect(completionGain);
-      completionGain.connect(audioContextRef.current.destination);
-      completionOscillator.frequency.setValueAtTime(
-        523.25,
-        audioContextRef.current.currentTime,
-      ); // C5
-      completionGain.gain.setValueAtTime(
-        0.3,
-        audioContextRef.current.currentTime,
-      );
-      completionOscillator.start();
-      completionOscillator.stop(audioContextRef.current.currentTime + 0.5);
+      playTimerComplete();
     }
-  }, [timer?.remaining, lastRemainingTime, soundEnabled]);
+  }, [timer?.remaining, lastRemainingTime, soundEnabled, playTimerComplete]);
 
   // Track last remaining time for completion detection
   useEffect(() => {
     setLastRemainingTime(timer?.remaining || null);
   }, [timer?.remaining]);
+
+  // Track phase changes for sound effects
+  useEffect(() => {
+    if (
+      timer?.phase &&
+      lastPhase &&
+      timer.phase !== lastPhase &&
+      soundEnabled
+    ) {
+      playPhaseChange();
+    }
+    setLastPhase(timer?.phase || null);
+  }, [timer?.phase, lastPhase, soundEnabled, playPhaseChange]);
+
+  // Ticking sound during countdown - DISABLED
+  // useEffect(() => {
+  //   if (!timer?.isRunning || !soundEnabled) return;
+
+  //   const tickInterval = setInterval(() => {
+  //     if (timer.isRunning && timer.remaining > 0) {
+  //       playTick();
+  //     }
+  //   }, 1000); // Tick every second
+
+  //   return () => clearInterval(tickInterval);
+  // }, [timer?.isRunning, timer?.remaining, soundEnabled, playTick]);
 
   // Show success feedback
   useEffect(() => {
@@ -195,6 +248,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
     await actions.startTimer();
     if (!error) {
       setActionSuccess("Timer started!");
+      playTimerStart();
     }
   };
 
@@ -202,6 +256,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
     await actions.pauseTimer();
     if (!error) {
       setActionSuccess("Timer paused!");
+      playTimerPause();
     }
   };
 
@@ -209,6 +264,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
     await actions.resetTimer();
     if (!error) {
       setActionSuccess("Timer reset!");
+      playTimerReset();
     }
   };
 
@@ -226,7 +282,8 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
         : timer.phase === "break"
           ? 5 * 60
           : 15 * 60;
-    return ((total - timer.remaining) / total) * 100;
+    const progress = ((total - timer.remaining) / total) * 100;
+    return Math.max(0, Math.min(progress, 100)); // Clamp between 0 and 100
   };
 
   const getPhaseLabel = (phase: string): string => {
@@ -340,7 +397,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
           )}
 
           {/* Circular Timer - No Background Container */}
-          <div className="relative group">
+          <div className="relative group timer-container">
             <div className="w-32 h-32 relative">
               {/* Progress Circle Only */}
               <svg
@@ -411,7 +468,17 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
 
             {/* Expanded Controls Panel */}
             {isExpanded && (
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 bg-gradient-to-br from-background/98 to-background/95 backdrop-blur-md border border-border/50 rounded-xl shadow-2xl p-4 min-w-[220px] animate-in slide-in-from-top-2 duration-200">
+              <div
+                className={`absolute bg-gradient-to-br from-background/98 to-background/95 backdrop-blur-md border border-border/50 rounded-xl shadow-2xl p-4 min-w-[220px] animate-in duration-200 ${
+                  getDropdownPosition() === "right"
+                    ? "left-full ml-2 top-1/2 transform -translate-y-1/2 slide-in-from-left-2"
+                    : getDropdownPosition() === "left"
+                      ? "right-full mr-2 top-1/2 transform -translate-y-1/2 slide-in-from-right-2"
+                      : getDropdownPosition() === "top"
+                        ? "bottom-full mb-2 left-1/2 transform -translate-x-1/2 slide-in-from-bottom-2"
+                        : "top-full mt-2 left-1/2 transform -translate-x-1/2 slide-in-from-top-2"
+                }`}
+              >
                 <div className="space-y-4">
                   {/* Phase Info */}
                   <div className="text-center">
@@ -505,7 +572,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
                         <Switch
                           id="sound-toggle"
                           checked={soundEnabled}
-                          onCheckedChange={setSoundEnabled}
+                          onCheckedChange={toggleSound}
                           className="scale-90"
                         />
                       </div>
@@ -535,7 +602,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
             {/* Settings Button */}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="absolute -bottom-2 -right-2 w-6 h-6 bg-background border rounded-full shadow-md flex items-center justify-center hover:bg-muted/50 transition-colors opacity-0 group-hover:opacity-100"
+              className="absolute bottom-0 right-0 w-6 h-6 bg-background border rounded-full shadow-md flex items-center justify-center hover:bg-muted/50 transition-colors opacity-0 group-hover:opacity-100 settings-button"
             >
               <Settings className="w-3 h-3" />
             </button>
@@ -543,94 +610,64 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
         </div>
       </div>
 
-      {/* Mobile - Minimalistic Horizontal Bar */}
+      {/* Mobile & Tablet - Ultra Minimalistic Design */}
       <div className="block lg:hidden">
         {/* Success Feedback */}
         {actionSuccess && (
           <div className="mb-2">
-            <div className="bg-green-600 text-white px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-top dark:bg-green-500">
-              <Check className="w-4 h-4" />
-              <span className="text-sm font-medium">{actionSuccess}</span>
+            <div className="bg-green-600 text-white px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-top dark:bg-green-500">
+              <Check className="w-3 h-3" />
+              <span className="text-xs font-medium">{actionSuccess}</span>
             </div>
           </div>
         )}
 
-        <div className="bg-background/95 backdrop-blur-sm border rounded-xl p-4 shadow-lg">
-          <div className="space-y-4">
-            {/* Timer Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  {getPhaseIcon(timer.phase, "md")}
-                  <span className="font-semibold text-lg">
+        <div className="bg-background/95 backdrop-blur-sm border rounded-lg p-3 shadow-lg">
+          <div className="flex items-center justify-between">
+            {/* Left: Phase Info & Timer */}
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              {/* Phase Icon & Label */}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {getPhaseIcon(timer.phase, "sm")}
+                <div className="hidden sm:block">
+                  <div className="text-sm mb-1.5 font-medium leading-none">
                     {getPhaseLabel(timer.phase)}
-                  </span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {timer.session}/{timer.totalSessions}
+                  </div>
                 </div>
-                <Badge
-                  variant="outline"
-                  className={`text-sm ${getPhaseColor(timer.phase)}`}
-                >
-                  {timer.isRunning
-                    ? "Running"
-                    : timer.isPaused
-                      ? "Paused"
-                      : "Stopped"}
-                </Badge>
               </div>
 
+              {/* Timer Display - Centered on mobile & tablet */}
+              <div className="flex-1 min-w-0 flex justify-center lg:justify-start">
+                <div className="text-center lg:text-left">
+                  <div className="text-xl font-mono font-bold tracking-tight">
+                    {formatTime(timer.remaining)}
+                  </div>
+                  <div className="text-xs text-muted-foreground sm:hidden">
+                    {timer.session}/{timer.totalSessions}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Status & Controls */}
+            <div className="flex items-center gap-2 flex-shrink-0">
               {/* Status Indicator */}
               <div
-                className={`w-3 h-3 rounded-full ${
+                className={`w-2 h-2 rounded-full ${
                   timer.isRunning
-                    ? "bg-green-500 animate-pulse shadow-lg shadow-green-500/50"
+                    ? "bg-green-500 animate-pulse"
                     : timer.isPaused
-                      ? "bg-yellow-500 shadow-lg shadow-yellow-500/50"
+                      ? "bg-yellow-500"
                       : "bg-gray-400"
                 }`}
               ></div>
-            </div>
 
-            {/* Timer Display and Progress */}
-            <div className="space-y-3">
-              <div className="text-center">
-                <div className="text-3xl font-mono font-bold tracking-tight">
-                  {formatTime(timer.remaining)}
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">
-                  Session {timer.session}/{timer.totalSessions}
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="space-y-2">
-                <div className="w-full bg-muted/20 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full transition-all duration-1000 ${
-                      timer.phase === "focus"
-                        ? "bg-red-500"
-                        : timer.phase === "break"
-                          ? "bg-green-500"
-                          : "bg-blue-500"
-                    }`}
-                    style={{
-                      width: `${getProgress()}%`,
-                      boxShadow: timer.isRunning
-                        ? `0 0 8px currentColor`
-                        : "none",
-                    }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{Math.round(getProgress())}% Complete</span>
-                  <span>{getPhaseLabel(timer.phase)} Time</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Controls */}
-            {canControl && (
-              <div className="space-y-3">
-                <div className="flex gap-2">
+              {/* Compact Controls */}
+              {canControl && (
+                <div className="flex gap-1">
                   <Button
                     onClick={handleStartTimer}
                     disabled={
@@ -639,14 +676,14 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
                       loading.reset ||
                       timer.isRunning
                     }
-                    className="flex-1 h-10 font-medium"
+                    size="sm"
+                    className="h-8 w-8 p-0"
                   >
                     {loading.start ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <Loader2 className="w-3 h-3 animate-spin" />
                     ) : (
-                      <Play className="w-4 h-4 mr-2" />
+                      <Play className="w-3 h-3" />
                     )}
-                    {loading.start ? "Starting..." : "Start"}
                   </Button>
                   <Button
                     onClick={handlePauseTimer}
@@ -657,67 +694,74 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
                       !timer.isRunning
                     }
                     variant="outline"
-                    className="flex-1 h-10 font-medium"
+                    size="sm"
+                    className="h-8 w-8 p-0"
                   >
                     {loading.pause ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <Loader2 className="w-3 h-3 animate-spin" />
                     ) : (
-                      <Pause className="w-4 h-4 mr-2" />
+                      <Pause className="w-3 h-3" />
                     )}
-                    {loading.pause ? "Pausing..." : "Pause"}
                   </Button>
                   <Button
                     onClick={handleResetTimer}
                     disabled={loading.start || loading.pause || loading.reset}
                     variant="outline"
-                    className="flex-1 h-10 font-medium"
+                    size="sm"
+                    className="h-8 w-8 p-0"
                   >
                     {loading.reset ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <Loader2 className="w-3 h-3 animate-spin" />
                     ) : (
-                      <RotateCcw className="w-4 h-4 mr-2" />
+                      <RotateCcw className="w-3 h-3" />
                     )}
-                    {loading.reset ? "Resetting..." : "Reset"}
                   </Button>
-                </div>
 
-                {/* Sound Toggle */}
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 border border-border/30">
-                  <Label
-                    htmlFor="mobile-sound-toggle"
-                    className="text-sm flex items-center gap-2 font-medium cursor-pointer"
+                  {/* Sound Toggle - Compact */}
+                  <Button
+                    onClick={toggleSound}
+                    variant="outline"
+                    size="sm"
+                    className="h-8 w-8 p-0"
                   >
                     {soundEnabled ? (
-                      <Volume2 className="w-4 h-4 text-green-600" />
+                      <Volume2 className="w-3 h-3 text-green-600" />
                     ) : (
-                      <VolumeX className="w-4 h-4 text-muted-foreground" />
+                      <VolumeX className="w-3 h-3 text-muted-foreground" />
                     )}
-                    Sound Effects
-                  </Label>
-                  <Switch
-                    id="mobile-sound-toggle"
-                    checked={soundEnabled}
-                    onCheckedChange={setSoundEnabled}
-                  />
+                  </Button>
                 </div>
-              </div>
-            )}
-
-            {!canControl && (
-              <div className="text-center p-3 rounded-lg bg-muted/20 border border-border/30">
-                <p className="text-sm text-muted-foreground">
-                  Only moderators can control the timer
-                </p>
-              </div>
-            )}
-
-            {/* Error Display */}
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+              )}
+            </div>
           </div>
+
+          {/* Progress Bar - Compact */}
+          <div className="mt-3">
+            <div className="w-full bg-muted/20 rounded-full h-1.5">
+              <div
+                className={`h-1.5 rounded-full transition-all duration-1000 ${
+                  timer.phase === "focus"
+                    ? "bg-red-500"
+                    : timer.phase === "break"
+                      ? "bg-green-500"
+                      : "bg-blue-500"
+                }`}
+                style={{
+                  width: `${getProgress()}%`,
+                  boxShadow: timer.isRunning ? `0 0 4px currentColor` : "none",
+                }}
+              ></div>
+            </div>
+          </div>
+
+          {/* Error Display - Compact */}
+          {error && (
+            <div className="mt-2">
+              <Alert variant="destructive" className="p-2">
+                <AlertDescription className="text-xs">{error}</AlertDescription>
+              </Alert>
+            </div>
+          )}
         </div>
       </div>
     </>

@@ -1,8 +1,10 @@
+/* eslint-disable */
+
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// import { Badge } from "@/components/ui/badge";
+// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import {
   Users,
@@ -12,16 +14,16 @@ import {
   Crown,
   Shield,
   User as UserIcon,
-  Loader2,
-  Check,
-  UserPlus,
-  UserMinus,
+  // Loader2,
+  // Check,
+  // UserPlus,
+  // UserMinus,
 } from "lucide-react";
 import { StudyRoom } from "../hooks/useRooms";
 import { useRoomMembers } from "../hooks/useRoomMembers";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 
 interface RoomSidebarProps {
   room: StudyRoom;
@@ -145,7 +147,7 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
       </Card>
 
       {/* Room Creator */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle className="text-lg">Room Creator</CardTitle>
         </CardHeader>
@@ -172,10 +174,10 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Join/Leave Room */}
-      {user && (
+      {/* {user && (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Your Status</CardTitle>
@@ -194,8 +196,7 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
                   disabled={loading.join || loading.leave}
                   variant="outline"
                   size="sm"
-                  className="w-full transition-all duration-200 hover:scale-105"
-                >
+                  className="w-full transition-all duration-200 hover:scale-105">
                   {loading.leave ? (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   ) : (
@@ -214,8 +215,7 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
                   onClick={actions.joinRoom}
                   disabled={loading.join || loading.leave}
                   size="sm"
-                  className="w-full transition-all duration-200 hover:scale-105"
-                >
+                  className="w-full transition-all duration-200 hover:scale-105">
                   {loading.join ? (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   ) : (
@@ -227,10 +227,11 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
             )}
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       {/* Members List */}
-      <Card>
+
+      {/* <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-lg">
             <span>Members</span>
@@ -241,12 +242,11 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-3 max-h-96 overflow-y-auto">
-            {/* Show real-time members */}
+       
             {members.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
-              >
+                className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <Avatar className="w-8 h-8">
@@ -258,12 +258,11 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
                         {member.user.name?.charAt(0) || "?"}
                       </AvatarFallback>
                     </Avatar>
-                    {/* Status indicator */}
+             
                     <div
                       className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-background ${getStatusColor(
-                        member.status,
-                      )}`}
-                    ></div>
+                        member.status
+                      )}`}></div>
                   </div>
                   <div>
                     <p className="text-sm font-medium">
@@ -276,22 +275,21 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
                 </div>
                 <Badge
                   variant="outline"
-                  className={`${getRoleBadgeColor(member.role)} text-xs`}
-                >
+                  className={`${getRoleBadgeColor(member.role)} text-xs`}>
                   {getRoleIcon(member.role)}
                   <span className="ml-1 hidden sm:inline">{member.role}</span>
                 </Badge>
               </div>
             ))}
 
-            {/* Show message if no members */}
+     
             {members.length === 0 && (
               <div className="text-center py-4 text-muted-foreground">
                 <p className="text-sm">No members in this room</p>
               </div>
             )}
 
-            {/* Show loading state */}
+      
             {(loading.join || loading.leave) && (
               <div className="text-center py-4 text-muted-foreground">
                 <div className="flex items-center justify-center gap-2">
@@ -301,7 +299,7 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
               </div>
             )}
 
-            {/* Show error state */}
+     
             {error && (
               <div className="text-center py-4 text-red-600">
                 <p className="text-sm">{error}</p>
@@ -309,7 +307,7 @@ export function RoomSidebar({ room }: RoomSidebarProps) {
             )}
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }

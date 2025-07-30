@@ -128,9 +128,21 @@ export function useVoiceRecorder(options: VoiceRecorderOptions) {
 
   const cancelRecording = useCallback(() => {
     if (mediaRecorderRef.current && state.isRecording) {
+      // Stop the media recorder without triggering onstop
+      mediaRecorderRef.current.ondataavailable = null;
+      mediaRecorderRef.current.onstop = null;
+
+      if (mediaRecorderRef.current.state !== "inactive") {
+        mediaRecorderRef.current.stop();
+      }
+
       mediaRecorderRef.current.stream
         .getTracks()
         .forEach((track) => track.stop());
+
+      // Clear audio chunks to prevent upload
+      audioChunksRef.current = [];
+
       setState((prev) => ({
         ...prev,
         isRecording: false,

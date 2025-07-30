@@ -18,6 +18,7 @@ export interface TimerData {
 // In-memory timer store
 const timerStore = new Map<string, TimerData>();
 const countdownIntervals = new Map<string, NodeJS.Timeout>();
+const saveDebounceTimers = new Map<string, NodeJS.Timeout>();
 
 // Timer configuration
 const TIMER_CONFIG = {
@@ -68,11 +69,64 @@ export class TimerStore {
     // Ensure updatedAt is always current
     timer.updatedAt = new Date();
 
-    // Save to memory and database
+    // Save to memory immediately
     timerStore.set(roomId, timer);
-    await TimerDatabase.saveTimer(roomId, timer);
+
+    // Debounce database save to reduce conflicts
+    this.debouncedSave(roomId, timer);
 
     return timer;
+  }
+
+  // Debounced save to database
+  private static debouncedSave(roomId: string, timer: TimerData): void {
+    // Clear existing debounce timer
+    const existingTimer = saveDebounceTimers.get(roomId);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+    }
+
+    // Only save if there are significant changes (not just countdown)
+    const shouldSave =
+      timer.isRunning !== undefined ||
+      timer.isPaused !== undefined ||
+      timer.phase !== undefined ||
+      timer.session !== undefined ||
+      timer.controlledBy !== undefined ||
+      timer.remaining === 0; // Only save when timer completes
+
+    if (!shouldSave) {
+      return; // Skip saving for pure countdown updates
+    }
+
+    // Set new debounce timer
+    const debounceTimer = setTimeout(async () => {
+      try {
+        await TimerDatabase.saveTimer(roomId, timer);
+      } catch (error) {
+        console.error("Error in debounced save:", error);
+      } finally {
+        saveDebounceTimers.delete(roomId);
+      }
+    }, 5000); // 5 seconds debounce to reduce database load
+
+    saveDebounceTimers.set(roomId, debounceTimer);
+  }
+
+  // Force immediate save to database
+  private static async forceSave(
+    roomId: string,
+    timer: TimerData,
+  ): Promise<void> {
+    // Clear any pending debounced save
+    const existingTimer = saveDebounceTimers.get(roomId);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      saveDebounceTimers.delete(roomId);
+    }
+
+    // Save immediately
+    await TimerDatabase.saveTimer(roomId, timer);
   }
 
   // Start timer
@@ -98,6 +152,9 @@ export class TimerStore {
       isPaused: false,
       controlledBy: userId,
     });
+
+    // Force immediate save for important operations
+    await this.forceSave(roomId, updatedTimer);
 
     // Start server-side countdown
     this.startCountdown(roomId);
@@ -129,7 +186,7 @@ export class TimerStore {
       });
     }
 
-    // Stop server-side countdown
+    // Stop server-side countdown immediately
     this.stopCountdown(roomId);
 
     const updatedTimer = await this.setTimer(roomId, {
@@ -137,6 +194,12 @@ export class TimerStore {
       isPaused: true,
       controlledBy: userId,
     });
+
+    // Force immediate save for important operations
+    await this.forceSave(roomId, updatedTimer);
+
+    // Double-check countdown is stopped
+    this.stopCountdown(roomId);
 
     // Trigger Pusher update
     await triggerTimerUpdate(roomId, updatedTimer, "paused", userId);
@@ -162,7 +225,7 @@ export class TimerStore {
       });
     }
 
-    // Stop server-side countdown
+    // Stop server-side countdown immediately
     this.stopCountdown(roomId);
 
     const updatedTimer = await this.setTimer(roomId, {
@@ -171,6 +234,12 @@ export class TimerStore {
       remaining: TIMER_CONFIG.focus,
       controlledBy: userId,
     });
+
+    // Force immediate save for important operations
+    await this.forceSave(roomId, updatedTimer);
+
+    // Double-check countdown is stopped
+    this.stopCountdown(roomId);
 
     // Trigger Pusher update
     await triggerTimerUpdate(roomId, updatedTimer, "reset", userId);
@@ -186,9 +255,27 @@ export class TimerStore {
     const timer = await this.getTimer(roomId);
     if (!timer) return null;
 
-    const updatedTimer = await this.setTimer(roomId, {
+    // Don't update if timer is paused
+    if (!timer.isRunning) {
+      return timer;
+    }
+
+    // Update memory immediately for responsive UI
+    const updatedTimer: TimerData = {
+      ...timer,
       remaining,
-    });
+      updatedAt: new Date(),
+    };
+
+    // Save to memory immediately
+    timerStore.set(roomId, updatedTimer);
+
+    // Only save to database for significant changes (not every tick)
+    // Skip database saves for countdown updates to avoid conflicts
+    if (remaining <= 0) {
+      // Only save when timer completes
+      this.debouncedSave(roomId, updatedTimer);
+    }
 
     // Check if timer completed
     if (remaining <= 0) {
@@ -212,7 +299,8 @@ export class TimerStore {
     this.stopCountdown(roomId);
 
     const interval = setInterval(async () => {
-      const timer = await this.getTimer(roomId);
+      // Get timer directly from memory to avoid race conditions
+      const timer = timerStore.get(roomId);
       if (!timer || !timer.isRunning || timer.remaining <= 0) {
         this.stopCountdown(roomId);
         return;
@@ -291,10 +379,27 @@ export class TimerStore {
   static clearTimer(roomId: string): void {
     this.stopCountdown(roomId);
     timerStore.delete(roomId);
+
+    // Clear debounce timer
+    const debounceTimer = saveDebounceTimers.get(roomId);
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+      saveDebounceTimers.delete(roomId);
+    }
   }
 
   // Get all timers (for debugging)
   static getAllTimers(): Map<string, TimerData> {
     return new Map(timerStore);
+  }
+
+  // Debug method to check countdown status
+  static getCountdownStatus(roomId: string): boolean {
+    return countdownIntervals.has(roomId);
+  }
+
+  // Debug method to get all active countdowns
+  static getActiveCountdowns(): string[] {
+    return Array.from(countdownIntervals.keys());
   }
 }

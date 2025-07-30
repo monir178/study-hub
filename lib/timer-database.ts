@@ -2,57 +2,105 @@ import { prisma } from "@/lib/prisma";
 import { TimerData } from "@/lib/timer-store";
 
 export class TimerDatabase {
-  // Save timer state to database
+  // Save timer state to database with aggressive conflict prevention
   static async saveTimer(roomId: string, timer: TimerData): Promise<void> {
-    try {
-      // Find existing session or create new one
-      const existingSession = await prisma.studySession.findFirst({
-        where: {
-          roomId,
-          status: "ACTIVE",
-        },
-        orderBy: { startedAt: "desc" },
-      });
+    // Skip saving if it's just a countdown update (remaining time only)
+    const isCountdownOnly =
+      Object.keys(timer).length === 1 && timer.hasOwnProperty("remaining");
+    if (isCountdownOnly) {
+      return; // Don't save countdown-only updates to avoid conflicts
+    }
 
-      if (existingSession) {
-        // Update existing session
-        await prisma.studySession.update({
-          where: { id: existingSession.id },
-          data: {
-            duration: timer.remaining,
-            phase: timer.phase,
-            remaining: timer.remaining,
-            session: timer.session,
-            totalSessions: timer.totalSessions,
-            controlledBy: timer.controlledBy || null,
-            status: timer.isRunning
-              ? "ACTIVE"
-              : timer.isPaused
-                ? "PAUSED"
-                : "COMPLETED",
-            endedAt: timer.isRunning ? null : new Date(),
-          },
+    const maxRetries = 5;
+    let retryCount = 0;
+
+    while (retryCount < maxRetries) {
+      try {
+        // Use a simple approach to avoid conflicts
+        const room = await prisma.studyRoom.findUnique({
+          where: { id: roomId },
+          select: { creatorId: true },
         });
-      } else {
-        // Create new session
-        await prisma.studySession.create({
-          data: {
+
+        if (!room) {
+          console.error("Room not found for timer creation");
+          return;
+        }
+
+        // Find existing session
+        const existingSession = await prisma.studySession.findFirst({
+          where: {
             roomId,
-            userId: timer.controlledBy || "system", // Use system if no user
-            duration: timer.remaining,
-            type: "POMODORO",
-            status: timer.isRunning ? "ACTIVE" : "PAUSED",
-            phase: timer.phase,
-            remaining: timer.remaining,
-            session: timer.session,
-            totalSessions: timer.totalSessions,
-            controlledBy: timer.controlledBy || null,
-            endedAt: timer.isRunning ? null : new Date(),
+            status: { in: ["ACTIVE", "PAUSED"] },
           },
+          orderBy: { startedAt: "desc" },
         });
+
+        if (existingSession) {
+          // Update existing session
+          await prisma.studySession.update({
+            where: { id: existingSession.id },
+            data: {
+              duration: timer.remaining,
+              phase: timer.phase,
+              remaining: timer.remaining,
+              session: timer.session,
+              totalSessions: timer.totalSessions,
+              controlledBy: timer.controlledBy || null,
+              status: timer.isRunning
+                ? "ACTIVE"
+                : timer.isPaused
+                  ? "PAUSED"
+                  : "COMPLETED",
+              endedAt: timer.isRunning ? null : new Date(),
+            },
+          });
+        } else {
+          // Create new session
+          await prisma.studySession.create({
+            data: {
+              roomId,
+              userId: timer.controlledBy || room.creatorId,
+              duration: timer.remaining,
+              type: "POMODORO",
+              status: timer.isRunning ? "ACTIVE" : "PAUSED",
+              phase: timer.phase,
+              remaining: timer.remaining,
+              session: timer.session,
+              totalSessions: timer.totalSessions,
+              controlledBy: timer.controlledBy || null,
+              endedAt: timer.isRunning ? null : new Date(),
+            },
+          });
+        }
+
+        // Success - break out of retry loop
+        break;
+      } catch (error: unknown) {
+        retryCount++;
+
+        // Check if it's a transaction conflict error
+        if (
+          error &&
+          typeof error === "object" &&
+          "code" in error &&
+          error.code === "P2034" &&
+          retryCount < maxRetries
+        ) {
+          console.warn(
+            `Database transaction conflict, retrying (${retryCount}/${maxRetries})...`,
+          );
+          // Wait longer with exponential backoff
+          await new Promise((resolve) =>
+            setTimeout(resolve, Math.pow(2, retryCount) * 200),
+          );
+          continue;
+        }
+
+        // If it's not a conflict error or we've exhausted retries, log and return
+        console.error("Error saving timer to database:", error);
+        break;
       }
-    } catch (error) {
-      console.error("Error saving timer to database:", error);
     }
   }
 
