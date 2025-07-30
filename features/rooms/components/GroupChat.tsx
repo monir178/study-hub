@@ -26,7 +26,7 @@ import {
   Send,
   Paperclip,
   Mic,
-  Square,
+  // Square,
   File,
   X,
   Loader2,
@@ -100,6 +100,12 @@ export function GroupChat({ roomId }: GroupChatProps) {
   }, [filePreviewUrl]);
 
   const handleSendMessage = async () => {
+    // If recording, stop recording and send voice message
+    if (voiceRecorder.isRecording) {
+      voiceRecorder.stopRecording();
+      return;
+    }
+
     if (!message.trim() && !selectedFile) return;
 
     // Set loading state immediately when user clicks send
@@ -688,28 +694,17 @@ export function GroupChat({ roomId }: GroupChatProps) {
               <div className="flex items-center gap-2 p-2 bg-red-50 dark:bg-red-950/20 rounded-lg">
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse flex-shrink-0" />
                 <span className="text-sm text-red-600 dark:text-red-400 flex-1">
-                  Recording... {voiceRecorder.formattedTime}
+                  Recording...
                 </span>
-                <div className="flex gap-1">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={voiceRecorder.stopRecording}
-                    className="h-6 w-6 p-0 text-green-600 flex-shrink-0"
-                    title="Send voice message"
-                  >
-                    <Send className="w-3 h-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={voiceRecorder.cancelRecording}
-                    className="h-6 w-6 p-0 text-red-600 flex-shrink-0"
-                    title="Cancel recording"
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
-                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={voiceRecorder.cancelRecording}
+                  className="h-6 w-6 p-0 text-red-600 flex-shrink-0"
+                  title="Cancel recording"
+                >
+                  <X className="w-3 h-3" />
+                </Button>
               </div>
             )}
 
@@ -750,21 +745,21 @@ export function GroupChat({ roomId }: GroupChatProps) {
                 size="sm"
                 variant="ghost"
                 onClick={() => {
-                  if (voiceRecorder.isRecording) {
-                    voiceRecorder.stopRecording();
-                  } else {
+                  if (!voiceRecorder.isRecording) {
                     voiceRecorder.startRecording();
                   }
                 }}
-                disabled={isSending || voiceRecorder.isUploading}
+                disabled={
+                  isSending ||
+                  voiceRecorder.isUploading ||
+                  voiceRecorder.isRecording
+                }
                 className={`h-10 w-10 p-0 flex-shrink-0 ${
                   voiceRecorder.isRecording ? "bg-red-100 text-red-600" : ""
                 }`}
               >
                 {voiceRecorder.isUploading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
-                ) : voiceRecorder.isRecording ? (
-                  <Square className="w-4 h-4" />
                 ) : (
                   <Mic className="w-4 h-4" />
                 )}
@@ -776,9 +771,10 @@ export function GroupChat({ roomId }: GroupChatProps) {
                 onClick={handleSendMessage}
                 disabled={
                   isSending ||
-                  voiceRecorder.isRecording ||
                   voiceRecorder.isUploading ||
-                  (!message.trim() && !selectedFile)
+                  (!voiceRecorder.isRecording &&
+                    !message.trim() &&
+                    !selectedFile)
                 }
                 className="h-10 px-3 sm:px-4 flex-shrink-0"
               >
