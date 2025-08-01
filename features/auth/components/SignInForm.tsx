@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,23 +21,38 @@ import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, Github, Mail } from "lucide-react";
 import Link from "next/link";
 
+// Form validation schema
+const signInSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type SignInFormData = z.infer<typeof signInSchema>;
+
 export function SignInForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignInFormData>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: SignInFormData) => {
     setError("");
 
     try {
       const result = await signIn("credentials", {
-        email,
-        password,
+        email: data.email,
+        password: data.password,
         redirect: false,
       });
 
@@ -47,18 +65,14 @@ export function SignInForm() {
       }
     } catch {
       setError("An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleOAuthSignIn = async (provider: "google" | "github") => {
-    setLoading(true);
     try {
       await signIn(provider, { callbackUrl: "/dashboard" });
     } catch {
       setError("OAuth sign in failed. Please try again.");
-      setLoading(false);
     }
   };
 
@@ -77,18 +91,20 @@ export function SignInForm() {
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
               placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
+              {...register("email")}
+              disabled={isSubmitting}
+              className={errors.email ? "border-red-500" : ""}
             />
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -98,10 +114,9 @@ export function SignInForm() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
+                {...register("password")}
+                disabled={isSubmitting}
+                className={errors.password ? "border-red-500" : ""}
               />
               <Button
                 type="button"
@@ -109,7 +124,7 @@ export function SignInForm() {
                 size="sm"
                 className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                 onClick={() => setShowPassword(!showPassword)}
-                disabled={loading}
+                disabled={isSubmitting}
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />
@@ -118,10 +133,13 @@ export function SignInForm() {
                 )}
               </Button>
             </div>
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password.message}</p>
+            )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Signing in..." : "Sign In"}
           </Button>
         </form>
 
@@ -140,7 +158,7 @@ export function SignInForm() {
           <Button
             variant="outline"
             onClick={() => handleOAuthSignIn("google")}
-            disabled={loading}
+            disabled={isSubmitting}
           >
             <Mail className="mr-2 h-4 w-4" />
             Google
@@ -148,7 +166,7 @@ export function SignInForm() {
           <Button
             variant="outline"
             onClick={() => handleOAuthSignIn("github")}
-            disabled={loading}
+            disabled={isSubmitting}
           >
             <Github className="mr-2 h-4 w-4" />
             GitHub

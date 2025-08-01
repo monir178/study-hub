@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,161 +17,112 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Eye, EyeOff, Github, Mail, User, Shield, Crown } from "lucide-react";
+import { Eye, EyeOff, Github, Mail, User } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { useApiMutation } from "@/lib/api/hooks/use-api-mutation";
 
-interface SignUpFormData {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  role: "USER" | "MODERATOR" | "ADMIN";
-}
+// Form validation schema
+const signUpSchema = z
+  .object({
+    name: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.string().email("Please enter a valid email address"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(
+        /(?=.*[a-z])/,
+        "Password must contain at least one lowercase letter",
+      )
+      .regex(
+        /(?=.*[A-Z])/,
+        "Password must contain at least one uppercase letter",
+      )
+      .regex(/(?=.*\d)/, "Password must contain at least one number")
+      .regex(
+        /(?=.*[@$!%*?&])/,
+        "Password must contain at least one special character (@$!%*?&)",
+      ),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
-interface ValidationErrors {
-  name?: string;
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-  role?: string;
+type SignUpFormData = z.infer<typeof signUpSchema>;
+
+interface RegisterResponse {
+  success: boolean;
+  message: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    createdAt: string;
+  };
 }
 
 export function SignUpForm() {
-  const [formData, setFormData] = useState<SignUpFormData>({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    role: "USER",
-  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
-    {},
-  );
   const router = useRouter();
 
-  const validateForm = (): boolean => {
-    const errors: ValidationErrors = {};
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError,
+  } = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-    // Name validation
-    if (!formData.name.trim()) {
-      errors.name = "Name is required";
-    } else if (formData.name.trim().length < 2) {
-      errors.name = "Name must be at least 2 characters";
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email) {
-      errors.email = "Email is required";
-    } else if (!emailRegex.test(formData.email)) {
-      errors.email = "Please enter a valid email address";
-    }
-
-    // Password validation
-    if (!formData.password) {
-      errors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      errors.password = "Password must be at least 8 characters";
-    } else if (!/(?=.*[a-z])/.test(formData.password)) {
-      errors.password = "Password must contain at least one lowercase letter";
-    } else if (!/(?=.*[A-Z])/.test(formData.password)) {
-      errors.password = "Password must contain at least one uppercase letter";
-    } else if (!/(?=.*\d)/.test(formData.password)) {
-      errors.password = "Password must contain at least one number";
-    } else if (!/(?=.*[@$!%*?&])/.test(formData.password)) {
-      errors.password =
-        "Password must contain at least one special character (@$!%*?&)";
-    }
-
-    // Confirm password validation
-    if (!formData.confirmPassword) {
-      errors.confirmPassword = "Please confirm your password";
-    } else if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = "Passwords do not match";
-    }
-
-    // Role validation
-    if (!formData.role) {
-      errors.role = "Please select a role";
-    }
-
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleInputChange = (field: keyof SignUpFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear validation error when user starts typing
-    if (validationErrors[field]) {
-      setValidationErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSuccess(false);
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setLoading(true);
-
-    try {
+  const registerMutation = useApiMutation<RegisterResponse, SignUpFormData>({
+    mutationFn: async (data) => {
+      // Use fetch directly to avoid API client response format issues
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: formData.name.trim(),
-          email: formData.email.toLowerCase().trim(),
-          password: formData.password,
-          role: formData.role,
+          name: data.name.trim(),
+          email: data.email.toLowerCase().trim(),
+          password: data.password,
+          role: "USER", // Automatically assign USER role
         }),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
       if (!response.ok) {
-        if (data.errors && Array.isArray(data.errors)) {
-          // Handle validation errors from server
-          const serverErrors: ValidationErrors = {};
-          data.errors.forEach((error: { field?: string; message: string }) => {
-            if (error.field) {
-              serverErrors[error.field as keyof ValidationErrors] =
-                error.message;
-            }
-          });
-          setValidationErrors(serverErrors);
-        } else {
-          setError(data.message || "Registration failed. Please try again.");
-        }
-        return;
+        throw new Error(result.message || "Registration failed");
       }
 
-      // Registration successful
-      setSuccess(true);
+      return result;
+    },
+    successMessage: "Account created successfully!",
+  });
 
-      // Auto sign-in after successful registration
-      setTimeout(async () => {
+  const onSubmit = async (data: SignUpFormData) => {
+    try {
+      const result = await registerMutation.mutateAsync(data);
+
+      if (result.success) {
+        setSuccess(true);
+
+        // Auto sign-in immediately after successful registration
         const signInResult = await signIn("credentials", {
-          email: formData.email,
-          password: formData.password,
+          email: data.email,
+          password: data.password,
           redirect: false,
         });
 
@@ -181,44 +135,34 @@ export function SignUpForm() {
             "/auth/signin?message=Registration successful. Please sign in.",
           );
         }
-      }, 1500);
-    } catch (error) {
-      console.error("Registration error:", error);
-      setError("An unexpected error occurred. Please try again.");
-    } finally {
-      setLoading(false);
+      }
+    } catch (error: unknown) {
+      // Handle server validation errors
+      if (
+        error &&
+        typeof error === "object" &&
+        "errors" in error &&
+        Array.isArray((error as any).errors)
+      ) {
+        (error as any).errors.forEach(
+          (err: { field?: string; message: string }) => {
+            if (err.field) {
+              setError(err.field as keyof SignUpFormData, {
+                type: "server",
+                message: err.message,
+              });
+            }
+          },
+        );
+      }
     }
   };
 
   const handleOAuthSignUp = async (provider: "google" | "github") => {
-    setLoading(true);
     try {
       await signIn(provider, { callbackUrl: "/dashboard" });
-    } catch {
-      setError("OAuth sign up failed. Please try again.");
-      setLoading(false);
-    }
-  };
-
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case "ADMIN":
-        return <Crown className="w-4 h-4" />;
-      case "MODERATOR":
-        return <Shield className="w-4 h-4" />;
-      default:
-        return <User className="w-4 h-4" />;
-    }
-  };
-
-  const getRoleDescription = (role: string) => {
-    switch (role) {
-      case "ADMIN":
-        return "Full platform access and user management";
-      case "MODERATOR":
-        return "Content moderation and community management";
-      default:
-        return "Access to study rooms, notes, and collaboration features";
+    } catch (error) {
+      console.error("OAuth sign up failed:", error);
     }
   };
 
@@ -253,13 +197,16 @@ export function SignUpForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {error && (
+        {registerMutation.error && (
           <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>
+              {registerMutation.error.response?.data?.message ||
+                "Registration failed. Please try again."}
+            </AlertDescription>
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Name Field */}
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
@@ -267,13 +214,12 @@ export function SignUpForm() {
               id="name"
               type="text"
               placeholder="Enter your full name"
-              value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              disabled={loading}
-              className={validationErrors.name ? "border-red-500" : ""}
+              {...register("name")}
+              disabled={isSubmitting}
+              className={errors.name ? "border-red-500" : ""}
             />
-            {validationErrors.name && (
-              <p className="text-sm text-red-500">{validationErrors.name}</p>
+            {errors.name && (
+              <p className="text-sm text-red-500">{errors.name.message}</p>
             )}
           </div>
 
@@ -284,67 +230,12 @@ export function SignUpForm() {
               id="email"
               type="email"
               placeholder="Enter your email"
-              value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              disabled={loading}
-              className={validationErrors.email ? "border-red-500" : ""}
+              {...register("email")}
+              disabled={isSubmitting}
+              className={errors.email ? "border-red-500" : ""}
             />
-            {validationErrors.email && (
-              <p className="text-sm text-red-500">{validationErrors.email}</p>
-            )}
-          </div>
-
-          {/* Role Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
-            <Select
-              value={formData.role}
-              onValueChange={(value) => handleInputChange("role", value)}
-              disabled={loading}
-            >
-              <SelectTrigger
-                className={validationErrors.role ? "border-red-500" : ""}
-              >
-                <SelectValue placeholder="Select your role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="USER">
-                  <div className="flex items-center gap-2">
-                    {getRoleIcon("USER")}
-                    <div>
-                      <div className="font-medium">User</div>
-                      <div className="text-xs text-muted-foreground">
-                        {getRoleDescription("USER")}
-                      </div>
-                    </div>
-                  </div>
-                </SelectItem>
-                <SelectItem value="MODERATOR">
-                  <div className="flex items-center gap-2">
-                    {getRoleIcon("MODERATOR")}
-                    <div>
-                      <div className="font-medium">Moderator</div>
-                      <div className="text-xs text-muted-foreground">
-                        {getRoleDescription("MODERATOR")}
-                      </div>
-                    </div>
-                  </div>
-                </SelectItem>
-                <SelectItem value="ADMIN">
-                  <div className="flex items-center gap-2">
-                    {getRoleIcon("ADMIN")}
-                    <div>
-                      <div className="font-medium">Admin</div>
-                      <div className="text-xs text-muted-foreground">
-                        {getRoleDescription("ADMIN")}
-                      </div>
-                    </div>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            {validationErrors.role && (
-              <p className="text-sm text-red-500">{validationErrors.role}</p>
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
             )}
           </div>
 
@@ -356,10 +247,9 @@ export function SignUpForm() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Create a strong password"
-                value={formData.password}
-                onChange={(e) => handleInputChange("password", e.target.value)}
-                disabled={loading}
-                className={validationErrors.password ? "border-red-500" : ""}
+                {...register("password")}
+                disabled={isSubmitting}
+                className={errors.password ? "border-red-500" : ""}
               />
               <Button
                 type="button"
@@ -367,7 +257,7 @@ export function SignUpForm() {
                 size="sm"
                 className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                 onClick={() => setShowPassword(!showPassword)}
-                disabled={loading}
+                disabled={isSubmitting}
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />
@@ -376,10 +266,8 @@ export function SignUpForm() {
                 )}
               </Button>
             </div>
-            {validationErrors.password && (
-              <p className="text-sm text-red-500">
-                {validationErrors.password}
-              </p>
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password.message}</p>
             )}
           </div>
 
@@ -391,14 +279,9 @@ export function SignUpForm() {
                 id="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={(e) =>
-                  handleInputChange("confirmPassword", e.target.value)
-                }
-                disabled={loading}
-                className={
-                  validationErrors.confirmPassword ? "border-red-500" : ""
-                }
+                {...register("confirmPassword")}
+                disabled={isSubmitting}
+                className={errors.confirmPassword ? "border-red-500" : ""}
               />
               <Button
                 type="button"
@@ -406,7 +289,7 @@ export function SignUpForm() {
                 size="sm"
                 className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                disabled={loading}
+                disabled={isSubmitting}
               >
                 {showConfirmPassword ? (
                   <EyeOff className="h-4 w-4" />
@@ -415,15 +298,15 @@ export function SignUpForm() {
                 )}
               </Button>
             </div>
-            {validationErrors.confirmPassword && (
+            {errors.confirmPassword && (
               <p className="text-sm text-red-500">
-                {validationErrors.confirmPassword}
+                {errors.confirmPassword.message}
               </p>
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creating Account..." : "Create Account"}
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Creating Account..." : "Create Account"}
           </Button>
         </form>
 
@@ -442,7 +325,7 @@ export function SignUpForm() {
           <Button
             variant="outline"
             onClick={() => handleOAuthSignUp("google")}
-            disabled={loading}
+            disabled={isSubmitting}
           >
             <Mail className="mr-2 h-4 w-4" />
             Google
@@ -450,7 +333,7 @@ export function SignUpForm() {
           <Button
             variant="outline"
             onClick={() => handleOAuthSignUp("github")}
-            disabled={loading}
+            disabled={isSubmitting}
           >
             <Github className="mr-2 h-4 w-4" />
             GitHub
