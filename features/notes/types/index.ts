@@ -1,14 +1,25 @@
 export interface Note {
   id: string;
   title: string;
-  content: string;
+  content: string; // Slate.js JSON content
   createdAt: string;
   updatedAt: string;
-  roomId: string;
-  isLocked?: boolean;
-  lockedBy?: string;
   version: number;
+  roomId: string;
+  createdBy: string;
+  creator: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
 }
+
+// Type for when no note exists yet
+export type NoteOrNull = Note | null;
+
+// Type for multiple notes
+export type NotesList = Note[];
 
 export interface NoteOperation {
   type:
@@ -48,26 +59,31 @@ export interface NoteUser {
 
 export interface CreateNoteRequest {
   title: string;
-  content?: string;
+  content: string;
   roomId: string;
 }
 
 export interface UpdateNoteRequest {
-  id: string;
   title?: string;
   content?: string;
-  operations?: NoteOperation[];
-  version: number;
+  roomId: string;
 }
 
 export interface NotePermissions {
   canEdit: boolean;
   canDelete: boolean;
-  canLock: boolean;
   canExport: boolean;
+  canRead: boolean;
 }
 
 export interface ExportOptions {
   format: "markdown" | "pdf";
   includeMetadata?: boolean;
+}
+
+export interface NoteEditorState {
+  isEditing: boolean;
+  isSaving: boolean;
+  hasUnsavedChanges: boolean;
+  lastSavedAt?: Date;
 }

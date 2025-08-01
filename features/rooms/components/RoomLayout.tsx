@@ -33,9 +33,10 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { RoomHeader } from "./RoomHeader";
 import { RoomSidebar } from "./RoomSidebar";
 import { PomodoroTimer } from "@/features/timer/components/PomodoroTimer";
-import { CollaborativeNotes } from "./CollaborativeNotes";
+
 import { GroupChat } from "./GroupChat";
-// import { ChatPanel } from "@/features/chat/components/ChatPanel";
+import { NotesContainer } from "@/features/notes/components/NotesContainer";
+import { RoomOverview } from "./RoomOverview";
 import { useRoomMembers } from "../hooks/useRoomMembers";
 
 interface RoomLayoutProps {
@@ -163,14 +164,14 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
         <PomodoroTimer roomId={roomId} roomCreatorId={room.creator.id} />
       </div>
 
-      <div className="container mx-auto ">
+      <div className="w-full max-w-[1920px] mx-auto ">
         {/* Room Header */}
         <RoomHeader room={room} />
 
         {/* Main Layout */}
-        <div className="grid gap-6 lg:grid-cols-4 mt-4">
-          {/* Main Content Panel */}
-          <div className="lg:col-span-3 space-y-6">
+        <div className="grid gap-4 lg:grid-cols-8 mt-4">
+          {/* Chat Panel - Left Side */}
+          <div className="lg:col-span-5 space-y-6">
             {/* Mobile Timer - Above Chat */}
             <div className="block lg:hidden">
               <PomodoroTimer roomId={roomId} roomCreatorId={room.creator.id} />
@@ -185,9 +186,11 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
                     {room.name}
                   </CardTitle>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
+                    <Badge className="text-xs font-semibold bg-primary/10 text-black dark:text-white">
                       <Users className="w-3 h-3 mr-1" />
-                      {room.onlineMembers} online
+                      {room.onlineMembers > 1
+                        ? `${room.onlineMembers} members`
+                        : `${room.onlineMembers} member`}
                     </Badge>
                   </div>
                 </div>
@@ -197,25 +200,37 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
                 <GroupChat roomId={roomId} />
               </CardContent>
             </Card>
+          </div>
 
-            {/* Notes Panel */}
+          {/* Notes Panel - Right Side */}
+          <div className="lg:col-span-3">
             <Card className="h-[calc(100vh-280px)] lg:h-[calc(100vh-200px)] flex flex-col">
-              <CardHeader className="pb-4 border-b flex-shrink-0">
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  Collaborative Notes
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 p-0 min-h-0">
-                <CollaborativeNotes roomId={roomId} />
+              <CardContent className="flex-1 flex flex-col min-h-0 p-0">
+                <NotesContainer
+                  roomId={roomId}
+                  room={{
+                    id: room.id,
+                    name: room.name,
+                    isPublic: room.isPublic,
+                    creatorId: room.creator.id,
+                    members: room.members.map((member) => ({
+                      userId: member.user.id,
+                      user: {
+                        id: member.user.id,
+                        name: member.user.name || "Unknown User",
+                        email: "",
+                      },
+                    })),
+                  }}
+                />
               </CardContent>
             </Card>
           </div>
 
-          {/* Sidebar Panel */}
-          <div className="lg:col-span-1">
-            <RoomSidebar room={room} />
-          </div>
+          {/* Room Overview - Far Right */}
+          {/* <div className="lg:col-span-1">
+            <RoomOverview room={room} />
+          </div> */}
         </div>
       </div>
     </div>

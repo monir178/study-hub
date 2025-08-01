@@ -49,16 +49,6 @@ export const unsubscribeFromRoomChat = (roomId: string) => {
   pusherClient.unsubscribe(`room-${roomId}-chat`);
 };
 
-// Helper function to subscribe to room notes channel
-export const subscribeToRoomNotes = (roomId: string) => {
-  return pusherClient.subscribe(`room-${roomId}-notes`);
-};
-
-// Helper function to unsubscribe from room notes channel
-export const unsubscribeFromRoomNotes = (roomId: string) => {
-  pusherClient.unsubscribe(`room-${roomId}-notes`);
-};
-
 // Server-side helper to trigger timer updates
 export const triggerTimerUpdate = async (
   roomId: string,

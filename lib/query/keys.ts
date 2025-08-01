@@ -39,6 +39,9 @@ export const queryKeys = {
   notes: ["notes"] as const,
   note: (id: string) => [...queryKeys.notes, id] as const,
   userNotes: (userId: string) => [...queryKeys.notes, "user", userId] as const,
+  roomNotes: (roomId: string) => [...queryKeys.rooms, roomId, "notes"] as const,
+  roomNote: (roomId: string, noteId: string) =>
+    [...queryKeys.rooms, roomId, "notes", noteId] as const,
 
   // Timer/Sessions
   sessions: ["sessions"] as const,

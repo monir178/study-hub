@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import authSlice from "@/features/auth/store/authSlice";
 import roomsSlice from "@/features/rooms/store/roomsSlice";
 import chatSlice from "@/features/chat/store/chatSlice";
-import notesSlice from "@/features/notes/store/notesSlice";
+// import notesSlice from "@/features/notes/store/notesSlice";
 import usersSlice from "@/features/users/store/usersSlice";
 
 export const store = configureStore({
@@ -10,7 +10,7 @@ export const store = configureStore({
     auth: authSlice,
     rooms: roomsSlice,
     chat: chatSlice,
-    notes: notesSlice,
+    // notes: notesSlice,
     users: usersSlice,
   },
   middleware: (getDefaultMiddleware) =>

@@ -95,7 +95,7 @@ export function RoomHeader({ room }: RoomHeaderProps) {
           )} */}
 
           {/* Leave Room Button */}
-          {room.userRole !== "ADMIN" && room.creator.id !== currentUser?.id && (
+          {room.creator.id !== currentUser?.id && (
             <Button
               variant="outline"
               onClick={handleLeaveRoom}

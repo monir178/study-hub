@@ -27,7 +27,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -280,7 +279,6 @@ export function StudyRoomCard({
 
                   {deletePermission && (
                     <>
-                      {canEditRoom() && <DropdownMenuSeparator />}
                       <DropdownMenuItem
                         className="text-red-600 focus:text-red-600"
                         onSelect={(e) => {
@@ -401,7 +399,7 @@ export function StudyRoomCard({
                 : "Join Room"}
           </Button>
 
-          {room.isJoined && room.userRole !== "ADMIN" && (
+          {room.isJoined && room.creator.id !== currentUser?.id && (
             <Button
               onClick={handleLeave}
               disabled={loading || isLeaving}

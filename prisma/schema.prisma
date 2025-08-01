@@ -55,8 +55,8 @@ model User {
   roomMembers   RoomMember[]
   messages      Message[]
   studySessions StudySession[]
-  noteEdits     NoteEdit[]
-  lockedNotes   Note[]          @relation("NoteLocks")
+  createdNotes  Note[]          @relation("NoteCreator")
+ 
 }
 
 model VerificationToken {
@@ -84,6 +84,7 @@ model StudyRoom {
   members       RoomMember[]
   messages      Message[]
   notes         Note[]
+
   studySessions StudySession[]
 }
 
@@ -115,35 +116,8 @@ model Message {
   room   StudyRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
 }
 
-model Note {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  content   String   @default("")
-  isLocked  Boolean  @default(false)
-  lockedBy  String?  @db.ObjectId
-  lockedAt  DateTime?
-  version   Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  roomId String    @db.ObjectId
-  room   StudyRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
 
-  lockedByUser User? @relation("NoteLocks", fields: [lockedBy], references: [id])
-  edits        NoteEdit[]
-}
-
-model NoteEdit {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  operation String   // JSON string of the operation
-  createdAt DateTime @default(now())
-
-  userId String @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  noteId String @db.ObjectId
-  note   Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
-}
 
 model StudySession {
   id        String        @id @default(auto()) @map("_id") @db.ObjectId
@@ -165,6 +139,23 @@ model StudySession {
 
   roomId String    @db.ObjectId
   room   StudyRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+}
+
+model Note {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String   // Slate.js JSON content
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  version   Int      @default(1)
+
+  // Room relationship - many notes per room
+  roomId String    @db.ObjectId
+  room   StudyRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  // Creator relationship
+  createdBy String @db.ObjectId
+  creator  User    @relation("NoteCreator", fields: [createdBy], references: [id], onDelete: Cascade)
 }
 
 enum Role {
