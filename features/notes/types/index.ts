@@ -87,3 +87,124 @@ export interface NoteEditorState {
   hasUnsavedChanges: boolean;
   lastSavedAt?: Date;
 }
+
+// Component-specific types
+export interface RoomInfo {
+  id: string;
+  name: string;
+  isPublic: boolean;
+  creatorId: string;
+  members: Array<{
+    userId: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  }>;
+}
+
+export interface NotesContainerProps {
+  roomId: string;
+  room?: RoomInfo;
+}
+
+export interface NotesListProps {
+  notes: Note[];
+  isLoading: boolean;
+  onNoteSelect: (note: Note) => void;
+  onCreateNote: () => void;
+  onDeleteNote?: (noteId: string) => void;
+  permissions: NotePermissions;
+  room?: RoomInfo;
+  isDeleting?: boolean;
+  onDeleteSuccess?: () => void;
+  onBackToList?: () => void;
+  showBackButton?: boolean;
+  selectedNote?: Note | null;
+  isMinimized?: boolean;
+  onSave?: (content: string, title: string) => void;
+  onExportMarkdown?: () => void;
+  onExportPDF?: () => void;
+  isSaving?: boolean;
+}
+
+export interface NotesPanelProps {
+  note?: Note;
+  isLoading: boolean;
+  editorState: NoteEditorState;
+  permissions: NotePermissions;
+  onSave: (content: string, title: string) => void;
+  onExportMarkdown: () => void;
+  onExportPDF: () => void;
+  onBack: () => void;
+  isSaving: boolean;
+}
+
+export interface SlateEditorProps {
+  note?: Note;
+  isLoading: boolean;
+  editorState: NoteEditorState;
+  permissions: NotePermissions;
+  onSave: (content: string, title: string) => void;
+  onExportMarkdown?: () => void;
+  onExportPDF?: () => void;
+  onChange?: (content: string, title: string) => void;
+  hideHeader?: boolean;
+  isSaving: boolean;
+}
+
+export interface DeleteDialogState {
+  isOpen: boolean;
+  isDeleting: boolean;
+  noteId: string | null;
+  noteTitle: string;
+}
+
+export interface NoteCardProps {
+  note: Note;
+  onSelect: (note: Note) => void;
+  onDelete?: (noteId: string) => void;
+  permissions: NotePermissions;
+  isDeleting?: boolean;
+  onDeleteClick: (noteId: string, noteTitle: string) => void;
+}
+
+export interface NotesHeaderProps {
+  notesCount: number;
+  showBackButton: boolean;
+  onBackToList?: () => void;
+  onCreateNote?: () => void;
+  permissions: NotePermissions;
+}
+
+export interface NotesSearchProps {
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+}
+
+export interface NotesEmptyStateProps {
+  searchQuery: string;
+  permissions: NotePermissions;
+  onCreateNote?: () => void;
+  room?: RoomInfo;
+}
+
+export interface NotesToolbarProps {
+  permissions: NotePermissions;
+  activeTools: Set<string>;
+  onToggleMark: (format: string) => void;
+  onToggleBlock: (format: string) => void;
+  onExportMarkdown?: () => void;
+  onExportPDF?: () => void;
+}
+
+export interface NotesTitleEditorProps {
+  title: string;
+  isEditing: boolean;
+  onTitleChange: (title: string) => void;
+  onStartEdit: () => void;
+  onSave: () => void;
+  onCancel: () => void;
+  permissions: NotePermissions;
+}

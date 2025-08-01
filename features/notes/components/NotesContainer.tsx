@@ -3,25 +3,7 @@
 import React, { useState } from "react";
 import { useNotes } from "../hooks/useNotes";
 import { NotesList } from "./NotesList";
-import { Note } from "../types";
-
-interface NotesContainerProps {
-  roomId: string;
-  room?: {
-    id: string;
-    name: string;
-    isPublic: boolean;
-    creatorId: string;
-    members: Array<{
-      userId: string;
-      user: {
-        id: string;
-        name: string;
-        email: string;
-      };
-    }>;
-  };
-}
+import { Note, NotesContainerProps } from "../types";
 
 export function NotesContainer({ roomId, room }: NotesContainerProps) {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);

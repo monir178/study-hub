@@ -2,15 +2,12 @@
 
 import React, { useState, useCallback, useEffect } from "react";
 import { SlateEditor } from "./SlateEditor";
-import { Note, NoteEditorState } from "../types";
+import { NotesPanelProps } from "../types";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
   Download,
   Save,
-  Edit2,
-  Check,
-  X,
   Loader2,
   FileText,
   FileDown,
@@ -21,25 +18,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { Input } from "@/components/ui/input";
-import { formatDistanceToNow } from "date-fns";
-
-interface NotesPanelProps {
-  note?: Note;
-  isLoading: boolean;
-  editorState: NoteEditorState;
-  permissions: {
-    canEdit: boolean;
-    canExport: boolean;
-    canRead: boolean;
-  };
-  onSave: (content: string, title: string) => void;
-  onExportMarkdown: () => void;
-  onExportPDF: () => void;
-  onBack: () => void;
-  isSaving: boolean;
-}
+import { NotesTitleEditor } from "./NotesTitleEditor";
+import { formatLastSaved } from "../utils";
 
 export function NotesPanel({
   note,
@@ -55,6 +35,7 @@ export function NotesPanel({
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState(note?.title || "Untitled Note");
   const [editorContent, setEditorContent] = useState("");
+  const [lastSavedText, setLastSavedText] = useState<string | null>(null);
 
   // Update title when note changes
   useEffect(() => {
@@ -62,6 +43,15 @@ export function NotesPanel({
       setTitleValue(note.title);
     }
   }, [note?.title]);
+
+  // Update last saved text when note changes
+  useEffect(() => {
+    const updateLastSaved = async () => {
+      const text = await formatLastSaved(note?.updatedAt);
+      setLastSavedText(text);
+    };
+    updateLastSaved();
+  }, [note?.updatedAt]);
 
   const handleTitleSave = useCallback(() => {
     // Just exit edit mode, don't save to database
@@ -84,17 +74,6 @@ export function NotesPanel({
   const handleSave = useCallback(() => {
     onSave(editorContent, titleValue);
   }, [onSave, editorContent, titleValue]);
-
-  const formatLastSaved = useCallback(() => {
-    if (!note?.updatedAt) return null;
-
-    try {
-      const updatedAt = new Date(note.updatedAt);
-      return `Saved ${formatDistanceToNow(updatedAt, { addSuffix: true })}`;
-    } catch {
-      return null;
-    }
-  }, [note?.updatedAt]);
 
   if (isLoading) {
     return (
@@ -164,52 +143,17 @@ export function NotesPanel({
 
       {/* Header Row 2: Note title and last saved info */}
       <div className="flex items-center justify-between p-4 pb-2">
-        <div className="flex items-center gap-2 flex-1">
-          {isEditingTitle ? (
-            <div className="flex items-center gap-2 flex-1">
-              <Input
-                value={titleValue}
-                onChange={(e) => setTitleValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleTitleSave();
-                  } else if (e.key === "Escape") {
-                    handleTitleCancel();
-                  }
-                }}
-                className="text-lg font-semibold"
-                autoFocus
-              />
-              <Button size="sm" variant="ghost" onClick={handleTitleSave}>
-                <Check className="w-4 h-4" />
-              </Button>
-              <Button size="sm" variant="ghost" onClick={handleTitleCancel}>
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 flex-1">
-              <h1
-                className="text-lg font-semibold cursor-pointer hover:text-blue-600 transition-colors"
-                onClick={() => permissions.canEdit && setIsEditingTitle(true)}
-              >
-                {titleValue}
-              </h1>
-              {permissions.canEdit && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setIsEditingTitle(true)}
-                  className="p-1 h-auto"
-                >
-                  <Edit2 className="w-3 h-3" />
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
+        <NotesTitleEditor
+          title={titleValue}
+          isEditing={isEditingTitle}
+          onTitleChange={setTitleValue}
+          onStartEdit={() => setIsEditingTitle(true)}
+          onSave={handleTitleSave}
+          onCancel={handleTitleCancel}
+          permissions={permissions}
+        />
 
-        <div className="text-sm text-muted-foreground">{formatLastSaved()}</div>
+        <div className="text-sm text-muted-foreground">{lastSavedText}</div>
       </div>
 
       {/* Editor */}

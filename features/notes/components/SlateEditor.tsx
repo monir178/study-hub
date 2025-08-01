@@ -10,55 +10,15 @@ import {
   RenderLeafProps,
 } from "slate-react";
 import { withHistory } from "slate-history";
-import {
-  Bold,
-  Italic,
-  Underline,
-  Code,
-  Heading1,
-  Heading2,
-  Heading3,
-  List,
-  ListOrdered,
-  Quote,
-  FileText,
-  FileDown,
-  Lock,
-  Save,
-  Loader2,
-} from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Note, NoteEditorState } from "../types";
+import { SlateEditorProps } from "../types";
+import { NotesToolbar } from "./NotesToolbar";
 
 // Using built-in Slate.js types
-
-interface SlateEditorProps {
-  note?: Note;
-  isLoading: boolean;
-  editorState: NoteEditorState;
-  permissions: {
-    canEdit: boolean;
-    canExport: boolean;
-    canRead: boolean;
-  };
-  onSave: (content: string, title: string) => void;
-  onExportMarkdown?: () => void;
-  onExportPDF?: () => void;
-  onChange?: (content: string, title: string) => void;
-  hideHeader?: boolean;
-  isSaving: boolean;
-}
 
 const initialValue: Descendant[] = [
   {
@@ -111,7 +71,7 @@ export function SlateEditor({
       setValue(initialValue);
       setKey((prev) => prev + 1); // Force re-render
     }
-  }, [note?.content]);
+  }, [note?.content, note]);
 
   // Update title when note changes
   useEffect(() => {
@@ -198,7 +158,9 @@ export function SlateEditor({
     }
 
     if (leaf.code) {
-      children = <code className="bg-gray-100 px-1 rounded">{children}</code>;
+      children = (
+        <code className="bg-primary/20 px-1  rounded">{children}</code>
+      );
     }
 
     if (leaf.italic) {
@@ -222,27 +184,26 @@ export function SlateEditor({
           // Unwrap any existing list items
           editor.unwrapNodes({
             match: (n: unknown) =>
-              !Editor.isEditor(n) && LIST_TYPES.includes((n as any).type),
+              !Editor.isEditor(n) &&
+              LIST_TYPES.includes((n as { type: string }).type),
             split: true,
           });
         }
 
-        let newProperties: any;
         if (isActive) {
-          newProperties = { type: "paragraph" };
+          editor.setNodes({ type: "paragraph" });
           setActiveTools((prev) => {
             const newSet = new Set(prev);
             newSet.delete(format);
             return newSet;
           });
         } else if (isList) {
-          newProperties = { type: "list-item" };
+          editor.setNodes({ type: "list-item" as const });
           setActiveTools((prev) => new Set([...prev, format]));
         } else {
-          newProperties = { type: format };
+          editor.setNodes({ type: format as any });
           setActiveTools((prev) => new Set([...prev, format]));
         }
-        editor.setNodes(newProperties);
 
         if (!isActive && isList) {
           // Wrap the list items in the list type
@@ -279,14 +240,15 @@ export function SlateEditor({
     [editor],
   );
 
-  const isBlockActive = (editor: any, format: string) => {
+  const isBlockActive = (editor: Editor, format: string) => {
     try {
       const { selection } = editor;
       if (!selection) return false;
 
       const [match] = editor.nodes({
         at: editor.unhangRange(selection),
-        match: (n: any) => !Editor.isEditor(n) && n.type === format,
+        match: (n: unknown) =>
+          !Editor.isEditor(n) && (n as { type: string }).type === format,
       });
 
       const isActive = !!match;
@@ -297,13 +259,15 @@ export function SlateEditor({
     }
   };
 
-  const isMarkActive = (editor: any, format: string) => {
+  const isMarkActive = (editor: Editor, format: string) => {
     try {
       const { selection } = editor;
       if (!selection) return false;
 
       const marks = Editor.marks(editor);
-      const isActive = marks ? (marks as any)[format] === true : false;
+      const isActive = marks
+        ? (marks as Record<string, boolean>)[format] === true
+        : false;
       return isActive;
     } catch (error) {
       console.error("Error in isMarkActive:", error);
@@ -320,7 +284,7 @@ export function SlateEditor({
       const marks = Editor.marks(editor);
       if (marks) {
         Object.keys(marks).forEach((key) => {
-          if ((marks as any)[key] === true) {
+          if ((marks as Record<string, boolean>)[key] === true) {
             newActiveTools.add(key);
           }
         });
@@ -332,10 +296,13 @@ export function SlateEditor({
         try {
           const [match] = editor.nodes({
             at: editor.unhangRange(selection),
-            match: (n: any) => !Editor.isEditor(n) && n.type !== "paragraph",
+            match: (n: unknown) =>
+              !Editor.isEditor(n) &&
+              (n as { type: string }).type !== "paragraph",
           });
           if (match) {
-            newActiveTools.add((match as any).type);
+            const node = match[0] as { type: string };
+            newActiveTools.add(node.type);
           }
         } catch (selectionError) {
           console.warn("Error checking block selection:", selectionError);
@@ -369,168 +336,14 @@ export function SlateEditor({
     return (
       <div className="h-full flex flex-col">
         {/* Toolbar */}
-        <div className="flex items-center gap-1 p-2 border-b mb-2 flex-wrap">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("bold") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleMark("bold")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Bold className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Bold</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("italic") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleMark("italic")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Italic className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Italic</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("underline") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleMark("underline")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Underline className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Underline</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("code") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleMark("code")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Code className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Code</TooltipContent>
-            </Tooltip>
-
-            <Separator orientation="vertical" className="h-6" />
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("heading-one") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleBlock("heading-one")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Heading1 className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Heading 1</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("heading-two") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleBlock("heading-two")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Heading2 className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Heading 2</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={
-                    activeTools.has("heading-three") ? "default" : "ghost"
-                  }
-                  size="sm"
-                  onClick={() => toggleBlock("heading-three")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Heading3 className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Heading 3</TooltipContent>
-            </Tooltip>
-
-            <Separator orientation="vertical" className="h-6" />
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={
-                    activeTools.has("bulleted-list") ? "default" : "ghost"
-                  }
-                  size="sm"
-                  onClick={() => toggleBlock("bulleted-list")}
-                  disabled={!permissions.canEdit}
-                >
-                  <List className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Bullet List</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={
-                    activeTools.has("numbered-list") ? "default" : "ghost"
-                  }
-                  size="sm"
-                  onClick={() => toggleBlock("numbered-list")}
-                  disabled={!permissions.canEdit}
-                >
-                  <ListOrdered className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Numbered List</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("block-quote") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleBlock("block-quote")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Quote className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Quote</TooltipContent>
-            </Tooltip>
-
-            {!permissions.canEdit && (
-              <div className="ml-auto">
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  <Lock className="w-3 h-3" />
-                  Read Only
-                </Badge>
-              </div>
-            )}
-          </TooltipProvider>
-        </div>
+        <NotesToolbar
+          permissions={permissions}
+          activeTools={activeTools}
+          onToggleMark={toggleMark}
+          onToggleBlock={toggleBlock}
+          onExportMarkdown={onExportMarkdown}
+          onExportPDF={onExportPDF}
+        />
 
         {/* Editor */}
         <div className="flex-1 overflow-auto">
@@ -566,17 +379,7 @@ export function SlateEditor({
       <CardHeader className="flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2 flex-1">
-            <FileText className="w-5 h-5" />
-            {permissions.canEdit ? (
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Note title..."
-                className="max-w-md"
-              />
-            ) : (
-              <CardTitle>{note?.title || "Untitled Note"}</CardTitle>
-            )}
+            <CardTitle>{note?.title || "Untitled Note"}</CardTitle>
           </div>
           <div className="flex items-center gap-2">
             {permissions.canEdit && (
@@ -599,12 +402,6 @@ export function SlateEditor({
                 )}
               </Button>
             )}
-            {!permissions.canEdit && (
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Lock className="w-3 h-3" />
-                Read Only
-              </Badge>
-            )}
             {editorState.hasUnsavedChanges && (
               <Badge variant="outline" className="text-orange-600">
                 Unsaved
@@ -621,187 +418,14 @@ export function SlateEditor({
 
       <CardContent className="flex-1 flex flex-col min-h-0">
         {/* Toolbar */}
-        <div className="flex items-center gap-1 p-2 border-b mb-4 flex-wrap">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("bold") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleMark("bold")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Bold className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Bold</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("italic") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleMark("italic")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Italic className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Italic</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("underline") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleMark("underline")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Underline className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Underline</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("code") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleMark("code")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Code className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Code</TooltipContent>
-            </Tooltip>
-
-            <Separator orientation="vertical" className="h-6" />
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("heading-one") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleBlock("heading-one")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Heading1 className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Heading 1</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("heading-two") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleBlock("heading-two")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Heading2 className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Heading 2</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={
-                    activeTools.has("heading-three") ? "default" : "ghost"
-                  }
-                  size="sm"
-                  onClick={() => toggleBlock("heading-three")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Heading3 className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Heading 3</TooltipContent>
-            </Tooltip>
-
-            <Separator orientation="vertical" className="h-6" />
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={
-                    activeTools.has("bulleted-list") ? "default" : "ghost"
-                  }
-                  size="sm"
-                  onClick={() => toggleBlock("bulleted-list")}
-                  disabled={!permissions.canEdit}
-                >
-                  <List className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Bullet List</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={
-                    activeTools.has("numbered-list") ? "default" : "ghost"
-                  }
-                  size="sm"
-                  onClick={() => toggleBlock("numbered-list")}
-                  disabled={!permissions.canEdit}
-                >
-                  <ListOrdered className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Numbered List</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeTools.has("block-quote") ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => toggleBlock("block-quote")}
-                  disabled={!permissions.canEdit}
-                >
-                  <Quote className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Quote</TooltipContent>
-            </Tooltip>
-
-            <div className="ml-auto flex items-center gap-1">
-              {permissions.canExport && onExportMarkdown && onExportPDF && (
-                <>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={onExportMarkdown}
-                      >
-                        <FileText className="w-4 h-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Export as Markdown</TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" onClick={onExportPDF}>
-                        <FileDown className="w-4 h-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Export as PDF</TooltipContent>
-                  </Tooltip>
-                </>
-              )}
-            </div>
-          </TooltipProvider>
-        </div>
+        <NotesToolbar
+          permissions={permissions}
+          activeTools={activeTools}
+          onToggleMark={toggleMark}
+          onToggleBlock={toggleBlock}
+          onExportMarkdown={onExportMarkdown}
+          onExportPDF={onExportPDF}
+        />
 
         {/* Editor */}
         <div className="flex-1 overflow-auto">

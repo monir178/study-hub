@@ -2,26 +2,10 @@ import { useCallback } from "react";
 import { useApiQuery, useApiMutation, useCacheUtils } from "@/lib/api/hooks";
 import { queryKeys } from "@/lib/query/keys";
 import { NotesService } from "../services/notes.service";
-import { Note, CreateNoteRequest, UpdateNoteRequest } from "../types";
+import { Note, CreateNoteRequest, UpdateNoteRequest, RoomInfo } from "../types";
 import { useAuth } from "@/lib/hooks/useAuth";
 
-export function useNotes(
-  roomId: string,
-  room?: {
-    id: string;
-    name: string;
-    isPublic: boolean;
-    creatorId: string;
-    members: Array<{
-      userId: string;
-      user: {
-        id: string;
-        name: string;
-        email: string;
-      };
-    }>;
-  },
-) {
+export function useNotes(roomId: string, room?: RoomInfo) {
   const { invalidate } = useCacheUtils();
   const { user: currentUser } = useAuth();
 
