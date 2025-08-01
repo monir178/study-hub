@@ -87,8 +87,8 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto py-6">
+      <div className="min-h-screen   bg-background">
+        <div className="container mx-auto ">
           <div className="flex items-center gap-4 mb-6">
             <Button variant="ghost" size="sm" onClick={() => router.back()}>
               <ArrowLeft className="w-4 h-4 mr-2" />

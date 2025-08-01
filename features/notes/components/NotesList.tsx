@@ -30,6 +30,37 @@ import {
 } from "lucide-react";
 import { Note } from "../types";
 
+// Utility function to extract plain text from Slate.js content
+const extractTextFromSlateContent = (content: string): string => {
+  try {
+    const parsed = JSON.parse(content);
+
+    const extractText = (nodes: unknown[]): string => {
+      return nodes
+        .map((node) => {
+          const nodeObj = node as { text?: string; children?: unknown[] };
+          if (nodeObj.text !== undefined) {
+            return nodeObj.text;
+          }
+          if (nodeObj.children && Array.isArray(nodeObj.children)) {
+            return extractText(nodeObj.children);
+          }
+          return "";
+        })
+        .join("");
+    };
+
+    if (Array.isArray(parsed)) {
+      return extractText(parsed);
+    }
+
+    return content; // Fallback to original content if parsing fails
+  } catch {
+    // If it's not valid JSON, assume it's plain text
+    return content;
+  }
+};
+
 interface NotesListProps {
   notes: Note[];
   isLoading: boolean;
@@ -287,9 +318,14 @@ export function NotesList({
                           {note.title}
                         </h3>
                         <p className="text-xs text-muted-foreground line-clamp-2">
-                          {note.content.length > 100
-                            ? `${note.content.substring(0, 100)}...`
-                            : note.content}
+                          {(() => {
+                            const plainText = extractTextFromSlateContent(
+                              note.content,
+                            );
+                            return plainText.length > 100
+                              ? `${plainText.substring(0, 100)}...`
+                              : plainText || "No content";
+                          })()}
                         </p>
                       </div>
 
