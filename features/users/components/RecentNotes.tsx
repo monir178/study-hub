@@ -46,7 +46,7 @@ export function RecentNotes({ recentNotes, loading }: RecentNotesProps) {
     <Card className="min-h-[200px]">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Recent Notes</CardTitle>
+          <CardTitle className="text-lg">My Recent Notes</CardTitle>
           <FileText className="w-5 h-5 text-muted-foreground" />
         </div>
       </CardHeader>

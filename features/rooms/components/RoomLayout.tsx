@@ -38,6 +38,7 @@ import { GroupChat } from "./GroupChat";
 import { NotesContainer } from "@/features/notes/components/NotesContainer";
 import { RoomOverview } from "./RoomOverview";
 import { useRoomMembers } from "../hooks/useRoomMembers";
+import { Loading } from "@/components/ui/loading";
 
 interface RoomLayoutProps {
   roomId: string;
@@ -86,54 +87,7 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
   }, [room, currentUser?.id, memberActions]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen   bg-background">
-        <div className="container mx-auto ">
-          <div className="flex items-center gap-4 mb-6">
-            <Button variant="ghost" size="sm" onClick={() => router.back()}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-4">
-            {/* Main Content Skeleton */}
-            <div className="lg:col-span-3 space-y-6">
-              <Card>
-                <CardHeader>
-                  <div className="space-y-2">
-                    <div className="h-8 bg-muted animate-pulse rounded w-3/4"></div>
-                    <div className="h-4 bg-muted animate-pulse rounded w-full"></div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-96 bg-muted animate-pulse rounded"></div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Sidebar Skeleton */}
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <div className="h-6 bg-muted animate-pulse rounded w-1/2"></div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-muted animate-pulse rounded-full"></div>
-                        <div className="h-4 bg-muted animate-pulse rounded w-24"></div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error || !room) {
