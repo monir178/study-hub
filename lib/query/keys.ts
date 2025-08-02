@@ -46,6 +46,8 @@ export const queryKeys = {
   notes: ["notes"] as const,
   note: (id: string) => [...queryKeys.notes, id] as const,
   userNotes: (userId: string) => [...queryKeys.notes, "user", userId] as const,
+  userNotesPaginated: (page: number, limit: number) =>
+    [...queryKeys.notes, "user", "paginated", { page, limit }] as const,
   roomNotes: (roomId: string) => [...queryKeys.rooms, roomId, "notes"] as const,
   roomNote: (roomId: string, noteId: string) =>
     [...queryKeys.rooms, roomId, "notes", noteId] as const,

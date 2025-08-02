@@ -12,6 +12,7 @@ export interface Note {
     name: string;
     email: string;
     role: string;
+    image?: string;
   };
 }
 
@@ -20,6 +21,20 @@ export type NoteOrNull = Note | null;
 
 // Type for multiple notes
 export type NotesList = Note[];
+
+// Type for user notes with room information
+export interface UserNote extends Note {
+  room: {
+    id: string;
+    name: string;
+    isPublic: boolean;
+    members: Array<{
+      userId: string;
+    }>;
+  };
+}
+
+export type UserNotesList = UserNote[];
 
 export interface NoteOperation {
   type:

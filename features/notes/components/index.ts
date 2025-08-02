@@ -9,3 +9,7 @@ export { NotesEmptyState } from "./NotesEmptyState";
 export { NotesToolbar } from "./NotesToolbar";
 export { NotesTitleEditor } from "./NotesTitleEditor";
 export { DeleteDialog } from "./DeleteDialog";
+export { UserNotesContainer } from "./UserNotesContainer";
+export { UserNoteCard } from "./UserNoteCard";
+export { UserNotesList } from "./UserNotesList";
+export { UserNoteViewer } from "./UserNoteViewer";

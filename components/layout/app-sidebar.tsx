@@ -44,7 +44,7 @@ interface NavItem {
 const userNavItems: NavItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Study Rooms", href: "/dashboard/rooms", icon: Users },
-  { name: "My Notes", href: "/notes", icon: FileText },
+  { name: "Public Notes", href: "/dashboard/notes", icon: FileText },
   { name: "Timer", href: "/timer", icon: Clock },
   { name: "Chat", href: "/chat", icon: MessageSquare },
 ];

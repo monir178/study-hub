@@ -1,0 +1,140 @@
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { FileText, ArrowRight, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { UserNote } from "../types";
+import { UserNoteCard } from "./UserNoteCard";
+
+interface UserNotesListProps {
+  notes: UserNote[];
+  selectedNote: UserNote | null;
+  pagination?: {
+    totalCount: number;
+    hasNextPage: boolean;
+  };
+  isLoading: boolean;
+  onNoteSelect: (note: UserNote) => void;
+  onLoadMore: () => void;
+}
+
+export function UserNotesList({
+  notes,
+  selectedNote,
+  pagination,
+  isLoading,
+  onNoteSelect,
+  onLoadMore,
+}: UserNotesListProps) {
+  if (isLoading && !notes.length) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              My Notes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="w-10 h-10 rounded-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-48" />
+                      <Skeleton className="h-3 w-32" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-8 w-20" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-1/2 border-r">
+      <Card className="h-full flex flex-col">
+        <CardHeader className="flex-shrink-0">
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="w-5 h-5" />
+            My Notes
+            {pagination && (
+              <Badge variant="secondary" className="ml-2">
+                {pagination.totalCount} total
+              </Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+
+        <CardContent className="flex-1 flex flex-col min-h-0 p-0">
+          {notes.length === 0 ? (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center py-12">
+                <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No notes found</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Join some study rooms to start creating notes
+                </p>
+                <Button asChild>
+                  <Link href="/dashboard/rooms">
+                    Browse Study Rooms
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex-1 overflow-hidden">
+              {/* Scrollable Notes List with Load More Button Inside */}
+              <ScrollArea className="h-full">
+                <div className="px-6 py-6 space-y-3">
+                  {notes.map((note) => (
+                    <UserNoteCard
+                      key={note.id}
+                      note={note}
+                      isSelected={selectedNote?.id === note.id}
+                      onSelect={onNoteSelect}
+                    />
+                  ))}
+
+                  {/* Load More Button Inside Scroll Area */}
+                  {pagination?.hasNextPage && (
+                    <div className="pt-3">
+                      <Button
+                        onClick={onLoadMore}
+                        disabled={isLoading}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          "Load More Notes"
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
