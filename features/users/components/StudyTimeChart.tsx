@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { StudyTimeByDay } from "../types";
 import { format } from "date-fns";
+import { StudyTimeChartSkeleton } from "../dashboard/components/skeletons";
 
 interface StudyTimeChartProps {
   data: StudyTimeByDay[];
@@ -21,16 +22,7 @@ interface StudyTimeChartProps {
 
 export function StudyTimeChart({ data, loading }: StudyTimeChartProps) {
   if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Study Time (Last 7 Days)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px] bg-muted animate-pulse rounded" />
-        </CardContent>
-      </Card>
-    );
+    return <StudyTimeChartSkeleton />;
   }
 
   // Transform data for chart

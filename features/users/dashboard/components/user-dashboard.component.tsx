@@ -6,19 +6,22 @@ import { UserDashboardBento } from "../../components/UserDashboardBento";
 import { StudyTimeChart } from "../../components/StudyTimeChart";
 import { RecentRooms } from "../../components/RecentRooms";
 import { RecentNotes } from "../../components/RecentNotes";
-import { UserDashboardSkeleton } from "./";
+import {
+  UserDashboardStatsSkeleton,
+  StudyTimeChartSkeleton,
+  RecentRoomsSkeleton,
+  RecentNotesSkeleton,
+  UserDashboardBentoSkeleton,
+} from "./skeletons";
 
 interface UserDashboardProps {
   loading?: boolean;
 }
 
 export function UserDashboard({ loading }: UserDashboardProps) {
-  const { data, isLoading, error } = useUserDashboard();
+  const { data, error } = useUserDashboard();
 
-  if (loading || isLoading) {
-    return <UserDashboardSkeleton />;
-  }
-
+  // Show error only if there's an actual error
   if (error) {
     return (
       <div className="space-y-6">
@@ -34,15 +37,29 @@ export function UserDashboard({ loading }: UserDashboardProps) {
     );
   }
 
+  // If data is not available, show skeleton layout
   if (!data) {
     return (
-      <div className="space-y-6">
-        <div className="text-center py-12">
-          <h3 className="text-lg font-semibold">No dashboard data available</h3>
-          <p className="text-sm text-muted-foreground mt-2">
-            Start studying to see your progress
-          </p>
+      <div className="space-y-6 max-w-[1920px] mx-auto">
+        {/* First Row: Dashboard Stats */}
+        <UserDashboardStatsSkeleton />
+
+        {/* Second Row: Left Chart + Right Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left: Study Time Area Chart */}
+          <div className="h-full">
+            <StudyTimeChartSkeleton />
+          </div>
+
+          {/* Right: Recent Rooms + Recent Notes */}
+          <div className="space-y-6 h-full">
+            <RecentRoomsSkeleton />
+            <RecentNotesSkeleton />
+          </div>
         </div>
+
+        {/* Third Row: Quick Actions + Streak */}
+        <UserDashboardBentoSkeleton />
       </div>
     );
   }
@@ -50,19 +67,29 @@ export function UserDashboard({ loading }: UserDashboardProps) {
   return (
     <div className="space-y-6 max-w-[1920px] mx-auto">
       {/* First Row: Dashboard Stats */}
-      <UserDashboardStats stats={data.stats} trends={data.trends} />
+      <UserDashboardStats
+        stats={data.stats}
+        trends={data.trends}
+        loading={loading}
+      />
 
       {/* Second Row: Left Chart + Right Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Study Time Area Chart */}
         <div className="h-full">
-          <StudyTimeChart data={data.studyTimeByDay} />
+          <StudyTimeChart data={data.studyTimeByDay} loading={loading} />
         </div>
 
         {/* Right: Recent Rooms + Recent Notes */}
         <div className="space-y-6 h-full">
-          <RecentRooms recentRooms={data.recentRooms.slice(0, 3)} />
-          <RecentNotes recentNotes={data.recentNotes.slice(0, 3)} />
+          <RecentRooms
+            recentRooms={data.recentRooms.slice(0, 3)}
+            loading={loading}
+          />
+          <RecentNotes
+            recentNotes={data.recentNotes.slice(0, 3)}
+            loading={loading}
+          />
         </div>
       </div>
 
@@ -72,6 +99,7 @@ export function UserDashboard({ loading }: UserDashboardProps) {
         recentRooms={data.recentRooms}
         recentNotes={data.recentNotes}
         streak={data.streak}
+        loading={loading}
       />
     </div>
   );

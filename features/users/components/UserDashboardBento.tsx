@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Users, FileText, TrendingUp, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { StudySession, RoomMember, Note, StudyStreak } from "../types";
+import { UserDashboardBentoSkeleton } from "../dashboard/components/skeletons";
 
 interface UserDashboardBentoProps {
   recentSessions: StudySession[];
@@ -22,24 +23,7 @@ export function UserDashboardBento({
   loading,
 }: UserDashboardBentoProps) {
   if (loading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <Card key={i} className="h-[200px]">
-            <CardHeader className="pb-3">
-              <div className="h-4 bg-muted animate-pulse rounded w-20"></div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="h-3 bg-muted animate-pulse rounded w-full"></div>
-                <div className="h-3 bg-muted animate-pulse rounded w-3/4"></div>
-                <div className="h-3 bg-muted animate-pulse rounded w-1/2"></div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
+    return <UserDashboardBentoSkeleton />;
   }
 
   return (
@@ -80,7 +64,7 @@ export function UserDashboardBento({
             >
               <Link href="/dashboard/notes">
                 <FileText className="w-6 h-6" />
-                <span className="text-sm">My Notes</span>
+                <span className="text-sm">Notes</span>
               </Link>
             </Button>
           </div>

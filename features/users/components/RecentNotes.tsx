@@ -6,6 +6,7 @@ import { FileText, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Note } from "../types";
+import { RecentNotesSkeleton } from "../dashboard/components/skeletons";
 
 interface RecentNotesProps {
   recentNotes: Note[];
@@ -14,32 +15,7 @@ interface RecentNotesProps {
 
 export function RecentNotes({ recentNotes, loading }: RecentNotesProps) {
   if (loading) {
-    return (
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Recent Notes</CardTitle>
-            <FileText className="w-5 h-5 text-muted-foreground" />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between p-3 border rounded-lg"
-              >
-                <div className="space-y-1">
-                  <div className="h-4 bg-muted animate-pulse rounded w-32" />
-                  <div className="h-3 bg-muted animate-pulse rounded w-24" />
-                </div>
-                <div className="h-8 bg-muted animate-pulse rounded w-16" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <RecentNotesSkeleton />;
   }
 
   return (

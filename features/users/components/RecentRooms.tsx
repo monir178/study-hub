@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { RoomMember } from "../types";
+import { RecentRoomsSkeleton } from "../dashboard/components/skeletons";
 
 interface RecentRoomsProps {
   recentRooms: RoomMember[];
@@ -14,35 +15,7 @@ interface RecentRoomsProps {
 
 export function RecentRooms({ recentRooms, loading }: RecentRoomsProps) {
   if (loading) {
-    return (
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Recent Rooms</CardTitle>
-            <Users className="w-5 h-5 text-muted-foreground" />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between p-3 border rounded-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-muted animate-pulse rounded-full" />
-                  <div className="space-y-1">
-                    <div className="h-4 bg-muted animate-pulse rounded w-24" />
-                    <div className="h-3 bg-muted animate-pulse rounded w-16" />
-                  </div>
-                </div>
-                <div className="h-8 bg-muted animate-pulse rounded w-16" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <RecentRoomsSkeleton />;
   }
 
   return (
