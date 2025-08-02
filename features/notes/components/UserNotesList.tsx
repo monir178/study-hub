@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,9 +29,21 @@ export function UserNotesList({
   onNoteSelect,
   onLoadMore,
 }: UserNotesListProps) {
+  const [isLoadMoreLoading, setIsLoadMoreLoading] = useState(false);
+
+  // Reset local loading state when global loading finishes
+  useEffect(() => {
+    if (!isLoading) {
+      setIsLoadMoreLoading(false);
+    }
+  }, [isLoading]);
+
   if (isLoading && !notes.length) {
     return <UserNotesListSkeleton />;
   }
+
+  // Show loading state for load more button when either local state or global loading
+  const showLoadMoreLoading = isLoadMoreLoading || isLoading;
 
   return (
     <div className="w-1/2 border-r">
@@ -83,12 +95,15 @@ export function UserNotesList({
                   {pagination?.hasNextPage && (
                     <div className="pt-3">
                       <Button
-                        onClick={onLoadMore}
-                        disabled={isLoading}
+                        onClick={() => {
+                          setIsLoadMoreLoading(true);
+                          onLoadMore();
+                        }}
+                        disabled={showLoadMoreLoading}
                         variant="outline"
                         className="w-full"
                       >
-                        {isLoading ? (
+                        {showLoadMoreLoading ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                             Loading...

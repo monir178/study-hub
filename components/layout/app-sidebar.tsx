@@ -111,19 +111,21 @@ export function AppSidebar() {
 
   return (
     <Sidebar variant="inset">
-      <SidebarHeader>
-        <div className="flex items-center gap-2 px-4 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <span className="text-sm font-bold">SH</span>
+      <Link href="/">
+        <SidebarHeader>
+          <div className="flex items-center gap-2 px-4 py-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <span className="text-sm font-bold">SH</span>
+            </div>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">StudyHub</span>
+              <span className="truncate text-xs text-muted-foreground">
+                Collaborative Learning
+              </span>
+            </div>
           </div>
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">StudyHub</span>
-            <span className="truncate text-xs text-muted-foreground">
-              Collaborative Learning
-            </span>
-          </div>
-        </div>
-      </SidebarHeader>
+        </SidebarHeader>
+      </Link>
 
       <SidebarContent>
         <SidebarGroup>

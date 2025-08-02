@@ -19,7 +19,7 @@ interface UserDashboardProps {
 }
 
 export function UserDashboard({ loading }: UserDashboardProps) {
-  const { data, error } = useUserDashboard();
+  const { data, error, isLoading } = useUserDashboard();
 
   // Show error only if there's an actual error
   if (error) {
@@ -70,25 +70,28 @@ export function UserDashboard({ loading }: UserDashboardProps) {
       <UserDashboardStats
         stats={data.stats}
         trends={data.trends}
-        loading={loading}
+        loading={isLoading || loading}
       />
 
       {/* Second Row: Left Chart + Right Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Study Time Area Chart */}
         <div className="h-full">
-          <StudyTimeChart data={data.studyTimeByDay} loading={loading} />
+          <StudyTimeChart
+            data={data.studyTimeByDay}
+            loading={isLoading || loading}
+          />
         </div>
 
         {/* Right: Recent Rooms + Recent Notes */}
         <div className="space-y-6 h-full">
           <RecentRooms
             recentRooms={data.recentRooms.slice(0, 3)}
-            loading={loading}
+            loading={isLoading || loading}
           />
           <RecentNotes
             recentNotes={data.recentNotes.slice(0, 3)}
-            loading={loading}
+            loading={isLoading || loading}
           />
         </div>
       </div>
@@ -99,7 +102,7 @@ export function UserDashboard({ loading }: UserDashboardProps) {
         recentRooms={data.recentRooms}
         recentNotes={data.recentNotes}
         streak={data.streak}
-        loading={loading}
+        loading={isLoading || loading}
       />
     </div>
   );
