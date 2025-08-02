@@ -11,6 +11,13 @@ export const queryKeys = {
   users: ["users"] as const,
   user: (id: string) => [...queryKeys.users, id] as const,
   userProfile: () => [...queryKeys.users, "profile"] as const,
+  userDashboard: () => [...queryKeys.userProfile(), "dashboard"] as const,
+  userDashboardStats: () => [...queryKeys.userDashboard(), "stats"] as const,
+  userStudyTime: () => [...queryKeys.userDashboard(), "study-time"] as const,
+  userSessionTypes: () =>
+    [...queryKeys.userDashboard(), "session-types"] as const,
+  userRoomActivity: () =>
+    [...queryKeys.userDashboard(), "room-activity"] as const,
 
   // Admin
   admin: ["admin"] as const,

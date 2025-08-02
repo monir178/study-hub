@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -29,8 +30,17 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [activeTab, setActiveTab] = useState("public");
   const [page, setPage] = useState(1);
+  const searchParams = useSearchParams();
 
   const debouncedSearch = useDebounce(search, 500);
+
+  // Check for create query parameter on mount
+  useEffect(() => {
+    const createParam = searchParams.get("create");
+    if (createParam === "true") {
+      setShowCreateForm(true);
+    }
+  }, [searchParams]);
 
   const {
     data: roomsData,

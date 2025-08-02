@@ -1,16 +1,11 @@
 "use client";
 
-import { DashboardStats } from "@/features/dashboard/components/DashboardStats";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Users, FileText, Plus, Timer } from "lucide-react";
-import Link from "next/link";
+import { useUserDashboard } from "../../hooks/useUserDashboard";
+import { UserDashboardStats } from "../../components/UserDashboardStats";
+import { UserDashboardBento } from "../../components/UserDashboardBento";
+import { StudyTimeChart } from "../../components/StudyTimeChart";
+import { RecentRooms } from "../../components/RecentRooms";
+import { RecentNotes } from "../../components/RecentNotes";
 import { UserDashboardSkeleton } from "./";
 
 interface UserDashboardProps {
@@ -18,112 +13,66 @@ interface UserDashboardProps {
 }
 
 export function UserDashboard({ loading }: UserDashboardProps) {
-  if (loading) {
+  const { data, isLoading, error } = useUserDashboard();
+
+  if (loading || isLoading) {
     return <UserDashboardSkeleton />;
   }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <h3 className="text-lg font-semibold text-destructive">
+            Failed to load dashboard data
+          </h3>
+          <p className="text-sm text-muted-foreground mt-2">
+            Please try refreshing the page
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <h3 className="text-lg font-semibold">No dashboard data available</h3>
+          <p className="text-sm text-muted-foreground mt-2">
+            Start studying to see your progress
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      <DashboardStats role="USER" />
+    <div className="space-y-6 max-w-[1920px] mx-auto">
+      {/* First Row: Dashboard Stats */}
+      <UserDashboardStats stats={data.stats} trends={data.trends} />
 
-      {/* Quick Actions */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="hover:shadow-md transition-shadow cursor-pointer group">
-          <CardHeader className="pb-3">
-            <Plus className="w-8 h-8 text-primary group-hover:scale-110 transition-transform" />
-          </CardHeader>
-          <CardContent>
-            <CardTitle className="text-lg mb-1">Create Room</CardTitle>
-            <CardDescription>Start a new study session</CardDescription>
-          </CardContent>
-        </Card>
+      {/* Second Row: Left Chart + Right Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left: Study Time Area Chart */}
+        <div className="h-full">
+          <StudyTimeChart data={data.studyTimeByDay} />
+        </div>
 
-        <Card className="hover:shadow-md transition-shadow cursor-pointer group">
-          <CardHeader className="pb-3">
-            <Users className="w-8 h-8 text-primary group-hover:scale-110 transition-transform" />
-          </CardHeader>
-          <CardContent>
-            <CardTitle className="text-lg mb-1">Browse Rooms</CardTitle>
-            <CardDescription>Find active study rooms</CardDescription>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:shadow-md transition-shadow cursor-pointer group">
-          <CardHeader className="pb-3">
-            <Timer className="w-8 h-8 text-primary group-hover:scale-110 transition-transform" />
-          </CardHeader>
-          <CardContent>
-            <CardTitle className="text-lg mb-1">Pomodoro Timer</CardTitle>
-            <CardDescription>Focus with timed sessions</CardDescription>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:shadow-md transition-shadow cursor-pointer group">
-          <CardHeader className="pb-3">
-            <FileText className="w-8 h-8 text-primary group-hover:scale-110 transition-transform" />
-          </CardHeader>
-          <CardContent>
-            <CardTitle className="text-lg mb-1">My Notes</CardTitle>
-            <CardDescription>Access saved notes</CardDescription>
-          </CardContent>
-        </Card>
+        {/* Right: Recent Rooms + Recent Notes */}
+        <div className="space-y-6 h-full">
+          <RecentRooms recentRooms={data.recentRooms.slice(0, 3)} />
+          <RecentNotes recentNotes={data.recentNotes.slice(0, 3)} />
+        </div>
       </div>
 
-      {/* Recent Activity */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Study Rooms</CardTitle>
-            <CardDescription>Your recently joined rooms</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                <div>
-                  <p className="font-medium">Mathematics Study Group</p>
-                  <p className="text-sm text-muted-foreground">
-                    3 members active
-                  </p>
-                </div>
-                <Button size="sm" variant="outline">
-                  Join
-                </Button>
-              </div>
-              <div className="text-center py-4">
-                <Button variant="ghost" asChild>
-                  <Link href="/dashboard/rooms">View All Rooms</Link>
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Notes</CardTitle>
-            <CardDescription>Your latest study notes</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                <div>
-                  <p className="font-medium">Calculus Chapter 5</p>
-                  <p className="text-sm text-muted-foreground">
-                    Updated 2 hours ago
-                  </p>
-                </div>
-                <Button size="sm" variant="outline">
-                  Open
-                </Button>
-              </div>
-              <div className="text-center py-4">
-                <Button variant="ghost" asChild>
-                  <Link href="/notes">View All Notes</Link>
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Third Row: Quick Actions + Streak */}
+      <UserDashboardBento
+        recentSessions={data.recentSessions}
+        recentRooms={data.recentRooms}
+        recentNotes={data.recentNotes}
+        streak={data.streak}
+      />
     </div>
   );
 }

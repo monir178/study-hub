@@ -18,7 +18,7 @@ export function useTimer({
   roomCreatorId,
 }: UseTimerProps): UsePomodoroTimerReturn {
   const { user } = useAuth();
-  const { update } = useCacheUtils();
+  const { update, invalidate } = useCacheUtils();
 
   // Check if user can control timer (Moderator/Admin or room owner)
   const canControl = Boolean(
@@ -44,6 +44,13 @@ export function useTimer({
       onSuccess: (data) => {
         // Update cache with new timer state
         update(queryKeys.timer(roomId), data);
+
+        // Invalidate user dashboard cache to update session stats
+        invalidate(queryKeys.userDashboard());
+        invalidate(queryKeys.userDashboardStats());
+        invalidate(queryKeys.userSessions("current"));
+        invalidate(queryKeys.userStudyTime());
+        invalidate(queryKeys.userSessionTypes());
       },
     },
     successMessage: "Timer started successfully!",
@@ -57,6 +64,13 @@ export function useTimer({
         if (data) {
           // Update cache with paused timer state
           update(queryKeys.timer(roomId), data);
+
+          // Invalidate user dashboard cache to update session stats
+          invalidate(queryKeys.userDashboard());
+          invalidate(queryKeys.userDashboardStats());
+          invalidate(queryKeys.userSessions("current"));
+          invalidate(queryKeys.userStudyTime());
+          invalidate(queryKeys.userSessionTypes());
         }
       },
     },
@@ -70,6 +84,13 @@ export function useTimer({
       onSuccess: (data) => {
         // Update cache with reset timer state
         update(queryKeys.timer(roomId), data);
+
+        // Invalidate user dashboard cache to update session stats
+        invalidate(queryKeys.userDashboard());
+        invalidate(queryKeys.userDashboardStats());
+        invalidate(queryKeys.userSessions("current"));
+        invalidate(queryKeys.userStudyTime());
+        invalidate(queryKeys.userSessionTypes());
       },
     },
     successMessage: "Timer reset successfully!",

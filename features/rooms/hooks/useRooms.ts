@@ -127,6 +127,11 @@ export function useCreateRoom() {
         cache.invalidate(queryKeys.publicRooms());
         // Add new room to cache
         cache.update(queryKeys.room(newRoom.id), newRoom);
+
+        // Invalidate user dashboard cache to update stats
+        cache.invalidate(queryKeys.userDashboard());
+        cache.invalidate(queryKeys.userDashboardStats());
+        cache.invalidate(queryKeys.userRoomActivity());
       },
     },
   });
