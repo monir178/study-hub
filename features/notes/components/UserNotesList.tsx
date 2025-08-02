@@ -2,12 +2,12 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { UserNote } from "../types";
 import { UserNoteCard } from "./UserNoteCard";
+import { UserNotesListSkeleton } from "./skeletons";
 
 interface UserNotesListProps {
   notes: UserNote[];
@@ -30,37 +30,7 @@ export function UserNotesList({
   onLoadMore,
 }: UserNotesListProps) {
   if (isLoading && !notes.length) {
-    return (
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              My Notes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
-                  <div className="flex items-center gap-4">
-                    <Skeleton className="w-10 h-10 rounded-full" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-48" />
-                      <Skeleton className="h-3 w-32" />
-                    </div>
-                  </div>
-                  <Skeleton className="h-8 w-20" />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <UserNotesListSkeleton />;
   }
 
   return (
@@ -69,7 +39,7 @@ export function UserNotesList({
         <CardHeader className="flex-shrink-0">
           <CardTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
-            My Notes
+            Public Notes
             {pagination && (
               <Badge variant="secondary" className="ml-2">
                 {pagination.totalCount} total

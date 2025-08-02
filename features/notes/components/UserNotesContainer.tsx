@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { UserNotesList } from "./UserNotesList";
 import { UserNoteViewer } from "./UserNoteViewer";
 import { renderSlateContent, slateToMarkdown } from "../utils/slate-utils";
+import { UserNotesContainerSkeleton } from "./skeletons";
 
 interface UserNotesContainerProps {
   initialPage?: number;
@@ -148,6 +149,11 @@ export function UserNotesContainer({
     );
   }
 
+  // Show skeleton when loading and no data
+  if (isLoading && !data) {
+    return <UserNotesContainerSkeleton />;
+  }
+
   const notes = allNotes;
   const pagination = data?.pagination;
 
@@ -168,6 +174,7 @@ export function UserNotesContainer({
         isEditingTitle={isEditingTitle}
         isJoining={isJoining}
         isUserMemberOfRoom={isUserMemberOfRoom}
+        loading={isLoading}
         onTitleChange={setTitleValue}
         onStartEdit={() => setIsEditingTitle(true)}
         onTitleSave={handleTitleSave}

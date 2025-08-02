@@ -4,6 +4,7 @@ import { FileText, Download, FileDown, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { UserNote } from "../types";
 import { NotesTitleEditor } from "./NotesTitleEditor";
+import { UserNoteViewerSkeleton } from "./skeletons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,7 @@ interface UserNoteViewerProps {
   isEditingTitle: boolean;
   isJoining: boolean;
   isUserMemberOfRoom: boolean;
+  loading?: boolean;
   onTitleChange: (value: string) => void;
   onStartEdit: () => void;
   onTitleSave: () => void;
@@ -34,6 +36,7 @@ export function UserNoteViewer({
   isEditingTitle,
   isJoining,
   isUserMemberOfRoom,
+  loading,
   onTitleChange,
   onStartEdit,
   onTitleSave,
@@ -140,6 +143,10 @@ export function UserNoteViewer({
         });
     }
   };
+
+  if (loading) {
+    return <UserNoteViewerSkeleton />;
+  }
 
   if (!selectedNote) {
     return (
