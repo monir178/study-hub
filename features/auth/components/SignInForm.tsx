@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,20 +20,31 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, Github, Mail } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
-// Form validation schema
-const signInSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
-});
-
-type SignInFormData = z.infer<typeof signInSchema>;
+type SignInFormData = {
+  email: string;
+  password: string;
+};
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const t = useTranslations("auth.signInForm");
+  const tAuth = useTranslations("auth");
+
+  // Create validation schema with translations
+  const signInSchema = z.object({
+    email: z
+      .string()
+      .email(
+        t("validation.emailInvalid") || "Please enter a valid email address",
+      ),
+    password: z
+      .string()
+      .min(1, t("validation.passwordRequired") || "Password is required"),
+  });
 
   const {
     register,
@@ -57,14 +69,14 @@ export function SignInForm() {
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        setError(t("invalidCredentials"));
       } else {
         // Redirect based on user role (will be handled by middleware)
         router.push("/dashboard");
         router.refresh();
       }
     } catch {
-      setError("An error occurred. Please try again.");
+      setError(t("errorOccurred"));
     }
   };
 
@@ -72,17 +84,15 @@ export function SignInForm() {
     try {
       await signIn(provider, { callbackUrl: "/dashboard" });
     } catch {
-      setError("OAuth sign in failed. Please try again.");
+      setError(t("oauthFailed"));
     }
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sign In</CardTitle>
-        <CardDescription>
-          Enter your credentials to access your account
-        </CardDescription>
+        <CardTitle>{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {error && (
@@ -93,11 +103,11 @@ export function SignInForm() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{tAuth("email")}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email"
+              placeholder={t("emailPlaceholder")}
               {...register("email")}
               disabled={isSubmitting}
               className={errors.email ? "border-red-500" : ""}
@@ -108,12 +118,12 @@ export function SignInForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{tAuth("password")}</Label>
             <div className="relative">
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
+                placeholder={t("passwordPlaceholder")}
                 {...register("password")}
                 disabled={isSubmitting}
                 className={errors.password ? "border-red-500" : ""}
@@ -139,7 +149,7 @@ export function SignInForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Signing in..." : "Sign In"}
+            {isSubmitting ? t("signingIn") : tAuth("signIn")}
           </Button>
         </form>
 
@@ -149,7 +159,7 @@ export function SignInForm() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
+              {tAuth("orContinueWith")}
             </span>
           </div>
         </div>
@@ -174,9 +184,11 @@ export function SignInForm() {
         </div>
 
         <div className="text-center text-sm">
-          <span className="text-muted-foreground">Don't have an account? </span>
+          <span className="text-muted-foreground">
+            {tAuth("dontHaveAccount")}{" "}
+          </span>
           <Link href="/auth/signup" className="text-primary hover:underline">
-            Sign up
+            {tAuth("signUp")}
           </Link>
         </div>
       </CardContent>

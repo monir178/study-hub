@@ -17,7 +17,8 @@
     "close": "Cerrar",
     "open": "Abrir",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "selectLanguage": "Seleccionar Idioma"
   },
   "auth": {
     "signIn": "Iniciar Sesión",
@@ -32,7 +33,47 @@
     "alreadyHaveAccount": "¿Ya tienes una cuenta?",
     "dontHaveAccount": "¿No tienes una cuenta?",
     "signInWithGoogle": "Iniciar sesión con Google",
-    "signInWithGitHub": "Iniciar sesión con GitHub"
+    "signInWithGitHub": "Iniciar sesión con GitHub",
+    "signInForm": {
+      "title": "Iniciar Sesión",
+      "description": "Ingresa tus credenciales para acceder a tu cuenta",
+      "emailPlaceholder": "Ingresa tu correo electrónico",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "signingIn": "Iniciando sesión...",
+      "invalidCredentials": "Correo electrónico o contraseña inválidos",
+      "errorOccurred": "Ocurrió un error. Por favor, inténtalo de nuevo.",
+      "oauthFailed": "Error al iniciar sesión con OAuth. Por favor, inténtalo de nuevo.",
+      "validation": {
+        "emailInvalid": "Por favor, ingresa un correo electrónico válido",
+        "passwordRequired": "La contraseña es requerida"
+      }
+    },
+    "signUpForm": {
+      "title": "Crear Cuenta",
+      "description": "Únete a StudyHub y comienza tu viaje de aprendizaje colaborativo",
+      "fullName": "Nombre Completo",
+      "fullNamePlaceholder": "Ingresa tu nombre completo",
+      "emailPlaceholder": "Ingresa tu correo electrónico",
+      "passwordPlaceholder": "Crea una contraseña segura",
+      "confirmPasswordPlaceholder": "Confirma tu contraseña",
+      "creatingAccount": "Creando Cuenta...",
+      "createAccount": "Crear Cuenta",
+      "accountCreated": "¡Cuenta Creada Exitosamente!",
+      "welcomeMessage": "¡Bienvenido a StudyHub! Te estamos conectando automáticamente...",
+      "registrationFailed": "Error en el registro. Por favor, inténtalo de nuevo.",
+      "registrationSuccess": "Registro exitoso. Por favor, inicia sesión.",
+      "validation": {
+        "nameMinLength": "El nombre debe tener al menos 2 caracteres",
+        "emailInvalid": "Por favor, ingresa un correo electrónico válido",
+        "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
+        "passwordLowercase": "La contraseña debe contener al menos una letra minúscula",
+        "passwordUppercase": "La contraseña debe contener al menos una letra mayúscula",
+        "passwordNumber": "La contraseña debe contener al menos un número",
+        "passwordSpecial": "La contraseña debe contener al menos un carácter especial (@$!%*?&)",
+        "passwordsNoMatch": "Las contraseñas no coinciden",
+        "passwordRequired": "La contraseña es requerida"
+      }
+    }
   },
   "navigation": {
     "dashboard": "Panel",
@@ -107,5 +148,69 @@
     "notifications": "Notificaciones",
     "emailNotifications": "Notificaciones por Correo",
     "pushNotifications": "Notificaciones Push"
+  },
+  "navbar": {
+    "features": "Características",
+    "pricing": "Precios",
+    "about": "Acerca de",
+    "dashboard": "Panel",
+    "rooms": "Salas",
+    "timer": "Temporizador",
+    "chat": "Chat",
+    "getStarted": "Comenzar",
+    "adminPanel": "Panel de Admin",
+    "logOut": "Cerrar sesión",
+    "toggleTheme": "Cambiar tema"
+  },
+  "landing": {
+    "hero": {
+      "title": "Estudia Juntos, Logra Más",
+      "subtitle": "Únete a sesiones de estudio sincronizadas con amigos. Comparte notas, chatea en tiempo real y mantente motivado con el aprendizaje colaborativo.",
+      "getStarted": "Comenzar a Aprender Juntos",
+      "exploreRooms": "Explorar Salas",
+      "watchDemo": "Ver Demo",
+      "trustedBy": "Únete al Futuro del Aprendizaje Colaborativo",
+      "footer": "Gratis para empezar • No se requiere tarjeta de crédito • Únete a más de 10,000 estudiantes en todo el mundo",
+      "stats": {
+        "activeUsers": "Usuarios Activos",
+        "studySessions": "Sesiones de Estudio",
+        "notesShared": "Notas Compartidas",
+        "satisfaction": "Tasa de Satisfacción"
+      }
+    },
+    "features": {
+      "title": "Todo lo que Necesitas para Estudiar Juntos",
+      "subtitle": "Características poderosas diseñadas para mejorar el aprendizaje colaborativo y aumentar la productividad",
+      "synchronizedTimers": {
+        "title": "Temporizadores Sincronizados",
+        "description": "Temporizadores Pomodoro que se sincronizan entre todos los miembros de la sala para sesiones de estudio enfocadas con descansos en perfecta armonía"
+      },
+      "collaborativeNotes": {
+        "title": "Notas Colaborativas",
+        "description": "Editor de markdown en tiempo real para tomar notas compartidas con colaboración en vivo e historial de versiones"
+      },
+      "groupChat": {
+        "title": "Chat Grupal",
+        "description": "Mensajería instantánea dentro de las salas de estudio para discutir temas, compartir recursos y mantenerse conectado"
+      },
+      "studyRooms": {
+        "title": "Salas de Estudio",
+        "description": "Crea o únete a salas públicas/privadas con permisos basados en roles y gestión de miembros"
+      },
+      "realTimeSync": {
+        "title": "Sincronización en Tiempo Real",
+        "description": "Todo se actualiza instantáneamente en todos los dispositivos y participantes con rendimiento ultrarrápido"
+      },
+      "securePrivate": {
+        "title": "Seguro y Privado",
+        "description": "Tus datos están protegidos con seguridad de nivel empresarial, encriptación y controles de privacidad"
+      }
+    },
+    "cta": {
+      "title": "¿Listo para Transformar tus Sesiones de Estudio?",
+      "subtitle": "Únete a miles de estudiantes que ya usan StudyHub para lograr sus objetivos de aprendizaje juntos. Comienza tu viaje de aprendizaje colaborativo hoy.",
+      "startLearning": "Comenzar a Aprender Juntos",
+      "exploreRooms": "Explorar Salas"
+    }
   }
 }

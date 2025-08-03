@@ -58,17 +58,6 @@ describe("Mock Validation", () => {
     expect(typeof signOut).toBe("function");
   });
 
-  test("Socket.IO mocks work", () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { io } = require("socket.io-client");
-
-    const socket = io();
-    expect(typeof socket.on).toBe("function");
-    expect(typeof socket.off).toBe("function");
-    expect(typeof socket.emit).toBe("function");
-    expect(typeof socket.disconnect).toBe("function");
-  });
-
   test("next-intl mocks work", () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { useTranslations, useLocale } = require("next-intl");

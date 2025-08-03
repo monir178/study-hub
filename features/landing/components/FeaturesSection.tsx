@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardDescription,
@@ -13,56 +14,49 @@ import {
   Shield,
 } from "lucide-react";
 
-const features = [
-  {
-    icon: Clock,
-    title: "Synchronized Timers",
-    description:
-      "Pomodoro timers that sync across all room members for focused study sessions with breaks in perfect harmony",
-  },
-  {
-    icon: FileText,
-    title: "Collaborative Notes",
-    description:
-      "Real-time markdown editor for shared note-taking with live collaboration and version history",
-  },
-  {
-    icon: MessageSquare,
-    title: "Group Chat",
-    description:
-      "Instant messaging within study rooms to discuss topics, share resources, and stay connected",
-  },
-  {
-    icon: Users,
-    title: "Study Rooms",
-    description:
-      "Create or join public/private rooms with role-based permissions and member management",
-  },
-  {
-    icon: Zap,
-    title: "Real-time Sync",
-    description:
-      "Everything updates instantly across all devices and participants with lightning-fast performance",
-  },
-  {
-    icon: Shield,
-    title: "Secure & Private",
-    description:
-      "Your data is protected with enterprise-grade security, encryption, and privacy controls",
-  },
-];
-
 export default function FeaturesSection() {
+  const t = useTranslations("landing.features");
+
+  const features = [
+    {
+      icon: Clock,
+      title: t("synchronizedTimers.title"),
+      description: t("synchronizedTimers.description"),
+    },
+    {
+      icon: FileText,
+      title: t("collaborativeNotes.title"),
+      description: t("collaborativeNotes.description"),
+    },
+    {
+      icon: MessageSquare,
+      title: t("groupChat.title"),
+      description: t("groupChat.description"),
+    },
+    {
+      icon: Users,
+      title: t("studyRooms.title"),
+      description: t("studyRooms.description"),
+    },
+    {
+      icon: Zap,
+      title: t("realTimeSync.title"),
+      description: t("realTimeSync.description"),
+    },
+    {
+      icon: Shield,
+      title: t("securePrivate.title"),
+      description: t("securePrivate.description"),
+    },
+  ];
+
   return (
     <section id="features" className="py-20 px-4 bg-muted/50">
       <div className="container mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-            Everything You Need to Study Together
-          </h2>
+          <h2 className="text-3xl lg:text-4xl font-bold mb-4">{t("title")}</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Powerful features designed to enhance collaborative learning and
-            boost productivity
+            {t("subtitle")}
           </p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

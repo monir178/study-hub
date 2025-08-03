@@ -17,7 +17,8 @@
     "close": "Close",
     "open": "Open",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "selectLanguage": "Select Language"
   },
   "auth": {
     "signIn": "Sign In",
@@ -32,7 +33,47 @@
     "alreadyHaveAccount": "Already have an account?",
     "dontHaveAccount": "Don't have an account?",
     "signInWithGoogle": "Sign in with Google",
-    "signInWithGitHub": "Sign in with GitHub"
+    "signInWithGitHub": "Sign in with GitHub",
+    "signInForm": {
+      "title": "Sign In",
+      "description": "Enter your credentials to access your account",
+      "emailPlaceholder": "Enter your email",
+      "passwordPlaceholder": "Enter your password",
+      "signingIn": "Signing in...",
+      "invalidCredentials": "Invalid email or password",
+      "errorOccurred": "An error occurred. Please try again.",
+      "oauthFailed": "OAuth sign in failed. Please try again.",
+      "validation": {
+        "emailInvalid": "Please enter a valid email address",
+        "passwordRequired": "Password is required"
+      }
+    },
+    "signUpForm": {
+      "title": "Create Account",
+      "description": "Join StudyHub and start your collaborative learning journey",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter your full name",
+      "emailPlaceholder": "Enter your email",
+      "passwordPlaceholder": "Create a strong password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "creatingAccount": "Creating Account...",
+      "createAccount": "Create Account",
+      "accountCreated": "Account Created Successfully!",
+      "welcomeMessage": "Welcome to StudyHub! You're being signed in automatically...",
+      "registrationFailed": "Registration failed. Please try again.",
+      "registrationSuccess": "Registration successful. Please sign in.",
+      "validation": {
+        "nameMinLength": "Name must be at least 2 characters",
+        "emailInvalid": "Please enter a valid email address",
+        "passwordMinLength": "Password must be at least 8 characters",
+        "passwordLowercase": "Password must contain at least one lowercase letter",
+        "passwordUppercase": "Password must contain at least one uppercase letter",
+        "passwordNumber": "Password must contain at least one number",
+        "passwordSpecial": "Password must contain at least one special character (@$!%*?&)",
+        "passwordsNoMatch": "Passwords do not match",
+        "passwordRequired": "Password is required"
+      }
+    }
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -107,5 +148,69 @@
     "notifications": "Notifications",
     "emailNotifications": "Email Notifications",
     "pushNotifications": "Push Notifications"
+  },
+  "navbar": {
+    "features": "Features",
+    "pricing": "Pricing",
+    "about": "About",
+    "dashboard": "Dashboard",
+    "rooms": "Rooms",
+    "timer": "Timer",
+    "chat": "Chat",
+    "getStarted": "Get Started",
+    "adminPanel": "Admin Panel",
+    "logOut": "Log out",
+    "toggleTheme": "Toggle theme"
+  },
+  "landing": {
+    "hero": {
+      "title": "Study Together, Achieve More",
+      "subtitle": "Join synchronized study sessions with friends. Share notes, chat in real-time, and stay motivated with collaborative learning.",
+      "getStarted": "Start Learning Together",
+      "exploreRooms": "Explore Rooms",
+      "watchDemo": "Watch Demo",
+      "trustedBy": "Join the Future of Collaborative Learning",
+      "footer": "Free to start • No credit card required • Join 10,000+ students worldwide",
+      "stats": {
+        "activeUsers": "Active Users",
+        "studySessions": "Study Sessions",
+        "notesShared": "Notes Shared",
+        "satisfaction": "Satisfaction Rate"
+      }
+    },
+    "features": {
+      "title": "Everything You Need to Study Together",
+      "subtitle": "Powerful features designed to enhance collaborative learning and boost productivity",
+      "synchronizedTimers": {
+        "title": "Synchronized Timers",
+        "description": "Pomodoro timers that sync across all room members for focused study sessions with breaks in perfect harmony"
+      },
+      "collaborativeNotes": {
+        "title": "Collaborative Notes",
+        "description": "Real-time markdown editor for shared note-taking with live collaboration and version history"
+      },
+      "groupChat": {
+        "title": "Group Chat",
+        "description": "Instant messaging within study rooms to discuss topics, share resources, and stay connected"
+      },
+      "studyRooms": {
+        "title": "Study Rooms",
+        "description": "Create or join public/private rooms with role-based permissions and member management"
+      },
+      "realTimeSync": {
+        "title": "Real-time Sync",
+        "description": "Everything updates instantly across all devices and participants with lightning-fast performance"
+      },
+      "securePrivate": {
+        "title": "Secure & Private",
+        "description": "Your data is protected with enterprise-grade security, encryption, and privacy controls"
+      }
+    },
+    "cta": {
+      "title": "Ready to Transform Your Study Sessions?",
+      "subtitle": "Join thousands of students already using StudyHub to achieve their learning goals together. Start your collaborative learning journey today.",
+      "startLearning": "Start Learning Together",
+      "exploreRooms": "Explore Rooms"
+    }
   }
 }

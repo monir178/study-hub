@@ -1,11 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Users, Clock, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CountUp from "@/components/ui/counter-up";
 
-const fadeUpVariants = {
+const fadeUpVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
     opacity: 1,
@@ -13,30 +14,32 @@ const fadeUpVariants = {
     transition: {
       duration: 1,
       delay: 0.5 + i * 0.2,
-      ease: [0.25, 0.4, 0.25, 1],
+      ease: [0.25, 0.4, 0.25, 1] as [number, number, number, number],
     },
   }),
 };
 
 export function HeroStats() {
+  const t = useTranslations("landing.hero.stats");
+
   const stats = [
     {
       icon: Users,
-      label: "Active Learners",
+      label: t("activeUsers"),
       value: "10K+",
       numericValue: "10000", // For CountUp animation
       color: "text-blue-500",
     },
     {
       icon: Clock,
-      label: "Study Hours",
+      label: t("studySessions"),
       value: "50K+",
       numericValue: "50000", // For CountUp animation
       color: "text-emerald-500",
     },
     {
       icon: MessageSquare,
-      label: "Messages Sent",
+      label: t("notesShared"),
       value: "100K+",
       numericValue: "100000", // For CountUp animation
       color: "text-purple-500",
@@ -47,7 +50,7 @@ export function HeroStats() {
     <motion.div
       className="flex flex-row justify-center gap-2 sm:gap-4 md:gap-6 mt-12 sm:mt-16 px-2 sm:px-4"
       custom={4}
-      variants={fadeUpVariants as any}
+      variants={fadeUpVariants}
       initial="hidden"
       animate="visible"
     >
@@ -56,7 +59,7 @@ export function HeroStats() {
           key={stat.label}
           className="group relative w-fit"
           custom={4 + index * 0.1}
-          variants={fadeUpVariants as any}
+          variants={fadeUpVariants}
           initial="hidden"
           animate="visible"
           whileHover={{ scale: 1.05 }}

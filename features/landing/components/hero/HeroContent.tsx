@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, Variants } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Zap } from "lucide-react";
 
@@ -18,6 +19,8 @@ const fadeUpVariants: Variants = {
 };
 
 export function HeroContent() {
+  const t = useTranslations("landing.hero");
+
   return (
     <>
       <motion.div
@@ -31,7 +34,7 @@ export function HeroContent() {
           className="mb-8 px-6 py-2 text-xs font-medium bg-black/5 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10 text-foreground  transition-all duration-300 md:text-sm"
         >
           <Zap className="w-4 h-4 mr-2 text-primary " />
-          Join the Future of Collaborative Learning
+          {t("trustedBy")}
         </Badge>
       </motion.div>
 
@@ -42,13 +45,7 @@ export function HeroContent() {
         animate="visible"
       >
         <h1 className="text-5xl  md:text-6xl  xl:text-8xl  font-bold mb-6 sm:mb-8 leading-[1.05] tracking-tight">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/40 from-1% via-foreground/95 to-foreground/80">
-            Study Together,
-          </span>
-          <br />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-400">
-            Achieve More
-          </span>
+          {t("title")}
         </h1>
       </motion.div>
 
@@ -59,8 +56,7 @@ export function HeroContent() {
         animate="visible"
       >
         <p className="text-sm sm:text-lg md:text-xl   mb-8 sm:mb-12 leading-relaxed font-light tracking-wide max-w-4xl mx-auto px-4">
-          Join study rooms with real-time Pomodoro timers, collaborative notes,
-          and group chat — built for focused, productive learning.
+          {t("subtitle")}
         </p>
       </motion.div>
     </>

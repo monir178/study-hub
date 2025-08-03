@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, Variants } from "framer-motion";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { ArrowRight, BookOpen, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +20,8 @@ const fadeUpVariants: Variants = {
 };
 
 export function HeroButtons() {
+  const t = useTranslations("landing.hero");
+
   return (
     <motion.div
       custom={1.6}
@@ -54,7 +57,7 @@ export function HeroButtons() {
               <BookOpen className="w-4 sm:w-5 h-4 sm:h-5" />
             </motion.div>
             <span className="font-semibold whitespace-nowrap">
-              Start Learning
+              {t("getStarted")}
             </span>
             <motion.div
               animate={{
@@ -99,7 +102,9 @@ export function HeroButtons() {
             >
               <Play className="w-3 sm:w-4 h-3 sm:h-4" />
             </motion.div>
-            <span className="font-semibold whitespace-nowrap">Watch Demo</span>
+            <span className="font-semibold whitespace-nowrap">
+              {t("watchDemo")}
+            </span>
           </Button>
         </motion.div>
       </Link>

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/lib/hooks/useAuth";
+import LanguageSelector from "./LanguageSelector";
 import {
   Sun,
   Moon,
@@ -39,19 +41,6 @@ interface NavItem {
   icon?: React.ComponentType<{ className?: string }>;
 }
 
-const landingNav: NavItem[] = [
-  { name: "Features", href: "#features" },
-  { name: "Pricing", href: "#pricing" },
-  { name: "About", href: "#about" },
-];
-
-const appNav: NavItem[] = [
-  { name: "Dashboard", href: "/dashboard", icon: BookOpen },
-  { name: "Rooms", href: "/dashboard/rooms", icon: Users },
-  { name: "Timer", href: "/timer", icon: Clock },
-  { name: "Chat", href: "/chat", icon: MessageSquare },
-];
-
 // Animation variants
 const navbarAnimations = {
   navbar: {
@@ -73,7 +62,7 @@ const navbarAnimations = {
 };
 
 export default function Navbar({
-  locale = "en",
+  locale: _locale = "en",
   _variant = "landing", // Now unused since we determine from auth state
 }: NavbarProps) {
   const [mounted, setMounted] = useState(false);
@@ -82,9 +71,27 @@ export default function Navbar({
   const { theme, setTheme } = useTheme();
   const { user, isAuthenticated } = useAuth(); // Removed unused isLoading
 
+  const t = useTranslations("navbar");
+  const tAuth = useTranslations("auth");
+  const tProfile = useTranslations("profile");
+  const tSettings = useTranslations("settings");
+
+  // Create nav items with translations
+  const landingNavItems: NavItem[] = [
+    { name: t("features"), href: "#features" },
+    { name: t("pricing"), href: "#pricing" },
+    { name: t("about"), href: "#about" },
+  ];
+
+  const appNavItems: NavItem[] = [
+    { name: t("dashboard"), href: "/dashboard", icon: BookOpen },
+    { name: t("rooms"), href: "/dashboard/rooms", icon: Users },
+    { name: t("timer"), href: "/timer", icon: Clock },
+    { name: t("chat"), href: "/chat", icon: MessageSquare },
+  ];
+
   // Determine which nav items to show based on authentication
-  // Fallback to landing nav if auth fails
-  const navItems = isAuthenticated ? appNav : landingNav;
+  const navItems = isAuthenticated ? appNavItems : landingNavItems;
 
   // Handle mounting for SSR
   useEffect(() => {
@@ -130,10 +137,7 @@ export default function Navbar({
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link
-              href={`/${locale}`}
-              className="flex items-center space-x-2 group"
-            >
+            <Link href="/" className="flex items-center space-x-2 group">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
                 <span className="text-primary-foreground font-bold text-sm">
                   S
@@ -154,6 +158,9 @@ export default function Navbar({
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-3">
+            {/* Language Selector */}
+            <LanguageSelector variant="compact" showLabel={false} />
+
             {/* Theme Toggle */}
             <Button
               variant="ghost"
@@ -175,17 +182,17 @@ export default function Navbar({
                   <Moon className="h-4 w-4" />
                 )}
               </motion.div>
-              <span className="sr-only">Toggle theme</span>
+              <span className="sr-only">{t("toggleTheme")}</span>
             </Button>
 
             {/* Auth Buttons / User Menu */}
             {!isAuthenticated ? (
               <>
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href={`/${locale}/auth/signin`}>Sign In</Link>
+                  <Link href="/auth/signin">{tAuth("signIn")}</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link href={`/${locale}/auth/signup`}>Get Started</Link>
+                  <Link href="/auth/signup">{t("getStarted")}</Link>
                 </Button>
               </>
             ) : (
@@ -225,30 +232,30 @@ export default function Navbar({
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href={`/${locale}/profile`}>
+                    <Link href="/profile">
                       <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                      <span>{tProfile("title")}</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href={`/${locale}/settings`}>
+                    <Link href="/settings">
                       <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
+                      <span>{tSettings("title")}</span>
                     </Link>
                   </DropdownMenuItem>
                   {user?.role === "ADMIN" && (
                     <DropdownMenuItem asChild>
-                      <Link href={`/${locale}/admin`}>
+                      <Link href="/admin">
                         <Shield className="mr-2 h-4 w-4" />
-                        <span>Admin Panel</span>
+                        <span>{t("adminPanel")}</span>
                       </Link>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href={`/${locale}/auth/signout`}>
+                    <Link href="/auth/signout">
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span>{t("logOut")}</span>
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -258,6 +265,8 @@ export default function Navbar({
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-2">
+            <LanguageSelector variant="compact" showLabel={false} />
+
             <Button
               variant="ghost"
               size="sm"
@@ -367,19 +376,13 @@ export default function Navbar({
                         className="w-full justify-center"
                         asChild
                       >
-                        <Link
-                          href={`/${locale}/auth/signin`}
-                          onClick={closeMenu}
-                        >
-                          Sign In
+                        <Link href="/auth/signin" onClick={closeMenu}>
+                          {tAuth("signIn")}
                         </Link>
                       </Button>
                       <Button className="w-full" asChild>
-                        <Link
-                          href={`/${locale}/auth/signup`}
-                          onClick={closeMenu}
-                        >
-                          Get Started
+                        <Link href="/auth/signup" onClick={closeMenu}>
+                          {t("getStarted")}
                         </Link>
                       </Button>
                     </>
@@ -417,9 +420,9 @@ export default function Navbar({
                         className="w-full justify-start"
                         asChild
                       >
-                        <Link href={`/${locale}/profile`} onClick={closeMenu}>
+                        <Link href="/profile" onClick={closeMenu}>
                           <User className="h-4 w-4 mr-2" />
-                          Profile
+                          {tProfile("title")}
                         </Link>
                       </Button>
                       <Button
@@ -427,9 +430,9 @@ export default function Navbar({
                         className="w-full justify-start"
                         asChild
                       >
-                        <Link href={`/${locale}/settings`} onClick={closeMenu}>
+                        <Link href="/settings" onClick={closeMenu}>
                           <Settings className="h-4 w-4 mr-2" />
-                          Settings
+                          {tSettings("title")}
                         </Link>
                       </Button>
                       {user?.role === "ADMIN" && (
@@ -438,9 +441,9 @@ export default function Navbar({
                           className="w-full justify-start"
                           asChild
                         >
-                          <Link href={`/${locale}/admin`} onClick={closeMenu}>
+                          <Link href="/admin" onClick={closeMenu}>
                             <Shield className="h-4 w-4 mr-2" />
-                            Admin Panel
+                            {t("adminPanel")}
                           </Link>
                         </Button>
                       )}
@@ -449,12 +452,9 @@ export default function Navbar({
                         className="w-full justify-start text-destructive hover:text-destructive"
                         asChild
                       >
-                        <Link
-                          href={`/${locale}/auth/signout`}
-                          onClick={closeMenu}
-                        >
+                        <Link href="/auth/signout" onClick={closeMenu}>
                           <LogOut className="h-4 w-4 mr-2" />
-                          Sign Out
+                          {tAuth("signOut")}
                         </Link>
                       </Button>
                     </>

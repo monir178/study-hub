@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,38 +20,15 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, Github, Mail, User } from "lucide-react";
 import { signIn } from "next-auth/react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useApiMutation } from "@/lib/api/hooks/use-api-mutation";
 
-// Form validation schema
-const signUpSchema = z
-  .object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
-    email: z.string().email("Please enter a valid email address"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(
-        /(?=.*[a-z])/,
-        "Password must contain at least one lowercase letter",
-      )
-      .regex(
-        /(?=.*[A-Z])/,
-        "Password must contain at least one uppercase letter",
-      )
-      .regex(/(?=.*\d)/, "Password must contain at least one number")
-      .regex(
-        /(?=.*[@$!%*?&])/,
-        "Password must contain at least one special character (@$!%*?&)",
-      ),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
-type SignUpFormData = z.infer<typeof signUpSchema>;
+type SignUpFormData = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 interface RegisterResponse {
   success: boolean;
@@ -69,6 +47,27 @@ export function SignUpForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const t = useTranslations("auth.signUpForm");
+  const tAuth = useTranslations("auth");
+
+  // Create validation schema with translations
+  const signUpSchema = z
+    .object({
+      name: z.string().min(2, t("validation.nameMinLength")),
+      email: z.string().email(t("validation.emailInvalid")),
+      password: z
+        .string()
+        .min(8, t("validation.passwordMinLength"))
+        .regex(/(?=.*[a-z])/, t("validation.passwordLowercase"))
+        .regex(/(?=.*[A-Z])/, t("validation.passwordUppercase"))
+        .regex(/(?=.*\d)/, t("validation.passwordNumber"))
+        .regex(/(?=.*[@$!%*?&])/, t("validation.passwordSpecial")),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("validation.passwordsNoMatch"),
+      path: ["confirmPassword"],
+    });
 
   const {
     register,
@@ -109,7 +108,7 @@ export function SignUpForm() {
 
       return result;
     },
-    successMessage: "Account created successfully!",
+    successMessage: t("accountCreated"),
   });
 
   const onSubmit = async (data: SignUpFormData) => {
@@ -132,7 +131,7 @@ export function SignUpForm() {
         } else {
           // If auto sign-in fails, redirect to sign-in page
           router.push(
-            "/auth/signin?message=Registration successful. Please sign in.",
+            `/auth/signin?message=${encodeURIComponent(t("registrationSuccess"))}`,
           );
         }
       }
@@ -142,18 +141,20 @@ export function SignUpForm() {
         error &&
         typeof error === "object" &&
         "errors" in error &&
-        Array.isArray((error as any).errors)
+        Array.isArray(
+          (error as { errors: { field?: string; message: string }[] }).errors,
+        )
       ) {
-        (error as any).errors.forEach(
-          (err: { field?: string; message: string }) => {
-            if (err.field) {
-              setError(err.field as keyof SignUpFormData, {
-                type: "server",
-                message: err.message,
-              });
-            }
-          },
-        );
+        (
+          error as { errors: { field?: string; message: string }[] }
+        ).errors.forEach((err: { field?: string; message: string }) => {
+          if (err.field) {
+            setError(err.field as keyof SignUpFormData, {
+              type: "server",
+              message: err.message,
+            });
+          }
+        });
       }
     }
   };
@@ -176,10 +177,10 @@ export function SignUpForm() {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-green-800">
-                Account Created Successfully!
+                {t("accountCreated")}
               </h3>
               <p className="text-sm text-muted-foreground mt-2">
-                Welcome to StudyHub! You're being signed in automatically...
+                {t("welcomeMessage")}
               </p>
             </div>
           </div>
@@ -191,17 +192,15 @@ export function SignUpForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create Account</CardTitle>
-        <CardDescription>
-          Join StudyHub and start your collaborative learning journey
-        </CardDescription>
+        <CardTitle>{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {registerMutation.error && (
           <Alert variant="destructive">
             <AlertDescription>
               {registerMutation.error.response?.data?.message ||
-                "Registration failed. Please try again."}
+                t("registrationFailed")}
             </AlertDescription>
           </Alert>
         )}
@@ -209,11 +208,11 @@ export function SignUpForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Name Field */}
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">{t("fullName")}</Label>
             <Input
               id="name"
               type="text"
-              placeholder="Enter your full name"
+              placeholder={t("fullNamePlaceholder")}
               {...register("name")}
               disabled={isSubmitting}
               className={errors.name ? "border-red-500" : ""}
@@ -225,11 +224,11 @@ export function SignUpForm() {
 
           {/* Email Field */}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{tAuth("email")}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email"
+              placeholder={t("emailPlaceholder")}
               {...register("email")}
               disabled={isSubmitting}
               className={errors.email ? "border-red-500" : ""}
@@ -241,12 +240,12 @@ export function SignUpForm() {
 
           {/* Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{tAuth("password")}</Label>
             <div className="relative">
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Create a strong password"
+                placeholder={t("passwordPlaceholder")}
                 {...register("password")}
                 disabled={isSubmitting}
                 className={errors.password ? "border-red-500" : ""}
@@ -273,12 +272,12 @@ export function SignUpForm() {
 
           {/* Confirm Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword">{tAuth("confirmPassword")}</Label>
             <div className="relative">
               <Input
                 id="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm your password"
+                placeholder={t("confirmPasswordPlaceholder")}
                 {...register("confirmPassword")}
                 disabled={isSubmitting}
                 className={errors.confirmPassword ? "border-red-500" : ""}
@@ -306,7 +305,7 @@ export function SignUpForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Creating Account..." : "Create Account"}
+            {isSubmitting ? t("creatingAccount") : t("createAccount")}
           </Button>
         </form>
 
@@ -316,7 +315,7 @@ export function SignUpForm() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
+              {tAuth("orContinueWith")}
             </span>
           </div>
         </div>
@@ -342,10 +341,10 @@ export function SignUpForm() {
 
         <div className="text-center text-sm">
           <span className="text-muted-foreground">
-            Already have an account?{" "}
+            {tAuth("alreadyHaveAccount")}{" "}
           </span>
           <Link href="/auth/signin" className="text-primary hover:underline">
-            Sign in
+            {tAuth("signIn")}
           </Link>
         </div>
       </CardContent>
