@@ -1,17 +1,20 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Timer, Users, BookOpen } from "lucide-react";
 
 export function UserDashboardStatsSkeleton() {
+  const t = useTranslations("dashboard.stats");
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {[
-        { title: "Study Sessions", icon: Timer },
-        { title: "Joined Rooms", icon: Users },
-        { title: "Created Rooms", icon: BookOpen },
-        { title: "Private Rooms", icon: BookOpen },
+        { title: t("totalSessions"), icon: Timer },
+        { title: t("joinedRooms"), icon: Users },
+        { title: t("createdRooms"), icon: BookOpen },
+        { title: t("privateRooms"), icon: BookOpen },
       ].map((item, index) => (
         <Card key={index} className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

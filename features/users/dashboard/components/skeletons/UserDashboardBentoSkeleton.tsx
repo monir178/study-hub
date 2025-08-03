@@ -1,17 +1,20 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp } from "lucide-react";
 
 export function UserDashboardBentoSkeleton() {
+  const t = useTranslations("dashboard");
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-full">
       {/* Quick Actions - Static, no skeleton needed */}
       <Card className="md:col-span-2 lg:col-span-2 hover:shadow-md transition-shadow cursor-pointer group">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Quick Actions</CardTitle>
+            <CardTitle className="text-lg">{t("quickActions")}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
@@ -36,7 +39,7 @@ export function UserDashboardBentoSkeleton() {
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Streak</CardTitle>
+            <CardTitle className="text-lg">{t("streak")}</CardTitle>
             <TrendingUp className="w-5 h-5 text-muted-foreground" />
           </div>
         </CardHeader>

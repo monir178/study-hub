@@ -2,6 +2,7 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -39,32 +40,10 @@ interface NavItem {
   roles?: string[];
 }
 
-const userNavItems: NavItem[] = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Study Rooms", href: "/dashboard/rooms", icon: Users },
-  { name: "Public Notes", href: "/dashboard/notes", icon: FileText },
-];
-
-const moderatorNavItems: NavItem[] = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Reports", href: "/dashboard?tab=reports", icon: Calendar },
-  { name: "Study Rooms", href: "/dashboard/rooms", icon: Users },
-  { name: "Users", href: "/dashboard?tab=users", icon: BookOpen },
-  { name: "Analytics", href: "/dashboard?tab=analytics", icon: BarChart3 },
-];
-
-const adminNavItems: NavItem[] = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Users", href: "/dashboard?tab=users", icon: Users },
-  { name: "Sessions", href: "/dashboard?tab=sessions", icon: Calendar },
-  { name: "Content", href: "/dashboard?tab=content", icon: FileText },
-  { name: "Analytics", href: "/dashboard?tab=analytics", icon: BarChart3 },
-  { name: "Settings", href: "/dashboard?tab=settings", icon: Settings },
-];
-
 export function AppSidebar() {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const t = useTranslations("sidebar");
 
   // Don't render sidebar on public pages or if not authenticated
   if (
@@ -76,16 +55,57 @@ export function AppSidebar() {
     return null;
   }
 
-  // Get navigation items based on user role
-  const getNavItems = () => {
+  // Get navigation items based on user role with translations
+  const getNavItems = (): NavItem[] => {
     switch (session.user.role) {
       case "ADMIN":
-        return adminNavItems;
+        return [
+          { name: t("dashboard"), href: "/dashboard", icon: Home },
+          { name: t("users"), href: "/dashboard?tab=users", icon: Users },
+          {
+            name: t("sessions"),
+            href: "/dashboard?tab=sessions",
+            icon: Calendar,
+          },
+          {
+            name: t("content"),
+            href: "/dashboard?tab=content",
+            icon: FileText,
+          },
+          {
+            name: t("analytics"),
+            href: "/dashboard?tab=analytics",
+            icon: BarChart3,
+          },
+          {
+            name: t("settings"),
+            href: "/dashboard?tab=settings",
+            icon: Settings,
+          },
+        ];
       case "MODERATOR":
-        return moderatorNavItems;
+        return [
+          { name: t("dashboard"), href: "/dashboard", icon: Home },
+          {
+            name: t("reports"),
+            href: "/dashboard?tab=reports",
+            icon: Calendar,
+          },
+          { name: t("studyRooms"), href: "/dashboard/rooms", icon: Users },
+          { name: t("users"), href: "/dashboard?tab=users", icon: BookOpen },
+          {
+            name: t("analytics"),
+            href: "/dashboard?tab=analytics",
+            icon: BarChart3,
+          },
+        ];
       case "USER":
       default:
-        return userNavItems;
+        return [
+          { name: t("dashboard"), href: "/dashboard", icon: Home },
+          { name: t("studyRooms"), href: "/dashboard/rooms", icon: Users },
+          { name: t("publicNotes"), href: "/dashboard/notes", icon: FileText },
+        ];
     }
   };
 
@@ -115,7 +135,7 @@ export function AppSidebar() {
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-semibold">StudyHub</span>
               <span className="truncate text-xs text-muted-foreground">
-                Collaborative Learning
+                {t("collaborativeLearning")}
               </span>
             </div>
           </div>
@@ -124,7 +144,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("navigation")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => {
@@ -152,14 +172,14 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("account")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/profile"}>
                   <Link href="/profile">
                     <User className="h-4 w-4" />
-                    <span>Profile</span>
+                    <span>{t("profile")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -167,7 +187,7 @@ export function AppSidebar() {
                 <SidebarMenuButton asChild isActive={pathname === "/settings"}>
                   <Link href="/settings">
                     <Settings className="h-4 w-4" />
-                    <span>Settings</span>
+                    <span>{t("settings")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -176,7 +196,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Preferences</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("preferences")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {/* <SidebarMenuItem>
@@ -210,14 +230,14 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => {
-                    if (confirm("Are you sure you want to sign out?")) {
+                    if (confirm(t("signOutConfirm"))) {
                       signOut({ callbackUrl: "/" });
                     }
                   }}
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Sign Out</span>
+                  <span>{t("signOut")}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

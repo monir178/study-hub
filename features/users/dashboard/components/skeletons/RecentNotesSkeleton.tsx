@@ -1,13 +1,16 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function RecentNotesSkeleton() {
+  const t = useTranslations("dashboard.charts");
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Notes</CardTitle>
+        <CardTitle>{t("recentNotes")}</CardTitle>
         <Skeleton className="h-4 w-48" />
       </CardHeader>
       <CardContent>

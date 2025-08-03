@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import {
@@ -21,6 +22,8 @@ interface StudyTimeChartProps {
 }
 
 export function StudyTimeChart({ data, loading }: StudyTimeChartProps) {
+  const t = useTranslations("dashboard.charts");
+
   if (loading) {
     return <StudyTimeChartSkeleton />;
   }
@@ -49,13 +52,15 @@ export function StudyTimeChart({ data, loading }: StudyTimeChartProps) {
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>Study Time (Last 7 Days)</CardTitle>
+        <CardTitle>
+          {t("studyTime")} ({t("last7Days")})
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer
           config={{
             time: {
-              label: "Study Time",
+              label: t("studyTime"),
               color: "var(--chart-1)",
             },
           }}

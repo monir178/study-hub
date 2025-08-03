@@ -149,6 +149,58 @@
     "emailNotifications": "Email Notifications",
     "pushNotifications": "Push Notifications"
   },
+  "sidebar": {
+    "navigation": "Navigation",
+    "account": "Account",
+    "preferences": "Preferences",
+    "dashboard": "Dashboard",
+    "studyRooms": "Study Rooms",
+    "publicNotes": "Public Notes",
+    "reports": "Reports",
+    "users": "Users",
+    "analytics": "Analytics",
+    "sessions": "Sessions",
+    "content": "Content",
+    "profile": "Profile",
+    "settings": "Settings",
+    "signOut": "Sign Out",
+    "signOutConfirm": "Are you sure you want to sign out?",
+    "collaborativeLearning": "Collaborative Learning"
+  },
+  "dashboard": {
+    "failedToLoad": "Failed to load dashboard data",
+    "tryRefresh": "Please try refreshing the page",
+    "quickActions": "Quick Actions",
+    "streak": "Streak",
+    "stats": {
+      "totalStudyTime": "Total Study Time",
+      "totalSessions": "Total Sessions",
+      "createdRooms": "Created Rooms",
+      "privateRooms": "Private Rooms",
+      "joinedRooms": "Joined Rooms",
+      "averageSessionTime": "Average Session Time",
+      "thisWeek": "This week",
+      "activeRooms": "Active rooms",
+      "totalCreated": "Total created",
+      "yourPrivateRooms": "Your private rooms"
+    },
+    "charts": {
+      "studyTime": "Study Time",
+      "recentRooms": "Recent Rooms",
+      "recentNotes": "Recent Notes",
+      "myRecentNotes": "My Recent Notes",
+      "last7Days": "Last 7 Days",
+      "members": "members",
+      "join": "Join",
+      "open": "Open",
+      "noRecentRooms": "No recent rooms",
+      "noRecentNotes": "No recent notes",
+      "browseRooms": "Browse Rooms",
+      "browseNotes": "Browse Notes",
+      "viewAllRooms": "View All Rooms",
+      "viewAllNotes": "View All Notes"
+    }
+  },
   "navbar": {
     "features": "Features",
     "pricing": "Pricing",

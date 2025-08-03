@@ -1,13 +1,18 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function StudyTimeChartSkeleton() {
+  const t = useTranslations("dashboard.charts");
+
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>Study Time (Last 7 Days)</CardTitle>
+        <CardTitle>
+          {t("studyTime")} ({t("last7Days")})
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

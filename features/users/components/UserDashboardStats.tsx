@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Timer, BookOpen, Users } from "lucide-react";
@@ -17,6 +18,8 @@ export function UserDashboardStats({
   trends,
   loading,
 }: UserDashboardStatsProps) {
+  const t = useTranslations("dashboard.stats");
+
   if (loading) {
     return <UserDashboardStatsSkeleton />;
   }
@@ -33,36 +36,36 @@ export function UserDashboardStats({
 
   const statsCards = [
     {
-      title: "Study Sessions",
+      title: t("totalSessions"),
       value: stats.totalSessions,
       change: trends.sessions.change,
       trend: trends.sessions.trend,
       icon: <Timer className="w-4 h-4" />,
-      description: "This week",
+      description: t("thisWeek"),
     },
     {
-      title: "Joined Rooms",
+      title: t("joinedRooms"),
       value: stats.joinedRoomsCount,
       change: trends.rooms.change,
       trend: trends.rooms.trend,
       icon: <Users className="w-4 h-4" />,
-      description: "Active rooms",
+      description: t("activeRooms"),
     },
     {
-      title: "Created Rooms",
+      title: t("createdRooms"),
       value: stats.createdRooms,
       change: trends.createdRooms.change,
       trend: trends.createdRooms.trend,
       icon: <BookOpen className="w-4 h-4" />,
-      description: "Total created",
+      description: t("totalCreated"),
     },
     {
-      title: "Private Rooms",
+      title: t("privateRooms"),
       value: stats.privateRooms,
       change: trends.privateRooms.change,
       trend: trends.privateRooms.trend,
       icon: <BookOpen className="w-4 h-4" />,
-      description: "Your private rooms",
+      description: t("yourPrivateRooms"),
     },
   ];
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, ArrowRight } from "lucide-react";
@@ -14,6 +15,8 @@ interface RecentNotesProps {
 }
 
 export function RecentNotes({ recentNotes, loading }: RecentNotesProps) {
+  const t = useTranslations("dashboard.charts");
+
   if (loading) {
     return <RecentNotesSkeleton />;
   }
@@ -22,7 +25,7 @@ export function RecentNotes({ recentNotes, loading }: RecentNotesProps) {
     <Card className="min-h-[200px]">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">My Recent Notes</CardTitle>
+          <CardTitle className="text-lg">{t("myRecentNotes")}</CardTitle>
           <FileText className="w-5 h-5 text-muted-foreground" />
         </div>
       </CardHeader>
@@ -42,7 +45,7 @@ export function RecentNotes({ recentNotes, loading }: RecentNotesProps) {
               </div>
               <Button size="sm" variant="outline" asChild>
                 <Link href={`/dashboard/rooms/${note.roomId}/notes/${note.id}`}>
-                  Open
+                  {t("open")}
                 </Link>
               </Button>
             </div>
@@ -50,16 +53,18 @@ export function RecentNotes({ recentNotes, loading }: RecentNotesProps) {
           {recentNotes.length === 0 && (
             <div className="text-center py-8">
               <FileText className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">No recent notes</p>
+              <p className="text-sm text-muted-foreground">
+                {t("noRecentNotes")}
+              </p>
               <Button variant="outline" size="sm" className="mt-2" asChild>
-                <Link href="/dashboard/notes">Browse Notes</Link>
+                <Link href="/dashboard/notes">{t("browseNotes")}</Link>
               </Button>
             </div>
           )}
           {recentNotes.length > 0 && (
             <Button variant="ghost" size="sm" className="w-full" asChild>
               <Link href="/dashboard/notes">
-                View All Notes
+                {t("viewAllNotes")}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>

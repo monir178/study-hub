@@ -149,6 +149,58 @@
     "emailNotifications": "Notificaciones por Correo",
     "pushNotifications": "Notificaciones Push"
   },
+  "sidebar": {
+    "navigation": "Navegación",
+    "account": "Cuenta",
+    "preferences": "Preferencias",
+    "dashboard": "Panel",
+    "studyRooms": "Salas de Estudio",
+    "publicNotes": "Notas Públicas",
+    "reports": "Reportes",
+    "users": "Usuarios",
+    "analytics": "Analíticas",
+    "sessions": "Sesiones",
+    "content": "Contenido",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "signOut": "Cerrar Sesión",
+    "signOutConfirm": "¿Estás seguro de que quieres cerrar sesión?",
+    "collaborativeLearning": "Aprendizaje Colaborativo"
+  },
+  "dashboard": {
+    "failedToLoad": "Error al cargar los datos del panel",
+    "tryRefresh": "Por favor, intenta actualizar la página",
+    "quickActions": "Acciones Rápidas",
+    "streak": "Racha",
+    "stats": {
+      "totalStudyTime": "Tiempo Total de Estudio",
+      "totalSessions": "Sesiones Totales",
+      "createdRooms": "Salas Creadas",
+      "privateRooms": "Salas Privadas",
+      "joinedRooms": "Salas Unidas",
+      "averageSessionTime": "Tiempo Promedio de Sesión",
+      "thisWeek": "Esta semana",
+      "activeRooms": "Salas activas",
+      "totalCreated": "Total creadas",
+      "yourPrivateRooms": "Tus salas privadas"
+    },
+    "charts": {
+      "studyTime": "Tiempo de Estudio",
+      "recentRooms": "Salas Recientes",
+      "recentNotes": "Notas Recientes",
+      "myRecentNotes": "Mis Notas Recientes",
+      "last7Days": "Últimos 7 Días",
+      "members": "miembros",
+      "join": "Unirse",
+      "open": "Abrir",
+      "noRecentRooms": "No hay salas recientes",
+      "noRecentNotes": "No hay notas recientes",
+      "browseRooms": "Explorar Salas",
+      "browseNotes": "Explorar Notas",
+      "viewAllRooms": "Ver Todas las Salas",
+      "viewAllNotes": "Ver Todas las Notas"
+    }
+  },
   "navbar": {
     "features": "Características",
     "pricing": "Precios",

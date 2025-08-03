@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useUserDashboard } from "../../hooks/useUserDashboard";
 import { UserDashboardStats } from "../../components/UserDashboardStats";
 import { UserDashboardBento } from "../../components/UserDashboardBento";
@@ -20,6 +21,7 @@ interface UserDashboardProps {
 
 export function UserDashboard({ loading }: UserDashboardProps) {
   const { data, error, isLoading } = useUserDashboard();
+  const t = useTranslations("dashboard");
 
   // Show error only if there's an actual error
   if (error) {
@@ -27,10 +29,10 @@ export function UserDashboard({ loading }: UserDashboardProps) {
       <div className="space-y-6">
         <div className="text-center py-12">
           <h3 className="text-lg font-semibold text-destructive">
-            Failed to load dashboard data
+            {t("failedToLoad")}
           </h3>
           <p className="text-sm text-muted-foreground mt-2">
-            Please try refreshing the page
+            {t("tryRefresh")}
           </p>
         </div>
       </div>
