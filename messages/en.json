@@ -164,7 +164,10 @@
   },
   "landing": {
     "hero": {
-      "title": "Study Together, Achieve More",
+      "title": {
+        "part1": "Study Together,",
+        "part2": "Achieve More"
+      },
       "subtitle": "Join synchronized study sessions with friends. Share notes, chat in real-time, and stay motivated with collaborative learning.",
       "getStarted": "Start Learning Together",
       "exploreRooms": "Explore Rooms",

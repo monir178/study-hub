@@ -45,7 +45,13 @@ export function HeroContent() {
         animate="visible"
       >
         <h1 className="text-5xl  md:text-6xl  xl:text-8xl  font-bold mb-6 sm:mb-8 leading-[1.05] tracking-tight">
-          {t("title")}
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/40 from-1% via-foreground/95 to-foreground/80">
+            {t("title.part1")}
+          </span>
+          <br />
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-400">
+            {t("title.part2")}
+          </span>
         </h1>
       </motion.div>
 

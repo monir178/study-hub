@@ -164,7 +164,10 @@
   },
   "landing": {
     "hero": {
-      "title": "Estudia Juntos, Logra Más",
+      "title": {
+        "part1": "Estudia Juntos,",
+        "part2": "Logra Más"
+      },
       "subtitle": "Únete a sesiones de estudio sincronizadas con amigos. Comparte notas, chatea en tiempo real y mantente motivado con el aprendizaje colaborativo.",
       "getStarted": "Comenzar a Aprender Juntos",
       "exploreRooms": "Explorar Salas",
