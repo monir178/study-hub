@@ -28,7 +28,7 @@ export function HeroButtons() {
       variants={fadeUpVariants}
       initial="hidden"
       animate="visible"
-      className="flex flex-row gap-3 sm:gap-6 justify-center mb-8 sm:mb-12 px-4"
+      className="flex flex-col md:flex-row gap-3 sm:gap-6 justify-center mb-8 sm:mb-12 px-4"
     >
       {/* Primary Button - Default variant */}
       <Link href="/auth/signup">

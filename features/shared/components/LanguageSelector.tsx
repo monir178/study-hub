@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Globe, Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 
 interface Language {
   code: string;
@@ -86,7 +86,7 @@ export default function LanguageSelector({
               transition={{ duration: 0.2 }}
               className="flex items-center justify-center"
             >
-              <Globe className="h-4 w-4" />
+              <span className="text-lg">{currentLanguage.flag}</span>
             </motion.div>
             <span className="sr-only">{t("selectLanguage")}</span>
           </Button>
@@ -135,7 +135,7 @@ export default function LanguageSelector({
               </span>
             )}
             <ChevronDown
-              className={`h-3 w-3 transition-transform duration-200 ${
+              className={`h-3 w-3 transition-transform duration-200 text-white ${
                 isOpen ? "rotate-180" : ""
               }`}
             />
