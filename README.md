@@ -5,7 +5,7 @@ A modern, full-featured collaborative learning platform built with Next.js 15, f
 ## 🚀 Features
 
 - **Real-time Pomodoro Timers** - Synchronized across all study room members
-- **Collaborative Notes** - Live markdown editor with real-time collaboration
+- **Notes** - Taking notes for individual study rooms. And share all public study room notes.
 - **Group Chat** - Instant messaging within study rooms
 - **Study Rooms** - Create or join public/private rooms with role-based permissions
 - **User Authentication** - NextAuth.js with email/password and OAuth providers
