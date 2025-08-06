@@ -242,7 +242,13 @@
         "in": "in",
         "ago": "ago"
       }
-    }
+    },
+    "userRoleDistribution": "User Role Distribution",
+    "usersByRole": "Distribution of users by their roles",
+    "totalUsers": "Total Users",
+    "sessionActivity": "Session Activity",
+    "last30Days": "Last 30 days",
+    "sessionTrendsLast30Days": "Session trends over the last 30 days"
   },
   "navbar": {
     "features": "Features",

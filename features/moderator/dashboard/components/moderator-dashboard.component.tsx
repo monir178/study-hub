@@ -6,7 +6,9 @@ import { ModeratorDashboardStats } from "../../components/ModeratorDashboardStat
 import { RecentUsers } from "../../components/RecentUsers";
 import { RecentRooms } from "../../components/RecentRooms";
 import { RecentSessions } from "../../components/RecentSessions";
-import { UserManagement } from "@/features/admin/dashboard/components/user-management.component";
+import { UserRoleDistributionChart } from "../../components/UserRoleDistributionChart";
+import { SessionActivityChart } from "../../components/SessionActivityChart";
+
 import {
   ModeratorDashboardStatsSkeleton,
   RecentUsersSkeleton,
@@ -45,19 +47,20 @@ export function ModeratorDashboard({ loading }: ModeratorDashboardProps) {
         {/* First Row: Dashboard Stats */}
         <ModeratorDashboardStatsSkeleton />
 
-        {/* Second Row: Recent Data */}
+        {/* Second Row: Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="h-[400px] bg-muted animate-pulse rounded-lg" />
+          <div className="h-[400px] bg-muted animate-pulse rounded-lg" />
+        </div>
+
+        {/* Third Row: Recent Data */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RecentUsersSkeleton />
           <RecentRoomsSkeleton />
         </div>
 
-        {/* Third Row: Recent Sessions */}
+        {/* Fourth Row: Recent Sessions */}
         <RecentActivitySkeleton />
-
-        {/* Fourth Row: User Management */}
-        <div className="space-y-6">
-          <div className="h-96 bg-muted animate-pulse rounded-lg" />
-        </div>
       </div>
     );
   }
@@ -70,7 +73,13 @@ export function ModeratorDashboard({ loading }: ModeratorDashboardProps) {
         loading={isLoading || loading}
       />
 
-      {/* Second Row: Recent Users + Recent Rooms */}
+      {/* Second Row: Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <UserRoleDistributionChart />
+        <SessionActivityChart />
+      </div>
+
+      {/* Third Row: Recent Users + Recent Rooms */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RecentUsers
           users={data.recentUsers.slice(0, 5)}
@@ -82,14 +91,11 @@ export function ModeratorDashboard({ loading }: ModeratorDashboardProps) {
         />
       </div>
 
-      {/* Third Row: Recent Sessions */}
+      {/* Fourth Row: Recent Sessions */}
       <RecentSessions
         sessions={data.recentSessions.slice(0, 5)}
         loading={isLoading || loading}
       />
-
-      {/* Fourth Row: User Management */}
-      <UserManagement />
     </div>
   );
 }

@@ -242,8 +242,15 @@
         "in": "en",
         "ago": "hace"
       }
-    }
+    },
+    "userRoleDistribution": "Distribución de Roles de Usuario",
+    "usersByRole": "Distribución de usuarios por sus roles",
+    "totalUsers": "Usuarios Totales",
+    "sessionActivity": "Actividad de Sesiones",
+    "last30Days": "Últimos 30 días",
+    "sessionTrendsLast30Days": "Tendencias de sesiones en los últimos 30 días"
   },
+
   "navbar": {
     "features": "Características",
     "pricing": "Precios",

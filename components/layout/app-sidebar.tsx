@@ -61,7 +61,7 @@ export function AppSidebar() {
       case "ADMIN":
         return [
           { name: t("dashboard"), href: "/dashboard", icon: Home },
-          { name: t("users"), href: "/dashboard?tab=users", icon: Users },
+          { name: t("users"), href: "/dashboard/users", icon: Users },
           {
             name: t("sessions"),
             href: "/dashboard?tab=sessions",
@@ -86,13 +86,8 @@ export function AppSidebar() {
       case "MODERATOR":
         return [
           { name: t("dashboard"), href: "/dashboard", icon: Home },
-          {
-            name: t("reports"),
-            href: "/dashboard?tab=reports",
-            icon: Calendar,
-          },
-          { name: t("studyRooms"), href: "/dashboard/rooms", icon: Users },
-          { name: t("users"), href: "/dashboard?tab=users", icon: BookOpen },
+          { name: t("users"), href: "/dashboard/users", icon: Users },
+          { name: t("studyRooms"), href: "/dashboard/rooms", icon: BookOpen },
           {
             name: t("analytics"),
             href: "/dashboard?tab=analytics",
