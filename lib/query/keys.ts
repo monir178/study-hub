@@ -63,8 +63,13 @@ export const queryKeys = {
 
   // Moderator
   moderator: ["moderator"] as const,
+  moderatorDashboard: () => [...queryKeys.moderator, "dashboard"] as const,
   moderatorStats: () => [...queryKeys.moderator, "stats"] as const,
   moderatorActivity: () => [...queryKeys.moderator, "activity"] as const,
+  moderatorRecentUsers: () => [...queryKeys.moderator, "recent-users"] as const,
+  moderatorRecentRooms: () => [...queryKeys.moderator, "recent-rooms"] as const,
+  moderatorRecentSessions: () =>
+    [...queryKeys.moderator, "recent-sessions"] as const,
   reports: (status?: string) =>
     status
       ? ([...queryKeys.moderator, "reports", status] as const)

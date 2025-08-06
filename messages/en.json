@@ -201,6 +201,49 @@
       "viewAllNotes": "View All Notes"
     }
   },
+  "moderator": {
+    "failedToLoad": "Failed to load moderator dashboard",
+    "tryRefresh": "Please try refreshing the page",
+    "dashboard": {
+      "title": "Moderator Dashboard",
+      "stats": {
+        "totalUsers": "Total Users",
+        "studyRooms": "Study Rooms",
+        "studySessions": "Study Sessions",
+        "messagesToday": "Messages Today",
+        "newThisWeek": "new this week",
+        "activeToday": "active today",
+        "activeNow": "active now",
+        "thisWeek": "this week"
+      },
+      "recentUsers": {
+        "title": "Recent Users",
+        "description": "Latest users who joined the platform",
+        "noUsers": "No recent users",
+        "viewAll": "View All Users",
+        "joined": "Joined",
+        "ago": "ago"
+      },
+      "recentRooms": {
+        "title": "Recent Rooms",
+        "description": "Latest study rooms created on the platform",
+        "noRooms": "No recent rooms",
+        "viewAll": "View All Rooms",
+        "by": "By",
+        "members": "members",
+        "ago": "ago"
+      },
+      "recentSessions": {
+        "title": "Recent Sessions",
+        "description": "Latest study sessions on the platform",
+        "noSessions": "No recent sessions",
+        "viewAll": "View All Sessions",
+        "session": "Session",
+        "in": "in",
+        "ago": "ago"
+      }
+    }
+  },
   "navbar": {
     "features": "Features",
     "pricing": "Pricing",

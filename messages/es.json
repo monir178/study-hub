@@ -201,6 +201,49 @@
       "viewAllNotes": "Ver Todas las Notas"
     }
   },
+  "moderator": {
+    "failedToLoad": "Error al cargar el panel de moderador",
+    "tryRefresh": "Por favor, intenta actualizar la página",
+    "dashboard": {
+      "title": "Panel de Moderador",
+      "stats": {
+        "totalUsers": "Usuarios Totales",
+        "studyRooms": "Salas de Estudio",
+        "studySessions": "Sesiones de Estudio",
+        "messagesToday": "Mensajes Hoy",
+        "newThisWeek": "nuevos esta semana",
+        "activeToday": "activos hoy",
+        "activeNow": "activos ahora",
+        "thisWeek": "esta semana"
+      },
+      "recentUsers": {
+        "title": "Usuarios Recientes",
+        "description": "Últimos usuarios que se unieron a la plataforma",
+        "noUsers": "No hay usuarios recientes",
+        "viewAll": "Ver Todos los Usuarios",
+        "joined": "Se unió",
+        "ago": "hace"
+      },
+      "recentRooms": {
+        "title": "Salas Recientes",
+        "description": "Últimas salas de estudio creadas en la plataforma",
+        "noRooms": "No hay salas recientes",
+        "viewAll": "Ver Todas las Salas",
+        "by": "Por",
+        "members": "miembros",
+        "ago": "hace"
+      },
+      "recentSessions": {
+        "title": "Sesiones Recientes",
+        "description": "Últimas sesiones de estudio en la plataforma",
+        "noSessions": "No hay sesiones recientes",
+        "viewAll": "Ver Todas las Sesiones",
+        "session": "Sesión",
+        "in": "en",
+        "ago": "hace"
+      }
+    }
+  },
   "navbar": {
     "features": "Características",
     "pricing": "Precios",

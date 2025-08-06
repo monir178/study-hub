@@ -1,91 +1,99 @@
 // ===============================================
-// MODERATOR TYPES
+// MODERATOR TYPES (Based on available Prisma models)
 // ===============================================
 
 export interface ModeratorStats {
   users: {
     total: number;
-    active: number;
     newThisWeek: number;
+    byRole: {
+      users: number;
+      moderators: number;
+      admins: number;
+    };
+  };
+  rooms: {
+    total: number;
+    public: number;
+    private: number;
+    activeToday: number;
   };
   sessions: {
     total: number;
-    thisWeek: number;
-    moderated: number;
+    activeNow: number;
+    completedToday: number;
+    byType: {
+      pomodoro: number;
+      custom: number;
+      break: number;
+    };
   };
-  reports: {
-    pending: number;
-    resolved: number;
-    dismissed: number;
-  };
-  content: {
-    reviewed: number;
-    flagged: number;
-    approved: number;
+  messages: {
+    totalToday: number;
+    totalThisWeek: number;
   };
 }
 
-export interface Report {
+export interface RecentUser {
   id: string;
-  type: "USER" | "CONTENT" | "SESSION" | "OTHER";
-  status: "PENDING" | "RESOLVED" | "DISMISSED";
-  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-  title: string;
-  description: string;
-  reportedBy: {
-    id: string;
-    name: string;
+  name: string | null;
+  email: string;
+  role: "USER" | "MODERATOR" | "ADMIN";
+  createdAt: string;
+}
+
+export interface RecentRoom {
+  id: string;
+  name: string;
+  description: string | null;
+  isPublic: boolean;
+  maxMembers: number;
+  createdAt: string;
+  creator: {
+    name: string | null;
     email: string;
   };
-  reportedUser?: {
-    id: string;
-    name: string;
+  _count: {
+    members: number;
+  };
+}
+
+export interface RecentSession {
+  id: string;
+  type: "POMODORO" | "CUSTOM" | "BREAK";
+  status: "ACTIVE" | "PAUSED" | "COMPLETED" | "CANCELLED";
+  duration: number;
+  startedAt: string;
+  endedAt: string | null;
+  user: {
+    name: string | null;
     email: string;
   };
-  targetId?: string; // ID of the reported content/session/etc.
-  evidence?: string[]; // URLs to screenshots, etc.
-  moderatorNotes?: string;
-  assignedTo?: {
-    id: string;
+  room: {
     name: string;
   };
-  createdAt: string;
-  updatedAt: string;
-  resolvedAt?: string;
 }
 
-export interface CreateReportData {
-  type: "USER" | "CONTENT" | "SESSION" | "OTHER";
-  priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-  title: string;
-  description: string;
-  reportedUserId?: string;
-  targetId?: string;
-  evidence?: string[];
-}
-
-export interface UpdateReportData {
-  status?: "PENDING" | "RESOLVED" | "DISMISSED";
-  priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-  moderatorNotes?: string;
-  assignedToId?: string;
-}
-
-export interface ModeratorActivity {
+export interface RecentMessage {
   id: string;
-  moderatorId: string;
-  moderatorName: string;
-  action:
-    | "REPORT_RESOLVED"
-    | "REPORT_DISMISSED"
-    | "USER_WARNED"
-    | "USER_SUSPENDED"
-    | "CONTENT_REMOVED"
-    | "SESSION_MODERATED";
-  description: string;
-  targetType: "USER" | "CONTENT" | "SESSION" | "REPORT";
-  targetId: string;
+  content: string;
+  type: "TEXT" | "SYSTEM" | "FILE";
   createdAt: string;
+  author: {
+    name: string | null;
+    email: string;
+  };
+  room: {
+    name: string;
+  };
+}
+
+export interface ModeratorDashboardData {
+  stats: ModeratorStats;
+  recentUsers: RecentUser[];
+  recentRooms: RecentRoom[];
+  recentSessions: RecentSession[];
+  recentMessages: RecentMessage[];
 }
 
 // Re-export User type for convenience
