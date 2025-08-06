@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 import { RecentUser } from "../types";
 import { formatDistanceToNow } from "date-fns";
+import { Link } from "@/i18n/navigation";
 
 interface RecentUsersProps {
   users: RecentUser[];
@@ -95,9 +96,11 @@ export function RecentUsers({ users, loading }: RecentUsersProps) {
           )}
         </div>
         {users.length > 0 && (
-          <Button variant="outline" className="w-full mt-4" size="sm">
-            View All Users
-          </Button>
+          <Link href="/dashboard/users">
+            <Button variant="outline" className="w-full mt-4" size="sm">
+              View All Users
+            </Button>
+          </Link>
         )}
       </CardContent>
     </Card>

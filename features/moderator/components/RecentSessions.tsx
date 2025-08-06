@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Calendar,
@@ -138,11 +137,6 @@ export function RecentSessions({ sessions, loading }: RecentSessionsProps) {
             ))
           )}
         </div>
-        {sessions.length > 0 && (
-          <Button variant="outline" className="w-full mt-4" size="sm">
-            View All Sessions
-          </Button>
-        )}
       </CardContent>
     </Card>
   );

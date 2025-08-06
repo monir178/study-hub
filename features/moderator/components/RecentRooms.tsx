@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Home, Lock, Globe } from "lucide-react";
 import { RecentRoom } from "../types";
 import { formatDistanceToNow } from "date-fns";
+import { Link } from "@/i18n/navigation";
 
 interface RecentRoomsProps {
   rooms: RecentRoom[];
@@ -91,9 +92,11 @@ export function RecentRooms({ rooms, loading }: RecentRoomsProps) {
           )}
         </div>
         {rooms.length > 0 && (
-          <Button variant="outline" className="w-full mt-4" size="sm">
-            View All Rooms
-          </Button>
+          <Link href="/dashboard/rooms">
+            <Button variant="outline" className="w-full mt-4" size="sm">
+              View All Rooms
+            </Button>
+          </Link>
         )}
       </CardContent>
     </Card>
