@@ -46,6 +46,19 @@ model User {
   role          Role      @default(USER)
   locale        String    @default("en")
   theme         Theme     @default(SYSTEM)
+  
+  // Additional profile fields
+  phoneNumber   String?
+  gender        Gender?
+  dateOfBirth   DateTime?
+  
+  // Address fields
+  street        String?
+  city          String?
+  region        String?
+  postalCode    String?
+  country       String?
+  
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -168,6 +181,13 @@ enum Theme {
   LIGHT
   DARK
   SYSTEM
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
 }
 
 enum RoomRole {
