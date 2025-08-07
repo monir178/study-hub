@@ -18,7 +18,8 @@
     "open": "Abrir",
     "yes": "Sí",
     "no": "No",
-    "selectLanguage": "Seleccionar Idioma"
+    "selectLanguage": "Seleccionar Idioma",
+    "email": "Correo Electrónico"
   },
   "auth": {
     "signIn": "Iniciar Sesión",
@@ -136,7 +137,69 @@
     "changePassword": "Cambiar Contraseña",
     "currentPassword": "Contraseña Actual",
     "newPassword": "Nueva Contraseña",
-    "confirmNewPassword": "Confirmar Nueva Contraseña"
+    "confirmNewPassword": "Confirmar Nueva Contraseña",
+    "form": {
+      "title": "Configuración del Perfil",
+      "description": "Administra la configuración de tu cuenta e información del perfil.",
+      "basicInformation": "Información Básica",
+      "personalInformation": "Información Personal",
+      "addressInformation": "Información de Dirección",
+      "fullName": "Nombre Completo",
+      "fullNamePlaceholder": "Ingresa tu nombre completo",
+      "phoneNumber": "Número de Teléfono",
+      "phoneNumberPlaceholder": "Ingresa número de teléfono",
+      "gender": "Género",
+      "genderPlaceholder": "Selecciona género",
+      "dateOfBirth": "Fecha de Nacimiento",
+      "dateOfBirthPlaceholder": "Selecciona una fecha",
+      "street": "Dirección",
+      "streetPlaceholder": "Ingresa dirección",
+      "city": "Ciudad",
+      "cityPlaceholder": "Ingresa ciudad",
+      "region": "Estado/Región",
+      "regionPlaceholder": "Ingresa estado o región",
+      "postalCode": "Código Postal",
+      "postalCodePlaceholder": "Ingresa código postal",
+      "country": "País",
+      "countryPlaceholder": "Selecciona país",
+      "uploadPhoto": "Subir Foto",
+      "changePhoto": "Cambiar Foto",
+      "removePhoto": "Quitar Foto",
+      "updateProfile": "Actualizar Perfil",
+      "updating": "Actualizando...",
+      "uploading": "Subiendo...",
+      "resetChanges": "Reiniciar Cambios",
+      "profileUpdated": "¡Perfil actualizado exitosamente!",
+      "uploadFailed": "Error al subir imagen. Por favor, inténtalo de nuevo.",
+      "updateFailed": "Error al actualizar perfil. Por favor, inténtalo de nuevo.",
+      "loadingProfile": "Cargando perfil...",
+      "failedToLoad": "Error al cargar datos del perfil",
+      "tryRefresh": "Por favor, intenta actualizar la página",
+      "genderOptions": {
+        "male": "Masculino",
+        "female": "Femenino",
+        "other": "Otro",
+        "preferNotToSay": "Prefiero no decir"
+      },
+      "validation": {
+        "nameRequired": "El nombre completo es requerido",
+        "nameMinLength": "El nombre debe tener al menos 2 caracteres",
+        "phoneInvalid": "Por favor, ingresa un número de teléfono válido",
+        "streetMinLength": "La dirección debe tener al menos 5 caracteres",
+        "cityMinLength": "La ciudad debe tener al menos 2 caracteres",
+        "regionMinLength": "El estado/región debe tener al menos 2 caracteres",
+        "postalCodeMinLength": "El código postal debe tener al menos 3 caracteres",
+        "countryRequired": "Por favor, selecciona un país",
+        "imageTypeInvalid": "Por favor, selecciona un archivo de imagen",
+        "imageSizeInvalid": "El tamaño de la imagen debe ser menor a 5MB"
+      }
+    },
+    "skeletons": {
+      "loadingProfile": "Cargando tu perfil...",
+      "loadingBasicInfo": "Cargando información básica...",
+      "loadingPersonalInfo": "Cargando información personal...",
+      "loadingAddress": "Cargando información de dirección..."
+    }
   },
   "settings": {
     "title": "Configuración",

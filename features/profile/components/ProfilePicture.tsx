@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 import { Upload, X } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "@/features/users/types";
@@ -21,19 +23,20 @@ export function ProfilePicture({
 }: ProfilePictureProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const t = useTranslations("profile.form");
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       // Validate file type
       if (!file.type.startsWith("image/")) {
-        alert("Please select an image file");
+        toast.error(t("validation.imageTypeInvalid"));
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert("Image size should be less than 5MB");
+        toast.error(t("validation.imageSizeInvalid"));
         return;
       }
 
@@ -100,7 +103,7 @@ export function ProfilePicture({
             type="button"
           >
             <Upload className="h-4 w-4 mr-2" />
-            {selectedFile ? "Change" : "Select"}
+            {selectedFile ? t("changePhoto") : t("uploadPhoto")}
           </Button>
 
           {(selectedFile || user.image) && (
@@ -112,7 +115,7 @@ export function ProfilePicture({
               type="button"
             >
               <X className="h-4 w-4 mr-2" />
-              {selectedFile ? "Cancel" : "Remove"}
+              {selectedFile ? "Cancel" : t("removePhoto")}
             </Button>
           )}
         </div>
@@ -123,7 +126,7 @@ export function ProfilePicture({
         <div className="text-sm text-center lg:text-left">
           <p className="text-green-600 font-medium">New image selected</p>
           <p className="text-muted-foreground">
-            Click "Update Profile" to save changes
+            Click "{t("updateProfile")}" to save changes
           </p>
         </div>
       )}

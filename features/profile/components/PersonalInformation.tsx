@@ -3,6 +3,7 @@
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { useFormContext } from "react-hook-form";
+import { useTranslations } from "next-intl";
 
 import {
   Select,
@@ -35,6 +36,7 @@ interface PersonalInformationProps {
 
 export function PersonalInformation({ user: _user }: PersonalInformationProps) {
   const form = useFormContext<ProfileFormData>();
+  const t = useTranslations("profile.form");
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -44,7 +46,7 @@ export function PersonalInformation({ user: _user }: PersonalInformationProps) {
         name="gender"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Gender</FormLabel>
+            <FormLabel>{t("gender")}</FormLabel>
             <Select
               onValueChange={field.onChange}
               value={field.value || ""}
@@ -52,15 +54,19 @@ export function PersonalInformation({ user: _user }: PersonalInformationProps) {
             >
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select gender" />
+                  <SelectValue placeholder={t("genderPlaceholder")} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="MALE">Male</SelectItem>
-                <SelectItem value="FEMALE">Female</SelectItem>
-                <SelectItem value="OTHER">Other</SelectItem>
+                <SelectItem value="MALE">{t("genderOptions.male")}</SelectItem>
+                <SelectItem value="FEMALE">
+                  {t("genderOptions.female")}
+                </SelectItem>
+                <SelectItem value="OTHER">
+                  {t("genderOptions.other")}
+                </SelectItem>
                 <SelectItem value="PREFER_NOT_TO_SAY">
-                  Prefer not to say
+                  {t("genderOptions.preferNotToSay")}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -75,7 +81,7 @@ export function PersonalInformation({ user: _user }: PersonalInformationProps) {
         name="dateOfBirth"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Date of Birth</FormLabel>
+            <FormLabel>{t("dateOfBirth")}</FormLabel>
             <Popover>
               <PopoverTrigger asChild>
                 <FormControl>
@@ -89,7 +95,7 @@ export function PersonalInformation({ user: _user }: PersonalInformationProps) {
                     {field.value ? (
                       format(field.value, "PPP")
                     ) : (
-                      <span>Pick a date</span>
+                      <span>{t("dateOfBirthPlaceholder")}</span>
                     )}
                     <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                   </Button>

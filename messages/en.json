@@ -18,7 +18,8 @@
     "open": "Open",
     "yes": "Yes",
     "no": "No",
-    "selectLanguage": "Select Language"
+    "selectLanguage": "Select Language",
+    "email": "Email"
   },
   "auth": {
     "signIn": "Sign In",
@@ -136,7 +137,69 @@
     "changePassword": "Change Password",
     "currentPassword": "Current Password",
     "newPassword": "New Password",
-    "confirmNewPassword": "Confirm New Password"
+    "confirmNewPassword": "Confirm New Password",
+    "form": {
+      "title": "Profile Settings",
+      "description": "Manage your account settings and profile information.",
+      "basicInformation": "Basic Information",
+      "personalInformation": "Personal Information",
+      "addressInformation": "Address Information",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter your full name",
+      "phoneNumber": "Phone Number",
+      "phoneNumberPlaceholder": "Enter phone number",
+      "gender": "Gender",
+      "genderPlaceholder": "Select gender",
+      "dateOfBirth": "Date of Birth",
+      "dateOfBirthPlaceholder": "Pick a date",
+      "street": "Street Address",
+      "streetPlaceholder": "Enter street address",
+      "city": "City",
+      "cityPlaceholder": "Enter city",
+      "region": "State/Region",
+      "regionPlaceholder": "Enter state or region",
+      "postalCode": "Postal Code",
+      "postalCodePlaceholder": "Enter postal code",
+      "country": "Country",
+      "countryPlaceholder": "Select country",
+      "uploadPhoto": "Upload Photo",
+      "changePhoto": "Change Photo",
+      "removePhoto": "Remove Photo",
+      "updateProfile": "Update Profile",
+      "updating": "Updating...",
+      "uploading": "Uploading...",
+      "resetChanges": "Reset Changes",
+      "profileUpdated": "Profile updated successfully!",
+      "uploadFailed": "Failed to upload image. Please try again.",
+      "updateFailed": "Failed to update profile. Please try again.",
+      "loadingProfile": "Loading profile...",
+      "failedToLoad": "Failed to load profile data",
+      "tryRefresh": "Please try refreshing the page",
+      "genderOptions": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other",
+        "preferNotToSay": "Prefer not to say"
+      },
+      "validation": {
+        "nameRequired": "Full name is required",
+        "nameMinLength": "Name must be at least 2 characters",
+        "phoneInvalid": "Please enter a valid phone number",
+        "streetMinLength": "Street address must be at least 5 characters",
+        "cityMinLength": "City must be at least 2 characters",
+        "regionMinLength": "State/Region must be at least 2 characters",
+        "postalCodeMinLength": "Postal code must be at least 3 characters",
+        "countryRequired": "Please select a country",
+        "imageTypeInvalid": "Please select an image file",
+        "imageSizeInvalid": "Image size should be less than 5MB"
+      }
+    },
+    "skeletons": {
+      "loadingProfile": "Loading your profile...",
+      "loadingBasicInfo": "Loading basic information...",
+      "loadingPersonalInfo": "Loading personal information...",
+      "loadingAddress": "Loading address information..."
+    }
   },
   "settings": {
     "title": "Settings",

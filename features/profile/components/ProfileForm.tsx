@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +25,7 @@ import "react-phone-number-input/style.css";
 import { ProfilePicture } from "./ProfilePicture";
 import { PersonalInformation } from "./PersonalInformation";
 import { PersonalAddress } from "./PersonalAddress";
+import { ProfileFormSkeleton } from "./skeletons";
 import {
   useUserProfile,
   useUpdateProfile,
@@ -53,6 +55,9 @@ const phoneInputStyles = `
 `;
 
 export function ProfileForm() {
+  const t = useTranslations("profile.form");
+  const commonT = useTranslations("common");
+
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
@@ -101,21 +106,20 @@ export function ProfileForm() {
   }, [user, form]);
 
   const onSubmit = async (data: ProfileFormData) => {
-    if (!user) return;
-
     try {
-      let imageUrl = user.image;
+      // Handle image upload first if there's a selected image
+      let imageUrl = user?.image || "";
 
-      // Upload image first if selected
       if (selectedImage) {
         setIsUploadingImage(true);
         try {
           const uploadResult =
             await UserService.uploadProfilePicture(selectedImage);
           imageUrl = uploadResult.url;
+          toast.success(t("profileUpdated"));
         } catch (uploadError) {
-          console.error("Image upload failed:", uploadError);
-          toast.error("Failed to upload image. Please try again.");
+          console.error("Upload error:", uploadError);
+          toast.error(t("uploadFailed"));
           return;
         } finally {
           setIsUploadingImage(false);
@@ -123,28 +127,22 @@ export function ProfileForm() {
       }
 
       // Update profile with form data and new image URL
-      await updateProfile({
+      const updateData = {
         ...data,
         image: imageUrl,
-      });
+      };
 
-      toast.success("Profile updated successfully!");
-      setSelectedImage(null);
+      await updateProfile(updateData);
+      toast.success(t("profileUpdated"));
+      setSelectedImage(null); // Clear selected image after successful update
     } catch (error) {
-      console.error("Failed to update profile:", error);
-      toast.error("Failed to update profile. Please try again.");
+      console.error("Profile update error:", error);
+      toast.error(t("updateFailed"));
     }
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading profile...</p>
-        </div>
-      </div>
-    );
+    return <ProfileFormSkeleton />;
   }
 
   if (error) {
@@ -152,7 +150,7 @@ export function ProfileForm() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <Alert variant="destructive" className="max-w-md">
           <AlertDescription>
-            Failed to load profile data. Please refresh the page and try again.
+            {t("failedToLoad")} {t("tryRefresh")}
           </AlertDescription>
         </Alert>
       </div>
@@ -164,7 +162,7 @@ export function ProfileForm() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <Alert variant="destructive" className="max-w-md">
           <AlertDescription>
-            User data not found. Please log in again.
+            {t("failedToLoad")} {t("tryRefresh")}
           </AlertDescription>
         </Alert>
       </div>
@@ -180,11 +178,9 @@ export function ProfileForm() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-          Profile Settings
+          {t("title")}
         </h1>
-        <p className="text-muted-foreground mt-2">
-          Manage your account settings and profile information.
-        </p>
+        <p className="text-muted-foreground mt-2">{t("description")}</p>
       </div>
       <div className="max-w-7xl mx-auto ">
         <Form {...form}>
@@ -192,7 +188,7 @@ export function ProfileForm() {
             {/* First Row - Profile Picture and Basic Info */}
             <Card className="w-full ">
               <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
+                <CardTitle>{t("basicInformation")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col w-full lg:flex-row gap-8 justify-between">
@@ -213,10 +209,10 @@ export function ProfileForm() {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Full Name</FormLabel>
+                          <FormLabel>{t("fullName")}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter your full name"
+                              placeholder={t("fullNamePlaceholder")}
                               {...field}
                             />
                           </FormControl>
@@ -227,7 +223,7 @@ export function ProfileForm() {
 
                     {/* Email (Read-only) */}
                     <div>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{commonT("email")}</FormLabel>
                       <Input value={user.email} disabled className="bg-muted" />
                     </div>
 
@@ -237,11 +233,11 @@ export function ProfileForm() {
                       name="phoneNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone Number</FormLabel>
+                          <FormLabel>{t("phoneNumber")}</FormLabel>
                           <FormControl>
                             <div className="phone-input-wrapper">
                               <PhoneInput
-                                placeholder="Enter phone number"
+                                placeholder={t("phoneNumberPlaceholder")}
                                 value={field.value || ""}
                                 onChange={field.onChange}
                                 defaultCountry="US"
@@ -256,8 +252,23 @@ export function ProfileForm() {
                   </div>
 
                   <div className="space-y-6">
-                    <PersonalInformation user={user} />
-                    <PersonalAddress user={user} />
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>{t("personalInformation")}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <PersonalInformation user={user} />
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>{t("addressInformation")}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <PersonalAddress user={user} />
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
               </CardContent>
@@ -288,10 +299,10 @@ export function ProfileForm() {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
                 {isUploadingImage
-                  ? "Uploading..."
+                  ? t("uploading")
                   : isPending
-                    ? "Updating..."
-                    : "Update Profile"}
+                    ? t("updating")
+                    : t("updateProfile")}
               </Button>
 
               <Button
@@ -304,7 +315,7 @@ export function ProfileForm() {
                 disabled={isSubmitting}
                 className="sm:w-auto w-full"
               >
-                Reset Changes
+                {t("resetChanges")}
               </Button>
             </div>
 
