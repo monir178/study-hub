@@ -177,18 +177,16 @@ export function ProfileForm() {
     <div className="min-h-screen bg-background">
       {/* Custom styles for phone input */}
       <style dangerouslySetInnerHTML={{ __html: phoneInputStyles }} />
-
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+          Profile Settings
+        </h1>
+        <p className="text-muted-foreground mt-2">
+          Manage your account settings and profile information.
+        </p>
+      </div>
       <div className="max-w-7xl mx-auto ">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Profile Settings
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your account settings and profile information.
-          </p>
-        </div>
-
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             {/* First Row - Profile Picture and Basic Info */}
