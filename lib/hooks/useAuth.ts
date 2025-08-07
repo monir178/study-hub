@@ -16,14 +16,9 @@ export function useAuth() {
     (state: RootState) => state.users,
   );
 
-  // Fetch complete user profile when session is available but currentUser is incomplete
+  // Always fetch fresh user profile when authenticated but no currentUser exists
   useEffect(() => {
-    if (
-      session?.user?.id &&
-      authUser &&
-      isInitialized &&
-      (!currentUser || !currentUser.locale || !currentUser.theme)
-    ) {
+    if (session?.user?.id && authUser && isInitialized && !currentUser) {
       // @ts-expect-error - dispatch is typed correctly
       dispatch(fetchCurrentUserProfile());
     }

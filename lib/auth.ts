@@ -62,6 +62,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     async jwt({ token, user, account }) {
+      // If user object exists (on sign-in), set the role
       if (user) {
         token.role = user.role;
       }
@@ -85,6 +86,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       if (token) {
         session.user.id = token.sub!;
+        session.user.name = token.name;
+        session.user.email = token.email!;
+        session.user.image = token.picture;
         session.user.role = token.role as "USER" | "MODERATOR" | "ADMIN";
       }
       return session;

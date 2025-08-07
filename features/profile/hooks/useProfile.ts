@@ -2,6 +2,7 @@ import { useApiMutation } from "@/lib/api/hooks/use-api-mutation";
 import { useCacheUtils } from "@/lib/api/hooks/use-cache-utils";
 import { useDispatch } from "react-redux";
 import { updateUser as updateAuthUser } from "@/features/auth/store/authSlice";
+import { updateCurrentUser } from "@/features/users/store/usersSlice";
 import {
   profileService,
   ProfileUpdateResponse,
@@ -28,10 +29,13 @@ export function useProfileUpdate() {
         };
         dispatch(updateAuthUser(authUserUpdate));
 
-        // Invalidate relevant queries
+        // Update current user in users store
+        dispatch(updateCurrentUser(data.user));
+
+        // Invalidate all user-related queries to refresh data everywhere
+        invalidate(queryKeys.users);
         invalidate(queryKeys.userProfile());
-        invalidate(["users"]);
-        invalidate(["auth", "session"]);
+        invalidate(queryKeys.user(data.user.id));
       },
     },
   });
@@ -67,10 +71,13 @@ export function useProfileWithImageUpdate() {
         };
         dispatch(updateAuthUser(authUserUpdate));
 
-        // Invalidate relevant queries
+        // Update current user in users store
+        dispatch(updateCurrentUser(data.user));
+
+        // Invalidate all user-related queries to refresh data everywhere
+        invalidate(queryKeys.users);
         invalidate(queryKeys.userProfile());
-        invalidate(["users"]);
-        invalidate(["auth", "session"]);
+        invalidate(queryKeys.user(data.user.id));
       },
     },
   });

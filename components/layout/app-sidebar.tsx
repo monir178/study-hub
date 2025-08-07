@@ -1,9 +1,10 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { signOut } from "next-auth/react";
 import { Link } from "@/i18n/navigation";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -41,13 +42,14 @@ interface NavItem {
 }
 
 export function AppSidebar() {
-  const { data: session } = useSession();
+  const { user, isAuthenticated } = useAuth();
   const pathname = usePathname();
   const t = useTranslations("sidebar");
 
   // Don't render sidebar on public pages or if not authenticated
   if (
-    !session ||
+    !isAuthenticated ||
+    !user ||
     !pathname ||
     pathname === "/" ||
     pathname.includes("/auth/")
@@ -57,7 +59,7 @@ export function AppSidebar() {
 
   // Get navigation items based on user role with translations
   const getNavItems = (): NavItem[] => {
-    switch (session.user.role) {
+    switch (user.role) {
       case "ADMIN":
         return [
           { name: t("dashboard"), href: "/dashboard", icon: Home },
@@ -246,24 +248,19 @@ export function AppSidebar() {
             <SidebarMenuButton size="lg" asChild>
               <Link href="/dashboard/profile">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage
-                    src={session.user.image || ""}
-                    alt={session.user.name || ""}
-                  />
+                  <AvatarImage src={user.image || ""} alt={user.name || ""} />
                   <AvatarFallback className="rounded-lg">
-                    {session.user.name?.charAt(0) ||
-                      session.user.email?.charAt(0) ||
-                      "U"}
+                    {user.name?.charAt(0) || user.email?.charAt(0) || "U"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {session.user.name || "User"}
+                    {user.name || "User"}
                   </span>
-                  <span className="truncate text-xs">{session.user.email}</span>
+                  <span className="truncate text-xs">{user.email}</span>
                 </div>
-                <Badge className={`text-xs ${getRoleColor(session.user.role)}`}>
-                  {session.user.role}
+                <Badge className={`text-xs ${getRoleColor(user.role)}`}>
+                  {user.role}
                 </Badge>
               </Link>
             </SidebarMenuButton>
