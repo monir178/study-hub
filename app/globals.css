@@ -198,3 +198,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Phone input styling to match other inputs */
+.phone-input .PhoneInputInput {
+  @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.phone-input .PhoneInputCountrySelect {
+  @apply text-sm text-foreground bg-background border-r border-input mr-2 pr-2;
+}
+
+.phone-input .PhoneInputCountrySelectArrow {
+  @apply text-muted-foreground;
+}

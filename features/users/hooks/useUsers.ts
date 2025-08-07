@@ -4,6 +4,9 @@ import { useCacheUtils } from "@/lib/api/hooks/use-cache-utils";
 import { UserService } from "../services/user.service";
 import { User, CreateUserData, UpdateUserData } from "../types";
 import { queryKeys, createQueryKeys } from "@/lib/query/keys";
+import { useDispatch } from "react-redux";
+import { updateUser as updateAuthUser } from "@/features/auth/store/authSlice";
+import { updateCurrentUser } from "@/features/users/store/usersSlice";
 
 // ===============================================
 // QUERIES
@@ -143,6 +146,7 @@ export function useUpdateUser() {
  */
 export function useUpdateProfile() {
   const cache = useCacheUtils();
+  const dispatch = useDispatch();
 
   return useApiMutation<User, Partial<UpdateUserData>>({
     mutationFn: (userData) => UserService.updateProfile(userData),
@@ -151,6 +155,47 @@ export function useUpdateProfile() {
       onSuccess: (updatedProfile) => {
         // Update profile in cache
         cache.update(queryKeys.userProfile(), updatedProfile);
+
+        // Update Redux state for global consistency
+        if (
+          updatedProfile.name !== undefined ||
+          updatedProfile.image !== undefined ||
+          updatedProfile.role !== undefined
+        ) {
+          dispatch(
+            updateAuthUser({
+              ...(updatedProfile.name !== undefined && {
+                name: updatedProfile.name || undefined,
+              }),
+              ...(updatedProfile.image !== undefined && {
+                image: updatedProfile.image || undefined,
+              }),
+              ...(updatedProfile.role !== undefined && {
+                role: updatedProfile.role,
+              }),
+            }),
+          );
+        }
+
+        // Update users slice with converted data
+        const userUpdate = {
+          ...(updatedProfile.id && { id: updatedProfile.id }),
+          ...(updatedProfile.name !== undefined && {
+            name: updatedProfile.name,
+          }),
+          ...(updatedProfile.email && { email: updatedProfile.email }),
+          ...(updatedProfile.image !== undefined && {
+            image: updatedProfile.image,
+          }),
+          ...(updatedProfile.role && { role: updatedProfile.role }),
+          ...(updatedProfile.createdAt && {
+            createdAt: updatedProfile.createdAt,
+          }),
+          ...(updatedProfile.updatedAt && {
+            updatedAt: updatedProfile.updatedAt,
+          }),
+        };
+        dispatch(updateCurrentUser(userUpdate));
       },
     },
   });

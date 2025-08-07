@@ -5,6 +5,8 @@ declare module "next-auth" {
     user: {
       id: string;
       role: "USER" | "MODERATOR" | "ADMIN";
+      locale?: string;
+      theme?: "LIGHT" | "DARK" | "SYSTEM";
     } & DefaultSession["user"];
   }
 
@@ -14,6 +16,8 @@ declare module "next-auth" {
     email?: string | null;
     image?: string | null;
     role: "USER" | "MODERATOR" | "ADMIN";
+    locale?: string;
+    theme?: "LIGHT" | "DARK" | "SYSTEM";
   }
 }
 

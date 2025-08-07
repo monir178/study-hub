@@ -48,6 +48,25 @@ export class UserService {
     return apiClient.patch<User>(`${this.BASE_PATH}/profile`, userData);
   }
 
+  // Upload profile picture
+  static async uploadProfilePicture(file: File): Promise<{ url: string }> {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("/api/upload/profile", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to upload image");
+    }
+
+    const result = await response.json();
+    return { url: result.data.url };
+  }
+
   // Delete user
   static async deleteUser(id: string): Promise<void> {
     await apiClient.delete(`${this.BASE_PATH}/${id}`);

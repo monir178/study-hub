@@ -2,37 +2,94 @@ export interface User {
   id: string;
   name: string | null;
   email: string;
+  emailVerified: string | null; // ISO string instead of Date
   image: string | null;
+  password: string | null;
   role: "USER" | "MODERATOR" | "ADMIN";
-  createdAt: Date;
-  updatedAt: Date;
+  locale: string;
+  theme: "LIGHT" | "DARK" | "SYSTEM";
+
+  // Additional profile fields
+  phoneNumber: string | null;
+  gender: "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY" | null;
+  dateOfBirth: string | null; // ISO string instead of Date
+
+  // Address fields
+  street: string | null;
+  city: string | null;
+  region: string | null;
+  postalCode: string | null;
+  country: string | null;
+
+  createdAt: string; // ISO string instead of Date
+  updatedAt: string; // ISO string instead of Date
 }
 
 export interface UserProfile {
   id: string;
-  name?: string;
+  name: string | null;
   email: string;
-  image?: string;
+  emailVerified: Date | null;
+  image: string | null;
   role: "USER" | "MODERATOR" | "ADMIN";
   locale: string;
   theme: "LIGHT" | "DARK" | "SYSTEM";
+
+  // Additional profile fields
+  phoneNumber: string | null;
+  gender: "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY" | null;
+  dateOfBirth: Date | null;
+
+  // Address fields
+  street: string | null;
+  city: string | null;
+  region: string | null;
+  postalCode: string | null;
+  country: string | null;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface UpdateUserData {
-  name?: string;
-  image?: string;
+  name?: string | null;
+  image?: string | null;
   locale?: string;
   theme?: "LIGHT" | "DARK" | "SYSTEM";
   role?: "USER" | "MODERATOR" | "ADMIN";
+
+  // Additional profile fields
+  phoneNumber?: string | null;
+  gender?: "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY" | null;
+  dateOfBirth?: Date | null;
+
+  // Address fields
+  street?: string | null;
+  city?: string | null;
+  region?: string | null;
+  postalCode?: string | null;
+  country?: string | null;
 }
 
 export interface CreateUserData {
-  name?: string;
+  name?: string | null;
   email: string;
   password: string;
   role?: "USER" | "MODERATOR" | "ADMIN";
   locale?: string;
   theme?: "LIGHT" | "DARK" | "SYSTEM";
+
+  // Additional profile fields
+  phoneNumber?: string | null;
+  gender?: "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY" | null;
+  dateOfBirth?: Date | null;
+
+  // Address fields
+  street?: string | null;
+  city?: string | null;
+  region?: string | null;
+  postalCode?: string | null;
+  country?: string | null;
 }
 
 export interface UserStats {

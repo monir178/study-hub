@@ -2,14 +2,29 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
 export interface User {
   id: string;
-  name?: string;
+  name: string | null;
   email: string;
-  image?: string;
+  emailVerified: string | null; // ISO string instead of Date
+  image: string | null;
+  password: string | null;
   role: "USER" | "MODERATOR" | "ADMIN";
   locale: string;
   theme: "LIGHT" | "DARK" | "SYSTEM";
-  createdAt: string;
-  updatedAt: string;
+
+  // Additional profile fields
+  phoneNumber: string | null;
+  gender: "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY" | null;
+  dateOfBirth: string | null; // ISO string instead of Date
+
+  // Address fields
+  street: string | null;
+  city: string | null;
+  region: string | null;
+  postalCode: string | null;
+  country: string | null;
+
+  createdAt: string; // ISO string instead of Date
+  updatedAt: string; // ISO string instead of Date
 }
 
 interface UsersState {
@@ -44,12 +59,32 @@ export const updateUser = createAsyncThunk(
   },
 );
 
+// Fetch current user profile with full details
+export const fetchCurrentUserProfile = createAsyncThunk(
+  "users/fetchCurrentUserProfile",
+  async () => {
+    const response = await fetch("/api/users/profile");
+    if (!response.ok) {
+      throw new Error("Failed to fetch user profile");
+    }
+    return response.json();
+  },
+);
+
 const usersSlice = createSlice({
   name: "users",
   initialState,
   reducers: {
     setCurrentUser: (state, action: PayloadAction<User | null>) => {
       state.currentUser = action.payload;
+    },
+    updateCurrentUser: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.currentUser) {
+        state.currentUser = { ...state.currentUser, ...action.payload };
+      }
+    },
+    clearCurrentUser: (state) => {
+      state.currentUser = null;
     },
     clearError: (state) => {
       state.error = null;
@@ -79,9 +114,26 @@ const usersSlice = createSlice({
         if (state.currentUser?.id === action.payload.id) {
           state.currentUser = action.payload;
         }
+      })
+      .addCase(fetchCurrentUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCurrentUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentUser = action.payload;
+      })
+      .addCase(fetchCurrentUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to fetch user profile";
       });
   },
 });
 
-export const { setCurrentUser, clearError } = usersSlice.actions;
+export const {
+  setCurrentUser,
+  updateCurrentUser,
+  clearCurrentUser,
+  clearError,
+} = usersSlice.actions;
 export default usersSlice.reducer;
