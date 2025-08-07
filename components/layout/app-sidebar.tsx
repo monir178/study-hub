@@ -172,7 +172,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/profile"}>
-                  <Link href="/profile">
+                  <Link href="/dashboard/profile">
                     <User className="h-4 w-4" />
                     <span>{t("profile")}</span>
                   </Link>
@@ -244,7 +244,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/profile">
+              <Link href="/dashboard/profile">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
                     src={session.user.image || ""}

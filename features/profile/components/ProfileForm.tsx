@@ -178,7 +178,7 @@ export function ProfileForm() {
       {/* Custom styles for phone input */}
       <style dangerouslySetInnerHTML={{ __html: phoneInputStyles }} />
 
-      <div className="max-w-screen-[1920px] mx-auto ">
+      <div className="max-w-7xl mx-auto ">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
@@ -192,14 +192,14 @@ export function ProfileForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             {/* First Row - Profile Picture and Basic Info */}
-            <Card>
+            <Card className="w-full ">
               <CardHeader>
                 <CardTitle>Basic Information</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="flex flex-col w-full lg:flex-row gap-8 justify-between">
                   {/* Profile Picture - Left Side */}
-                  <div className="flex justify-center lg:justify-start">
+                  <div className="flex justify-center lg:justify-start items-center">
                     <ProfilePicture
                       user={user}
                       selectedFile={selectedImage}
@@ -208,7 +208,7 @@ export function ProfileForm() {
                   </div>
 
                   {/* Basic Info - Right Side */}
-                  <div className="lg:col-span-2 space-y-6">
+                  <div className="space-y-6">
                     {/* Full Name */}
                     <FormField
                       control={form.control}
@@ -256,12 +256,17 @@ export function ProfileForm() {
                       )}
                     />
                   </div>
+
+                  <div className="space-y-6">
+                    <PersonalInformation user={user} />
+                    <PersonalAddress user={user} />
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Second Row - Additional Information */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Additional Information</CardTitle>
               </CardHeader>
@@ -272,10 +277,10 @@ export function ProfileForm() {
                   <PersonalAddress user={user} />
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Submit Section */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t">
+            <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t justify-end">
               <Button
                 type="submit"
                 disabled={isSubmitting}
