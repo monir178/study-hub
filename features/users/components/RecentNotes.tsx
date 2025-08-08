@@ -18,11 +18,15 @@ export function RecentNotes({ recentNotes, loading }: RecentNotesProps) {
   const t = useTranslations("dashboard.charts");
 
   if (loading) {
-    return <RecentNotesSkeleton />;
+    return (
+      <div data-testid="recent-notes-loading">
+        <RecentNotesSkeleton />
+      </div>
+    );
   }
 
   return (
-    <Card className="min-h-[200px]">
+    <Card className="min-h-[200px]" data-testid="recent-notes">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">{t("myRecentNotes")}</CardTitle>
@@ -34,6 +38,7 @@ export function RecentNotes({ recentNotes, loading }: RecentNotesProps) {
           {recentNotes.slice(0, 3).map((note) => (
             <div
               key={note.id}
+              data-testid="recent-note-item"
               className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
             >
               <div>
@@ -51,7 +56,7 @@ export function RecentNotes({ recentNotes, loading }: RecentNotesProps) {
             </div>
           ))}
           {recentNotes.length === 0 && (
-            <div className="text-center py-8">
+            <div className="text-center py-8" data-testid="recent-notes-empty">
               <FileText className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
               <p className="text-sm text-muted-foreground">
                 {t("noRecentNotes")}
@@ -63,7 +68,7 @@ export function RecentNotes({ recentNotes, loading }: RecentNotesProps) {
           )}
           {recentNotes.length > 0 && (
             <Button variant="ghost" size="sm" className="w-full" asChild>
-              <Link href="/dashboard/notes">
+              <Link href="/dashboard/notes" data-testid="recent-notes-view-all">
                 {t("viewAllNotes")}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>

@@ -19,7 +19,7 @@ const COLORS = [
 export function SessionTypesChart({ data, loading }: SessionTypesChartProps) {
   if (loading) {
     return (
-      <Card>
+      <Card data-testid="session-types-loading">
         <CardHeader>
           <CardTitle>Session Types</CardTitle>
         </CardHeader>
@@ -37,7 +37,7 @@ export function SessionTypesChart({ data, loading }: SessionTypesChartProps) {
   }));
 
   return (
-    <Card>
+    <Card data-testid="session-types">
       <CardHeader>
         <CardTitle>Session Types</CardTitle>
       </CardHeader>

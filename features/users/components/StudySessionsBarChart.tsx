@@ -24,7 +24,7 @@ export function StudySessionsBarChart({
 }: StudySessionsBarChartProps) {
   if (loading) {
     return (
-      <Card>
+      <Card data-testid="sessions-bar-loading">
         <CardHeader>
           <CardTitle>Study Sessions Overview</CardTitle>
         </CardHeader>
@@ -47,7 +47,7 @@ export function StudySessionsBarChart({
   }));
 
   return (
-    <Card>
+    <Card data-testid="sessions-bar">
       <CardHeader>
         <CardTitle className="text-lg">Study Sessions Overview</CardTitle>
       </CardHeader>

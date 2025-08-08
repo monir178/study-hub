@@ -18,11 +18,15 @@ export function RecentRooms({ recentRooms, loading }: RecentRoomsProps) {
   const t = useTranslations("dashboard.charts");
 
   if (loading) {
-    return <RecentRoomsSkeleton />;
+    return (
+      <div data-testid="recent-rooms-loading">
+        <RecentRoomsSkeleton />
+      </div>
+    );
   }
 
   return (
-    <Card className="min-h-[200px]">
+    <Card className="min-h-[200px]" data-testid="recent-rooms">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">{t("recentRooms")}</CardTitle>
@@ -34,6 +38,7 @@ export function RecentRooms({ recentRooms, loading }: RecentRoomsProps) {
           {recentRooms.slice(0, 3).map((room) => (
             <div
               key={room.id}
+              data-testid="recent-room-item"
               className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center gap-3">
@@ -60,7 +65,7 @@ export function RecentRooms({ recentRooms, loading }: RecentRoomsProps) {
             </div>
           ))}
           {recentRooms.length === 0 && (
-            <div className="text-center py-8">
+            <div className="text-center py-8" data-testid="recent-rooms-empty">
               <Users className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
               <p className="text-sm text-muted-foreground">
                 {t("noRecentRooms")}
@@ -72,7 +77,7 @@ export function RecentRooms({ recentRooms, loading }: RecentRoomsProps) {
           )}
           {recentRooms.length > 0 && (
             <Button variant="ghost" size="sm" className="w-full" asChild>
-              <Link href="/dashboard/rooms">
+              <Link href="/dashboard/rooms" data-testid="recent-rooms-view-all">
                 {t("viewAllRooms")}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>

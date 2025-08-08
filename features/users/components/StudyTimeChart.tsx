@@ -25,7 +25,11 @@ export function StudyTimeChart({ data, loading }: StudyTimeChartProps) {
   const t = useTranslations("dashboard.charts");
 
   if (loading) {
-    return <StudyTimeChartSkeleton />;
+    return (
+      <div data-testid="study-time-loading">
+        <StudyTimeChartSkeleton />
+      </div>
+    );
   }
 
   // Transform data for chart
@@ -50,7 +54,7 @@ export function StudyTimeChart({ data, loading }: StudyTimeChartProps) {
   });
 
   return (
-    <Card className="h-full">
+    <Card className="h-full" data-testid="study-time">
       <CardHeader>
         <CardTitle>
           {t("studyTime")} ({t("last7Days")})

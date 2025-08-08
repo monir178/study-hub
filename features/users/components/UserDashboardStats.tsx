@@ -21,7 +21,11 @@ export function UserDashboardStats({
   const t = useTranslations("dashboard.stats");
 
   if (loading) {
-    return <UserDashboardStatsSkeleton />;
+    return (
+      <div data-testid="user-stats-loading">
+        <UserDashboardStatsSkeleton />
+      </div>
+    );
   }
 
   //   const formatTime = (seconds: number) => {
@@ -81,9 +85,16 @@ export function UserDashboardStats({
   };
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div
+      className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+      data-testid="user-stats"
+    >
       {statsCards.map((stat, index) => (
-        <Card key={index} className="hover:shadow-md transition-shadow">
+        <Card
+          key={index}
+          className="hover:shadow-md transition-shadow"
+          data-testid="user-stats-card"
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
             {stat.icon}
@@ -95,6 +106,7 @@ export function UserDashboardStats({
                 <Badge
                   variant="secondary"
                   className={`${getTrendColor(stat.trend)} bg-transparent border-0 px-0`}
+                  data-testid="user-stats-change"
                 >
                   {stat.change}
                 </Badge>

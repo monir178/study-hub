@@ -23,11 +23,18 @@ export function UserDashboardBento({
   loading,
 }: UserDashboardBentoProps) {
   if (loading) {
-    return <UserDashboardBentoSkeleton />;
+    return (
+      <div data-testid="user-bento-loading">
+        <UserDashboardBentoSkeleton />
+      </div>
+    );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-full ">
+    <div
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-full "
+      data-testid="user-bento"
+    >
       {/* Quick Actions */}
       <Card className="md:col-span-2 lg:col-span-2 hover:shadow-md transition-shadow cursor-pointer group">
         <CardHeader className="pb-3">
@@ -42,7 +49,10 @@ export function UserDashboardBento({
               className="h-20 flex flex-col gap-2"
               asChild
             >
-              <Link href="/dashboard/rooms?create=true">
+              <Link
+                href="/dashboard/rooms?create=true"
+                data-testid="quick-create-room"
+              >
                 <BookOpen className="w-6 h-6" />
                 <span className="text-sm">Create Room</span>
               </Link>
@@ -52,7 +62,7 @@ export function UserDashboardBento({
               className="h-20 flex flex-col gap-2"
               asChild
             >
-              <Link href="/dashboard/rooms">
+              <Link href="/dashboard/rooms" data-testid="quick-browse-rooms">
                 <Users className="w-6 h-6" />
                 <span className="text-sm">Browse Rooms</span>
               </Link>
@@ -62,7 +72,7 @@ export function UserDashboardBento({
               className="h-20 flex flex-col gap-2"
               asChild
             >
-              <Link href="/dashboard/notes">
+              <Link href="/dashboard/notes" data-testid="quick-notes">
                 <FileText className="w-6 h-6" />
                 <span className="text-sm">Notes</span>
               </Link>
@@ -72,7 +82,7 @@ export function UserDashboardBento({
       </Card>
 
       {/* Study Streak */}
-      <Card>
+      <Card data-testid="user-bento-streak">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Streak</CardTitle>
@@ -81,7 +91,10 @@ export function UserDashboardBento({
         </CardHeader>
         <CardContent>
           <div className="text-center">
-            <div className="text-3xl font-bold text-primary">
+            <div
+              className="text-3xl font-bold text-primary"
+              data-testid="streak-current"
+            >
               {streak.current}
             </div>
             <p className="text-sm text-muted-foreground">days active</p>

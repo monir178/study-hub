@@ -37,16 +37,6 @@ jest.mock("next-intl", () => ({
   useLocale: () => "en",
 }));
 
-// Mock socket.io-client
-jest.mock("socket.io-client", () => ({
-  io: jest.fn(() => ({
-    on: jest.fn(),
-    off: jest.fn(),
-    emit: jest.fn(),
-    disconnect: jest.fn(),
-  })),
-}));
-
 // Mock framer-motion
 jest.mock("framer-motion", () => ({
   motion: {

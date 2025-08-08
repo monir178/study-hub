@@ -24,7 +24,7 @@ export function StudySessionsAreaChart({
 }: StudySessionsAreaChartProps) {
   if (loading) {
     return (
-      <Card>
+      <Card data-testid="sessions-area-loading">
         <CardHeader>
           <CardTitle>Study Sessions Overview</CardTitle>
         </CardHeader>
@@ -47,7 +47,7 @@ export function StudySessionsAreaChart({
   }));
 
   return (
-    <Card>
+    <Card data-testid="sessions-area">
       <CardHeader>
         <CardTitle>Study Sessions Overview</CardTitle>
       </CardHeader>

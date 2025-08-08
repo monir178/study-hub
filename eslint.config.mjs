@@ -25,6 +25,25 @@ const eslintConfig = [
       "@next/next/no-page-custom-font": "off",
     },
   },
+  // Test files: relax TS rules and declare Jest globals
+  {
+    files: ["**/*.test.ts", "**/*.test.tsx", "__tests__/**/*.{ts,tsx}"],
+    languageOptions: {
+      globals: {
+        jest: "readonly",
+        describe: "readonly",
+        it: "readonly",
+        expect: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly",
+      },
+    },
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+    },
+  },
   ...storybook.configs["flat/recommended"],
 ];
 
