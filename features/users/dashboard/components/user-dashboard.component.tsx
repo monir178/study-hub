@@ -26,7 +26,7 @@ export function UserDashboard({ loading }: UserDashboardProps) {
   // Show error only if there's an actual error
   if (error) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" data-testid="user-dashboard-error">
         <div className="text-center py-12">
           <h3 className="text-lg font-semibold text-destructive">
             {t("failedToLoad")}
@@ -42,7 +42,10 @@ export function UserDashboard({ loading }: UserDashboardProps) {
   // If data is not available, show skeleton layout
   if (!data) {
     return (
-      <div className="space-y-6 max-w-[1920px] mx-auto">
+      <div
+        className="space-y-6 max-w-[1920px] mx-auto"
+        data-testid="user-dashboard-skeleton"
+      >
         {/* First Row: Dashboard Stats */}
         <UserDashboardStatsSkeleton />
 
@@ -67,7 +70,10 @@ export function UserDashboard({ loading }: UserDashboardProps) {
   }
 
   return (
-    <div className="space-y-6 max-w-[1920px] mx-auto">
+    <div
+      className="space-y-6 max-w-[1920px] mx-auto"
+      data-testid="user-dashboard"
+    >
       {/* First Row: Dashboard Stats */}
       <UserDashboardStats
         stats={data.stats}
