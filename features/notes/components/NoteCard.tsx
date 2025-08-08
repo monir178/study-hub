@@ -19,6 +19,7 @@ export function NoteCard({
     <Card
       className="cursor-pointer hover:bg-muted/50 transition-colors relative"
       onClick={() => onSelect(note)}
+      data-testid="note-card"
     >
       <CardContent className="p-4">
         <div className="flex flex-col">

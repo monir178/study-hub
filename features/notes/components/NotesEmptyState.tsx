@@ -12,7 +12,10 @@ export function NotesEmptyState({
   room,
 }: NotesEmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center h-full text-center">
+    <div
+      className="flex flex-col items-center justify-center h-full text-center"
+      data-testid="notes-empty-state-root"
+    >
       <FileText className="w-12 h-12 text-muted-foreground mb-4" />
       <h3 className="font-medium mb-2">
         {searchQuery ? "No notes found" : "No notes yet"}
@@ -25,7 +28,11 @@ export function NotesEmptyState({
             : "No notes available in this room"}
       </p>
       {permissions.canEdit && !searchQuery ? (
-        <Button onClick={onCreateNote} className="flex items-center gap-2">
+        <Button
+          onClick={onCreateNote}
+          className="flex items-center gap-2"
+          data-testid="notes-empty-create"
+        >
           <Plus className="w-4 h-4" />
           Create Note
         </Button>

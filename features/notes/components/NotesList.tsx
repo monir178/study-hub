@@ -128,7 +128,7 @@ export function NotesList({
 
   if (isLoading) {
     return (
-      <div className="h-full flex flex-col">
+      <div className="h-full flex flex-col" data-testid="notes-list-loading">
         <div className="flex-shrink-0 p-6 pb-4 border-b">
           <Skeleton className="h-6 w-32" />
         </div>
@@ -144,7 +144,7 @@ export function NotesList({
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col" data-testid="notes-list">
       {/* Header */}
       <NotesHeader
         notesCount={filteredNotes.length}
@@ -165,7 +165,7 @@ export function NotesList({
         {/* Scrollable Content Area */}
         <ScrollArea className="flex-1 px-6 pb-6 overflow-hidden">
           {filteredNotes.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-3" data-testid="notes-list-items">
               {filteredNotes.map((note) => (
                 <NoteCard
                   key={note.id}
@@ -190,6 +190,7 @@ export function NotesList({
               permissions={permissions}
               onCreateNote={onCreateNote}
               room={room}
+              data-testid="notes-empty-state"
             />
           )}
         </ScrollArea>

@@ -22,6 +22,7 @@ export function UserNoteCard({
         isSelected ? "bg-primary/10 border-primary" : "hover:bg-muted/50"
       }`}
       onClick={() => onSelect(note)}
+      data-testid="user-note-card"
     >
       <div className="flex items-center gap-4">
         <Avatar className="w-10 h-10">
