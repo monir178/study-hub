@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -26,6 +27,8 @@ interface StudyRoomListProps {
 }
 
 export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
+  const t = useTranslations("rooms");
+  const tCommon = useTranslations("common");
   const [search, setSearch] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [activeTab, setActiveTab] = useState("public");
@@ -106,14 +109,12 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Study Rooms</h2>
-          <p className="text-muted-foreground">
-            Join collaborative study sessions with other learners
-          </p>
+          <h2 className="text-2xl font-bold">{t("title")}</h2>
+          <p className="text-muted-foreground">{t("subtitle")}</p>
         </div>
         <Button onClick={() => setShowCreateForm(true)}>
           <Plus className="w-4 h-4 mr-2" />
-          Create Room
+          {t("createRoom")}
         </Button>
       </div>
 
@@ -122,7 +123,7 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
-            placeholder="Search rooms by name or description..."
+            placeholder={t("searchRooms")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
@@ -136,7 +137,7 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
           <RefreshCw
             className={`w-4 h-4 mr-2 ${isRefetching ? "animate-spin" : ""}`}
           />
-          Refresh
+          {tCommon("refresh") || "Refresh"}
         </Button>
       </div>
 
@@ -145,11 +146,11 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
         <TabsList>
           <TabsTrigger value="public">
             <Globe className="w-4 h-4 mr-2" />
-            Public Rooms
+            {t("publicRooms")}
           </TabsTrigger>
           <TabsTrigger value="my-rooms">
             <Users className="w-4 h-4 mr-2" />
-            My Rooms
+            {t("myRooms")}
           </TabsTrigger>
         </TabsList>
 
@@ -159,10 +160,14 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Globe className="w-4 h-4" />
-                <span>{pagination.total} public rooms</span>
+                <span>
+                  {pagination.total} {t("publicRoomsCount")}
+                </span>
               </div>
               {debouncedSearch && (
-                <Badge variant="outline">Search: "{debouncedSearch}"</Badge>
+                <Badge variant="outline">
+                  {t("searchPrefix")} "{debouncedSearch}"
+                </Badge>
               )}
             </div>
           )}
@@ -194,9 +199,7 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Failed to load rooms. Please try again.
-              </AlertDescription>
+              <AlertDescription>{t("failedToLoadRooms")}</AlertDescription>
             </Alert>
           )}
 
@@ -206,16 +209,16 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
               <CardContent className="text-center py-12">
                 <Globe className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-medium mb-2">
-                  {debouncedSearch ? "No rooms found" : "No public rooms yet"}
+                  {debouncedSearch ? t("noRoomsFound") : t("noPublicRoomsYet")}
                 </h3>
                 <p className="text-muted-foreground mb-4">
                   {debouncedSearch
-                    ? "Try adjusting your search terms"
-                    : "Be the first to create a study room!"}
+                    ? t("tryAdjustingSearch")
+                    : t("beFirstToCreate")}
                 </p>
                 <Button onClick={() => setShowCreateForm(true)}>
                   <Plus className="w-4 h-4 mr-2" />
-                  Create First Room
+                  {t("createFirstRoomShort")}
                 </Button>
               </CardContent>
             </Card>
@@ -245,7 +248,7 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
                     onClick={handleLoadMore}
                     disabled={isLoading}
                   >
-                    {isLoading ? "Loading..." : "Load More"}
+                    {isLoading ? tCommon("loading") : tCommon("loadMore")}
                   </Button>
                 </div>
               )}
@@ -259,13 +262,13 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
             <Card>
               <CardContent className="text-center py-12">
                 <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium mb-2">No rooms yet</h3>
+                <h3 className="text-lg font-medium mb-2">{t("noRoomsYet")}</h3>
                 <p className="text-muted-foreground mb-4">
-                  Create or join rooms to see them here
+                  {t("createOrJoinToSee")}
                 </p>
                 <Button onClick={() => setShowCreateForm(true)}>
                   <Plus className="w-4 h-4 mr-2" />
-                  Create Room
+                  {t("createRoom")}
                 </Button>
               </CardContent>
             </Card>

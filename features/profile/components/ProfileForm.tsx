@@ -172,17 +172,11 @@ export function ProfileForm() {
   const isSubmitting = isPending || isUploadingImage;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex justify-center items-center bg-background">
       {/* Custom styles for phone input */}
       <style dangerouslySetInnerHTML={{ __html: phoneInputStyles }} />
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-          {t("title")}
-        </h1>
-        <p className="text-muted-foreground mt-2">{t("description")}</p>
-      </div>
-      <div className="max-w-7xl mx-auto ">
+
+      <div className="max-w-5xl mx-auto ">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             {/* First Row - Profile Picture and Basic Info */}
@@ -194,61 +188,66 @@ export function ProfileForm() {
                 <div className="flex flex-col w-full lg:flex-row gap-8 justify-between">
                   {/* Profile Picture - Left Side */}
                   <div className="flex justify-center lg:justify-start items-center">
-                    <ProfilePicture
-                      user={user}
-                      selectedFile={selectedImage}
-                      onFileSelect={setSelectedImage}
-                    />
-                  </div>
+                    <div className="flex  w-full flex-col gap-4 ">
+                      <ProfilePicture
+                        user={user}
+                        selectedFile={selectedImage}
+                        onFileSelect={setSelectedImage}
+                      />
+                      {/* Basic Info - Right Side */}
+                      <div className="space-y-6">
+                        {/* Full Name */}
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t("fullName")}</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder={t("fullNamePlaceholder")}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                  {/* Basic Info - Right Side */}
-                  <div className="space-y-6">
-                    {/* Full Name */}
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("fullName")}</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder={t("fullNamePlaceholder")}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        {/* Email (Read-only) */}
+                        <div>
+                          <FormLabel>{commonT("email")}</FormLabel>
+                          <Input
+                            value={user.email}
+                            disabled
+                            className="bg-muted"
+                          />
+                        </div>
 
-                    {/* Email (Read-only) */}
-                    <div>
-                      <FormLabel>{commonT("email")}</FormLabel>
-                      <Input value={user.email} disabled className="bg-muted" />
+                        {/* Phone Number */}
+                        <FormField
+                          control={form.control}
+                          name="phoneNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t("phoneNumber")}</FormLabel>
+                              <FormControl>
+                                <div className="phone-input-wrapper">
+                                  <PhoneInput
+                                    placeholder={t("phoneNumberPlaceholder")}
+                                    value={field.value || ""}
+                                    onChange={field.onChange}
+                                    defaultCountry="US"
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                     </div>
-
-                    {/* Phone Number */}
-                    <FormField
-                      control={form.control}
-                      name="phoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("phoneNumber")}</FormLabel>
-                          <FormControl>
-                            <div className="phone-input-wrapper">
-                              <PhoneInput
-                                placeholder={t("phoneNumberPlaceholder")}
-                                value={field.value || ""}
-                                onChange={field.onChange}
-                                defaultCountry="US"
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                   </div>
 
                   <div className="space-y-6">
@@ -273,20 +272,6 @@ export function ProfileForm() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Second Row - Additional Information */}
-            {/* <Card>
-              <CardHeader>
-                <CardTitle>Additional Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <PersonalInformation user={user} />
-                <div className="mt-8">
-                  <h3 className="text-lg font-semibold mb-6">Address</h3>
-                  <PersonalAddress user={user} />
-                </div>
-              </CardContent>
-            </Card> */}
 
             {/* Submit Section */}
             <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t justify-end">

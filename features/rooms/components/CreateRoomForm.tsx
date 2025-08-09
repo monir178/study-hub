@@ -1,8 +1,10 @@
 "use client";
 
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,7 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { Slider } from "@/components/ui/slider";
 import {
   Form,
@@ -28,40 +30,43 @@ import {
 import { Globe, Lock, Users, Plus } from "lucide-react";
 import { useCreateRoom } from "../hooks/useRooms";
 
-// Zod schema for form validation
-const createRoomSchema = z
-  .object({
-    name: z
-      .string()
-      .min(1, "Room name is required")
-      .max(100, "Room name must be less than 100 characters"),
-    description: z
-      .string()
-      .max(500, "Description must be less than 500 characters")
-      .optional()
-      .or(z.literal("")),
-    isPublic: z.boolean(),
-    maxMembers: z
-      .number()
-      .min(2, "Max members must be at least 2")
-      .max(50, "Max members cannot exceed 50"),
-    password: z.string().optional().or(z.literal("")),
-  })
-  .refine(
-    (data) => {
-      // If room is private, password is required
-      if (!data.isPublic && (!data.password || data.password.trim() === "")) {
-        return false;
-      }
-      return true;
-    },
-    {
-      message: "Password is required for private rooms",
-      path: ["password"],
-    },
-  );
-
-type CreateRoomFormData = z.infer<typeof createRoomSchema>;
+// Zod schema factory for form validation with translations
+const createRoomSchemaFactory = (t: (key: string) => string) =>
+  z
+    .object({
+      name: z
+        .string()
+        .min(1, t("validation.nameRequired"))
+        .min(3, t("validation.nameMinLength"))
+        .max(50, t("validation.nameMaxLength")),
+      description: z
+        .string()
+        .max(200, t("validation.descriptionMaxLength"))
+        .optional()
+        .or(z.literal("")),
+      isPublic: z.boolean(),
+      maxMembers: z
+        .number()
+        .min(2, t("validation.maxMembersMin"))
+        .max(50, t("validation.maxMembersMax")),
+      password: z.string().optional().or(z.literal("")),
+    })
+    .refine(
+      (data) => {
+        // If room is private, password is required
+        if (!data.isPublic && (!data.password || data.password.trim() === "")) {
+          return false;
+        }
+        if (!data.isPublic && data.password && data.password.length < 6) {
+          return false;
+        }
+        return true;
+      },
+      {
+        message: t("validation.passwordMinLength"),
+        path: ["password"],
+      },
+    );
 
 interface CreateRoomFormProps {
   onSuccess?: (roomId: string) => void;
@@ -69,7 +74,12 @@ interface CreateRoomFormProps {
 }
 
 export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
+  const t = useTranslations("rooms.createRoomForm");
   const createRoom = useCreateRoom();
+
+  const createRoomSchema = useMemo(() => createRoomSchemaFactory(t), [t]);
+
+  type CreateRoomFormData = z.infer<typeof createRoomSchema>;
 
   const form = useForm<CreateRoomFormData>({
     resolver: zodResolver(createRoomSchema),
@@ -102,11 +112,9 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Plus className="w-5 h-5" />
-          Create Study Room
+          {t("title")}
         </CardTitle>
-        <CardDescription>
-          Set up a new collaborative study space for you and your peers
-        </CardDescription>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -118,10 +126,10 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Room Name *</FormLabel>
+                  <FormLabel>{t("nameLabel")} *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="e.g., Mathematics Study Group"
+                      placeholder={t("namePlaceholder")}
                       disabled={createRoom.isPending}
                       {...field}
                     />
@@ -137,10 +145,10 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t("descriptionLabel")}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Describe what you'll be studying and any specific goals..."
+                      placeholder={t("descriptionPlaceholder")}
                       disabled={createRoom.isPending}
                       rows={3}
                       {...field}
@@ -157,7 +165,7 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
               name="isPublic"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Room Visibility</FormLabel>
+                  <FormLabel>{t("publicLabel")}</FormLabel>
                   <FormControl>
                     <div className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex items-center gap-3">
@@ -168,12 +176,12 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
                         )}
                         <div>
                           <p className="font-medium">
-                            {field.value ? "Public Room" : "Private Room"}
+                            {field.value ? t("publicLabel") : t("privateLabel")}
                           </p>
                           <p className="text-sm text-muted-foreground">
                             {field.value
-                              ? "Anyone can find and join this room"
-                              : "Only people with the password can join"}
+                              ? t("publicDescription")
+                              : t("privateDescription")}
                           </p>
                         </div>
                       </div>
@@ -196,15 +204,18 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Room Password *</FormLabel>
+                    <FormLabel>{t("passwordLabel")} *</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Enter a secure password"
+                        placeholder={t("passwordPlaceholder")}
                         disabled={createRoom.isPending}
                         {...field}
                       />
                     </FormControl>
+                    <FormDescription>
+                      {t("passwordDescription")}
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -217,7 +228,9 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
               name="maxMembers"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Maximum Members: {field.value}</FormLabel>
+                  <FormLabel>
+                    {t("maxMembersLabel")}: {field.value}
+                  </FormLabel>
                   <FormControl>
                     <div className="px-2">
                       <Slider
@@ -233,22 +246,12 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
                   </FormControl>
                   <FormDescription className="flex items-center gap-2">
                     <Users className="w-4 h-4" />
-                    <span>
-                      Recommended: 5-15 members for optimal collaboration
-                    </span>
+                    <span>{t("maxMembersDescription")}</span>
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Room Features Info */}
-            <Alert>
-              <AlertDescription>
-                Your room will include: Real-time chat, collaborative notes,
-                synchronized Pomodoro timer, and member management tools.
-              </AlertDescription>
-            </Alert>
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4 w-fit ml-auto">
@@ -257,7 +260,7 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
                 disabled={createRoom.isPending}
                 className="flex-1"
               >
-                {createRoom.isPending ? "Creating..." : "Create Room"}
+                {createRoom.isPending ? t("creating") : t("createButton")}
               </Button>
               {onCancel && (
                 <Button
@@ -266,7 +269,7 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
                   onClick={onCancel}
                   disabled={createRoom.isPending}
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
               )}
             </div>

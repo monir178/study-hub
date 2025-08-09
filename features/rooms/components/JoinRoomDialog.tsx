@@ -1,8 +1,10 @@
 "use client";
 
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -22,11 +24,10 @@ import {
 } from "@/components/ui/form";
 import { Lock } from "lucide-react";
 
-const joinRoomSchema = z.object({
-  password: z.string().min(1, "Password is required"),
-});
-
-type JoinRoomFormData = z.infer<typeof joinRoomSchema>;
+const joinRoomSchemaFactory = (t: (key: string) => string) =>
+  z.object({
+    password: z.string().min(1, t("validation.passwordRequired")),
+  });
 
 interface JoinRoomDialogProps {
   open: boolean;
@@ -43,6 +44,11 @@ export function JoinRoomDialog({
   roomName,
   isLoading = false,
 }: JoinRoomDialogProps) {
+  const t = useTranslations("rooms.joinRoomDialog");
+
+  const joinRoomSchema = useMemo(() => joinRoomSchemaFactory(t), [t]);
+  type JoinRoomFormData = z.infer<typeof joinRoomSchema>;
+
   const form = useForm<JoinRoomFormData>({
     resolver: zodResolver(joinRoomSchema),
     defaultValues: {
@@ -69,10 +75,10 @@ export function JoinRoomDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Lock className="w-5 h-5 text-orange-600" />
-            Join Private Room
+            {t("title")}
           </DialogTitle>
           <DialogDescription>
-            "{roomName}" is a private room. Please enter the password to join.
+            "{roomName}" {t("description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -83,11 +89,11 @@ export function JoinRoomDialog({
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Room Password</FormLabel>
+                  <FormLabel>{t("passwordLabel")}</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Enter room password"
+                      placeholder={t("passwordPlaceholder")}
                       disabled={isLoading}
                       {...field}
                     />
@@ -105,10 +111,10 @@ export function JoinRoomDialog({
                 disabled={isLoading}
                 className="flex-1"
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <Button type="submit" disabled={isLoading} className="flex-1">
-                {isLoading ? "Joining..." : "Join Room"}
+                {isLoading ? t("joining") : t("joinButton")}
               </Button>
             </div>
           </form>

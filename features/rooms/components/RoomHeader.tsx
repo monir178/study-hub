@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -30,6 +31,8 @@ interface RoomHeaderProps {
 }
 
 export function RoomHeader({ room }: RoomHeaderProps) {
+  const t = useTranslations("rooms.roomHeader");
+  const tRooms = useTranslations("rooms");
   const router = useRouter();
   const { user: currentUser } = useAuth();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -81,7 +84,7 @@ export function RoomHeader({ room }: RoomHeaderProps) {
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={() => router.back()}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Rooms
+            {t("backToRooms")}
           </Button>
         </div>
 
@@ -101,7 +104,7 @@ export function RoomHeader({ room }: RoomHeaderProps) {
               onClick={handleLeaveRoom}
               disabled={leaveRoom.isPending}
             >
-              {leaveRoom.isPending ? "Leaving..." : "Leave Room"}
+              {leaveRoom.isPending ? tRooms("leaving") : tRooms("leaveRoom")}
             </Button>
           )}
 
@@ -118,11 +121,11 @@ export function RoomHeader({ room }: RoomHeaderProps) {
                   <>
                     <DropdownMenuItem>
                       <Edit className="w-4 h-4 mr-2" />
-                      Edit Room
+                      {tRooms("editRoom")}
                     </DropdownMenuItem>
                     <DropdownMenuItem>
                       <Settings className="w-4 h-4 mr-2" />
-                      Room Settings
+                      {t("roomSettings")}
                     </DropdownMenuItem>
                   </>
                 )}
@@ -138,7 +141,7 @@ export function RoomHeader({ room }: RoomHeaderProps) {
                       }}
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
-                      Delete Room
+                      {tRooms("deleteRoom")}
                     </DropdownMenuItem>
                   </>
                 )}
@@ -152,23 +155,22 @@ export function RoomHeader({ room }: RoomHeaderProps) {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Room</AlertDialogTitle>
+            <AlertDialogTitle>{tRooms("deleteRoom")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to permanently delete "{room.name}"? This
-              action cannot be undone and will remove all messages, notes, and
-              member data associated with this room.
+              {t("confirmDelete")} "{room.name}"?{" "}
+              {t("confirmDeleteDescription")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={deleteRoom.isPending}>
-              Cancel
+              {t("cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteRoom}
               disabled={deleteRoom.isPending}
               className="bg-red-600 hover:bg-red-700"
             >
-              {deleteRoom.isPending ? "Deleting..." : "Delete Room"}
+              {deleteRoom.isPending ? tRooms("deleting") : tRooms("deleteRoom")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

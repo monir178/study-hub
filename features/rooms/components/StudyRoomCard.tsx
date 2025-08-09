@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -64,6 +65,8 @@ export function StudyRoomCard({
 }: StudyRoomCardProps) {
   const router = useRouter();
   const { user: currentUser } = useAuth();
+  const t = useTranslations("rooms.roomCard");
+  const tRooms = useTranslations("rooms");
   const deleteRoom = useDeleteRoom();
   const [deleteDialogState, setDeleteDialogState] = useState<{
     isOpen: boolean;
@@ -243,7 +246,7 @@ export function StudyRoomCard({
               )}
             </div>
             <CardDescription className="line-clamp-2">
-              {room.description || "No description provided"}
+              {room.description || tRooms("roomOverview.noDescription")}
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
@@ -290,7 +293,7 @@ export function StudyRoomCard({
                         }}
                       >
                         <Trash2 className="w-4 h-4 mr-2" />
-                        Delete Room
+                        {t("deleteRoom")}
                       </DropdownMenuItem>
                     </>
                   )}
@@ -315,7 +318,7 @@ export function StudyRoomCard({
           </Avatar>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">
-              Created by {room.creator.name || "Unknown"}
+              {t("createdBy")} {room.creator.name || "Unknown"}
             </span>
             <Badge
               variant="outline"
@@ -355,7 +358,9 @@ export function StudyRoomCard({
         {/* Member Avatars */}
         {room.members.length > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Members:</span>
+            <span className="text-sm text-muted-foreground">
+              {tRooms("members")}:
+            </span>
             <div className="flex -space-x-2">
               {room.members.slice(0, 5).map((member) => (
                 <Avatar
@@ -392,11 +397,11 @@ export function StudyRoomCard({
           >
             {loading || isJoining
               ? room.isJoined
-                ? "Loading..."
-                : "Joining..."
+                ? tRooms("loading")
+                : tRooms("joining")
               : room.isJoined
-                ? "Enter Room"
-                : "Join Room"}
+                ? t("viewRoom")
+                : t("joinRoom")}
           </Button>
 
           {room.isJoined && room.creator.id !== currentUser?.id && (
@@ -406,7 +411,7 @@ export function StudyRoomCard({
               variant="outline"
               size="sm"
             >
-              {isLeaving ? "Leaving..." : "Leave"}
+              {isLeaving ? tRooms("leaving") : t("leave")}
             </Button>
           )}
         </div>
@@ -432,11 +437,10 @@ export function StudyRoomCard({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Room</AlertDialogTitle>
+            <AlertDialogTitle>{t("deleteRoom")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to permanently delete "{room.name}"? This
-              action cannot be undone and will remove all messages, notes, and
-              member data associated with this room.
+              {t("confirmDelete")} "{room.name}"?{" "}
+              {t("confirmDeleteDescription")}
               {deleteDialogState.isDeleting && (
                 <span className="mt-2 space-y-2">
                   <span className="text-sm text-muted-foreground">
@@ -469,7 +473,7 @@ export function StudyRoomCard({
                   Deleting...
                 </span>
               ) : (
-                "Delete Room"
+                t("delete")
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
