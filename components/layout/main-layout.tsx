@@ -66,6 +66,11 @@ export function MainLayout({ children, locale = "en" }: MainLayoutProps) {
       const href = "/" + segments.slice(0, index + 1).join("/");
       const isLast = index === segments.length - 1;
 
+      // Skip "dashboard" segment since we handle it separately
+      if (segment === "dashboard") {
+        return;
+      }
+
       // Capitalize and format segment name
       const name = segment
         .split("-")
