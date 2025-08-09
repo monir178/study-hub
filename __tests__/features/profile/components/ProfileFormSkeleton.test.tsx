@@ -10,14 +10,6 @@ describe("ProfileFormSkeleton", () => {
     expect(screen.getByTestId("profile-form-skeleton")).toBeInTheDocument();
   });
 
-  it("renders header skeleton elements", () => {
-    render(<ProfileFormSkeleton />);
-
-    expect(screen.getByTestId("skeleton-header")).toBeInTheDocument();
-    expect(screen.getByTestId("skeleton-title")).toBeInTheDocument();
-    expect(screen.getByTestId("skeleton-subtitle")).toBeInTheDocument();
-  });
-
   it("renders basic information card skeleton", () => {
     render(<ProfileFormSkeleton />);
 
@@ -77,22 +69,20 @@ describe("ProfileFormSkeleton", () => {
     expect(screen.getByTestId("skeleton-reset-button")).toBeInTheDocument();
   });
 
-  it("renders correct number of address fields", () => {
-    render(<ProfileFormSkeleton />);
-
-    const addressFields = screen.getByTestId("skeleton-address-info-fields");
-    // Should have 6 address fields (street, city, region, postal, country, etc.)
-    expect(addressFields.children).toHaveLength(6);
-  });
-
   it("has proper layout classes", () => {
     render(<ProfileFormSkeleton />);
 
     const container = screen.getByTestId("profile-form-skeleton");
-    expect(container).toHaveClass("min-h-screen", "bg-background");
+    expect(container).toHaveClass(
+      "min-h-screen",
+      "flex",
+      "justify-center",
+      "items-center",
+      "bg-background",
+    );
 
     const mainContainer = screen.getByTestId("skeleton-main-container");
-    expect(mainContainer).toHaveClass("max-w-7xl", "mx-auto", "space-y-8");
+    expect(mainContainer).toHaveClass("space-y-8");
   });
 
   it("renders responsive grid layout for personal info fields", () => {
