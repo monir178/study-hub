@@ -21,17 +21,7 @@ import {
   SidebarMenuBadge,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import {
-  BookOpen,
-  Users,
-  FileText,
-  User,
-  BarChart3,
-  Home,
-  Calendar,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { BookOpen, Users, FileText, User, Home, LogOut } from "lucide-react";
 
 interface NavItem {
   name: string;
@@ -64,37 +54,15 @@ export function AppSidebar() {
         return [
           { name: t("dashboard"), href: "/dashboard", icon: Home },
           { name: t("users"), href: "/dashboard/users", icon: Users },
-          {
-            name: t("sessions"),
-            href: "/dashboard?tab=sessions",
-            icon: Calendar,
-          },
-          {
-            name: t("content"),
-            href: "/dashboard?tab=content",
-            icon: FileText,
-          },
-          {
-            name: t("analytics"),
-            href: "/dashboard?tab=analytics",
-            icon: BarChart3,
-          },
-          {
-            name: t("settings"),
-            href: "/dashboard?tab=settings",
-            icon: Settings,
-          },
+          { name: t("studyRooms"), href: "/dashboard/rooms", icon: Users },
+          { name: t("publicNotes"), href: "/dashboard/notes", icon: FileText },
         ];
       case "MODERATOR":
         return [
           { name: t("dashboard"), href: "/dashboard", icon: Home },
           { name: t("users"), href: "/dashboard/users", icon: Users },
           { name: t("studyRooms"), href: "/dashboard/rooms", icon: BookOpen },
-          {
-            name: t("analytics"),
-            href: "/dashboard?tab=analytics",
-            icon: BarChart3,
-          },
+          { name: t("publicNotes"), href: "/dashboard/notes", icon: FileText },
         ];
       case "USER":
       default:
@@ -180,14 +148,14 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
+              {/* <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/settings"}>
                   <Link href="/settings">
                     <Settings className="h-4 w-4" />
                     <span>{t("settings")}</span>
                   </Link>
                 </SidebarMenuButton>
-              </SidebarMenuItem>
+              </SidebarMenuItem> */}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
