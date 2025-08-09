@@ -73,7 +73,20 @@
         "passwordSpecial": "Password must contain at least one special character (@$!%*?&)",
         "passwordsNoMatch": "Passwords do not match",
         "passwordRequired": "Password is required"
-      }
+      },
+      "codeSent": "Verification code sent. Please check your email.",
+      "otpTitle": "Verify your email",
+      "otpDescription": "We sent a 6-digit code to <email></email>. It expires in 2 minutes.",
+      "otpLabel": "Verification Code",
+      "otpPlaceholder": "Enter 6-digit code",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "resendCode": "Resend code",
+      "resending": "Resending...",
+      "resendingDisabled": "Wait to resend",
+      "otpInvalid": "Invalid or expired code.",
+      "timeRemaining": "Time remaining:",
+      "secondsAbbrev": "s"
     }
   },
   "navigation": {
@@ -324,7 +337,9 @@
     "getStarted": "Get Started",
     "adminPanel": "Admin Panel",
     "logOut": "Log out",
-    "toggleTheme": "Toggle theme"
+    "toggleTheme": "Toggle theme",
+    "signOut": "Sign Out",
+    "signOutConfirm": "Are you sure you want to sign out?"
   },
   "landing": {
     "hero": {

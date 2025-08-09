@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
+import { signOut } from "next-auth/react";
 import { Link } from "@/i18n/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -252,11 +253,16 @@ export default function Navbar({
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/auth/signout">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>{t("logOut")}</span>
-                    </Link>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (confirm(t("signOutConfirm"))) {
+                        signOut({ callbackUrl: "/" });
+                      }
+                    }}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>{t("signOut")}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -449,13 +455,16 @@ export default function Navbar({
                       )}
                       <Button
                         variant="ghost"
-                        className="w-full justify-start text-destructive hover:text-destructive"
-                        asChild
+                        className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950"
+                        onClick={() => {
+                          closeMenu();
+                          if (confirm(t("signOutConfirm"))) {
+                            signOut({ callbackUrl: "/" });
+                          }
+                        }}
                       >
-                        <Link href="/auth/signout" onClick={closeMenu}>
-                          <LogOut className="h-4 w-4 mr-2" />
-                          {tAuth("signOut")}
-                        </Link>
+                        <LogOut className="h-4 w-4 mr-2" />
+                        {t("signOut")}
                       </Button>
                     </>
                   )}

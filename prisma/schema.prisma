@@ -81,6 +81,15 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model EmailVerificationCode {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  code      String
+  purpose   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
 model StudyRoom {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String

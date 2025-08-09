@@ -73,7 +73,20 @@
         "passwordSpecial": "La contraseña debe contener al menos un carácter especial (@$!%*?&)",
         "passwordsNoMatch": "Las contraseñas no coinciden",
         "passwordRequired": "La contraseña es requerida"
-      }
+      },
+      "codeSent": "Código de verificación enviado. Por favor, revisa tu correo.",
+      "otpTitle": "Verifica tu correo",
+      "otpDescription": "Enviamos un código de 6 dígitos a <email></email>. Expira en 2 minutos.",
+      "otpLabel": "Código de Verificación",
+      "otpPlaceholder": "Ingresa el código de 6 dígitos",
+      "verify": "Verificar",
+      "verifying": "Verificando...",
+      "resendCode": "Reenviar código",
+      "resending": "Reenviando...",
+      "resendingDisabled": "Espera para reenviar",
+      "otpInvalid": "Código inválido o expirado.",
+      "timeRemaining": "Tiempo restante:",
+      "secondsAbbrev": "s"
     }
   },
   "navigation": {
@@ -325,7 +338,9 @@
     "getStarted": "Comenzar",
     "adminPanel": "Panel de Admin",
     "logOut": "Cerrar sesión",
-    "toggleTheme": "Cambiar tema"
+    "toggleTheme": "Cambiar tema",
+    "signOut": "Cerrar sesión",
+    "signOutConfirm": "¿Estás seguro de que quieres cerrar sesión?"
   },
   "landing": {
     "hero": {
