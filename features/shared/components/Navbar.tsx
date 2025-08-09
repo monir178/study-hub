@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
+
 import { useTranslations } from "next-intl";
 import { signOut } from "next-auth/react";
 import { Link } from "@/i18n/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import ThemeToggleButton from "@/components/ui/theme-toggle-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -19,8 +20,6 @@ import {
 import { useAuth } from "@/lib/hooks/useAuth";
 import LanguageSelector from "./LanguageSelector";
 import {
-  Sun,
-  Moon,
   BookOpen,
   Users,
   Clock,
@@ -66,11 +65,9 @@ export default function Navbar({
   locale: _locale = "en",
   _variant = "landing", // Now unused since we determine from auth state
 }: NavbarProps) {
-  const [mounted, setMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { theme, setTheme } = useTheme();
-  const { user, isAuthenticated } = useAuth(); // Removed unused isLoading
+  const { user, isAuthenticated } = useAuth();
 
   const t = useTranslations("navbar");
   const tAuth = useTranslations("auth");
@@ -94,11 +91,6 @@ export default function Navbar({
   // Determine which nav items to show based on authentication
   const navItems = isAuthenticated ? appNavItems : landingNavItems;
 
-  // Handle mounting for SSR
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   // Handle scroll
   useEffect(() => {
     const handleScroll = () => {
@@ -110,12 +102,6 @@ export default function Navbar({
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const toggleTheme = () => {
-    if (mounted) {
-      setTheme(theme === "dark" ? "light" : "dark");
-    }
-  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -163,28 +149,7 @@ export default function Navbar({
             <LanguageSelector variant="compact" showLabel={false} />
 
             {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="w-9 h-9 p-0 hover:bg-muted relative overflow-hidden"
-            >
-              <motion.div
-                key={theme}
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="flex items-center justify-center"
-              >
-                {mounted && theme === "dark" ? (
-                  <Sun className="h-4 w-4" />
-                ) : (
-                  <Moon className="h-4 w-4" />
-                )}
-              </motion.div>
-              <span className="sr-only">{t("toggleTheme")}</span>
-            </Button>
+            <ThemeToggleButton variant="circle-blur" start="top-right" />
 
             {/* Auth Buttons / User Menu */}
             {!isAuthenticated ? (
@@ -273,27 +238,7 @@ export default function Navbar({
           <div className="md:hidden flex items-center space-x-2">
             <LanguageSelector variant="compact" showLabel={false} />
 
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="w-9 h-9 p-0 relative overflow-hidden"
-            >
-              <motion.div
-                key={theme}
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="flex items-center justify-center"
-              >
-                {mounted && theme === "dark" ? (
-                  <Sun className="h-4 w-4" />
-                ) : (
-                  <Moon className="h-4 w-4" />
-                )}
-              </motion.div>
-            </Button>
+            <ThemeToggleButton variant="circle-blur" start="top-right" />
 
             <button
               onClick={toggleMenu}

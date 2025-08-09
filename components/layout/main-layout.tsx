@@ -12,7 +12,6 @@ import { AppSidebar } from "./app-sidebar";
 import Navbar from "@/features/shared/components/Navbar";
 import LanguageSelector from "@/features/shared/components/LanguageSelector";
 import { Separator } from "@/components/ui/separator";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,6 +20,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import ThemeToggleButton from "../ui/theme-toggle-button";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -169,7 +169,7 @@ export function MainLayout({ children, locale = "en" }: MainLayoutProps) {
             </div>
             <div className="flex items-center gap-2 px-4">
               <LanguageSelector variant="compact" showLabel={false} />
-              <ThemeToggle />
+              <ThemeToggleButton variant="circle-blur" start="top-right" />
             </div>
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
