@@ -228,7 +228,10 @@
       "joinSession": "Join Session",
       "timer": "Timer",
       "focusTime": "Focus Time",
-      "breakTime": "Break Time"
+      "breakTime": "Break Time",
+      "messages": "Messages",
+      "notes": "Notes",
+      "createdTime": "Created"
     },
     "roomSidebar": {
       "onlineMembers": "Online Members",

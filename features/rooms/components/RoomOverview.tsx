@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, MessageSquare, FileText, Globe, Lock } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { StudyRoom } from "../hooks/useRooms";
 import { formatDistanceToNow } from "date-fns";
 
@@ -11,6 +12,9 @@ interface RoomOverviewProps {
 }
 
 export function RoomOverview({ room }: RoomOverviewProps) {
+  const t = useTranslations("rooms.roomOverview");
+  const tRooms = useTranslations("rooms");
+
   return (
     <Card className="border-0 shadow-none">
       <CardContent className="p-4 space-y-3">
@@ -20,21 +24,21 @@ export function RoomOverview({ room }: RoomOverviewProps) {
             <div className="text-xl font-semibold">{room.memberCount}</div>
             <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
               <Users className="w-3 h-3" />
-              Members
+              {tRooms("members")}
             </div>
           </div>
           <div className="text-center py-2">
             <div className="text-xl font-semibold">{room.messageCount}</div>
             <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
               <MessageSquare className="w-3 h-3" />
-              Messages
+              {t("messages")}
             </div>
           </div>
           <div className="text-center py-2">
             <div className="text-xl font-semibold">{room.noteCount || 0}</div>
             <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
               <FileText className="w-3 h-3" />
-              Notes
+              {t("notes")}
             </div>
           </div>
         </div>
@@ -45,12 +49,12 @@ export function RoomOverview({ room }: RoomOverviewProps) {
             {room.isPublic ? (
               <>
                 <Globe className="w-3 h-3 mr-1" />
-                Public
+                {tRooms("isPublic")}
               </>
             ) : (
               <>
                 <Lock className="w-3 h-3 mr-1" />
-                Private
+                {tRooms("isPrivate")}
               </>
             )}
           </Badge>
@@ -58,7 +62,7 @@ export function RoomOverview({ room }: RoomOverviewProps) {
 
         {/* Created Info */}
         <div className="text-center text-xs text-muted-foreground">
-          Created{" "}
+          {t("createdTime")}{" "}
           {formatDistanceToNow(new Date(room.createdAt), { addSuffix: true })}
         </div>
       </CardContent>

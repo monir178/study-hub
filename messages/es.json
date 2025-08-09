@@ -228,7 +228,10 @@
       "joinSession": "Unirse a la Sesión",
       "timer": "Temporizador",
       "focusTime": "Tiempo de Concentración",
-      "breakTime": "Tiempo de Descanso"
+      "breakTime": "Tiempo de Descanso",
+      "messages": "Mensajes",
+      "notes": "Notas",
+      "createdTime": "Creado"
     },
     "roomSidebar": {
       "onlineMembers": "Miembros En Línea",
