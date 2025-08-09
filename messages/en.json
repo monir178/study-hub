@@ -508,15 +508,15 @@
       }
     },
     "features": {
-      "title": "Everything You Need to Study Together",
-      "subtitle": "Powerful features designed to enhance collaborative learning and boost productivity",
+      "title": "Transform Your Learning Experience",
+      "subtitle": "Discover powerful tools that revolutionize how you study, collaborate, and achieve your academic goals",
       "synchronizedTimers": {
         "title": "Synchronized Timers",
         "description": "Pomodoro timers that sync across all room members for focused study sessions with breaks in perfect harmony"
       },
-      "collaborativeNotes": {
-        "title": "Collaborative Notes",
-        "description": "Real-time markdown editor for shared note-taking with live collaboration and version history"
+      "personalNotes": {
+        "title": "Personal Notes",
+        "description": "Create and organize your personal notes within study rooms. Keep your thoughts private while staying connected to your study groups."
       },
       "groupChat": {
         "title": "Group Chat",

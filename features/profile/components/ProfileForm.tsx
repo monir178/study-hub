@@ -147,7 +147,10 @@ export function ProfileForm() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div
+        className="min-h-screen flex items-center justify-center p-4"
+        data-testid="profile-form-error"
+      >
         <Alert variant="destructive" className="max-w-md">
           <AlertDescription>
             {t("failedToLoad")} {t("tryRefresh")}
@@ -159,7 +162,10 @@ export function ProfileForm() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div
+        className="min-h-screen flex items-center justify-center p-4"
+        data-testid="profile-form-error"
+      >
         <Alert variant="destructive" className="max-w-md">
           <AlertDescription>
             {t("failedToLoad")} {t("tryRefresh")}
@@ -178,7 +184,11 @@ export function ProfileForm() {
 
       <div className="max-w-5xl mx-auto ">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8"
+            data-testid="profile-form"
+          >
             {/* First Row - Profile Picture and Basic Info */}
             <Card className="w-full ">
               <CardHeader>
@@ -279,6 +289,7 @@ export function ProfileForm() {
                 type="submit"
                 disabled={isSubmitting}
                 className="sm:w-auto w-full"
+                data-testid="submit-button"
               >
                 {isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -299,6 +310,7 @@ export function ProfileForm() {
                 }}
                 disabled={isSubmitting}
                 className="sm:w-auto w-full"
+                data-testid="reset-button"
               >
                 {t("resetChanges")}
               </Button>

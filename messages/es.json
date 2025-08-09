@@ -509,15 +509,15 @@
       }
     },
     "features": {
-      "title": "Todo lo que Necesitas para Estudiar Juntos",
-      "subtitle": "Características poderosas diseñadas para mejorar el aprendizaje colaborativo y aumentar la productividad",
+      "title": "Transforma Tu Experiencia de Aprendizaje",
+      "subtitle": "Descubre herramientas poderosas que revolucionan cómo estudias, colaboras y alcanzas tus metas académicas",
       "synchronizedTimers": {
         "title": "Temporizadores Sincronizados",
         "description": "Temporizadores Pomodoro que se sincronizan entre todos los miembros de la sala para sesiones de estudio enfocadas con descansos en perfecta armonía"
       },
-      "collaborativeNotes": {
-        "title": "Notas Colaborativas",
-        "description": "Editor de markdown en tiempo real para tomar notas compartidas con colaboración en vivo e historial de versiones"
+      "personalNotes": {
+        "title": "Notas Personales",
+        "description": "Crea y organiza tus notas personales dentro de las salas de estudio. Mantén tus pensamientos privados mientras te mantienes conectado con tus grupos de estudio."
       },
       "groupChat": {
         "title": "Chat Grupal",

@@ -78,17 +78,26 @@ export function ProfilePicture({
   const displayImage = previewUrl || user.image;
 
   return (
-    <div className={`text-center lg:text-left space-y-4 ${className}`}>
+    <div
+      className={`text-center lg:text-left space-y-4 ${className}`}
+      data-testid="profile-picture"
+    >
       {/* Avatar Display */}
       <div className="flex flex-col items-center justify-center gap-4">
         <div className="relative inline-block">
-          <Avatar className="h-24 w-24 md:h-28 md:w-28 lg:h-32 lg:w-32">
+          <Avatar
+            className="h-24 w-24 md:h-28 md:w-28 lg:h-32 lg:w-32"
+            data-testid="profile-avatar"
+          >
             <AvatarImage
               className="object-cover"
               src={displayImage || undefined}
               alt={user.name || "Profile"}
             />
-            <AvatarFallback className="text-lg md:text-xl">
+            <AvatarFallback
+              className="text-lg md:text-xl"
+              data-testid="avatar-fallback"
+            >
               {getUserInitials()}
             </AvatarFallback>
           </Avatar>
@@ -101,6 +110,7 @@ export function ProfilePicture({
             variant="outline"
             size="sm"
             type="button"
+            data-testid="upload-button"
           >
             <Upload className="h-4 w-4 mr-2" />
             {selectedFile ? t("changePhoto") : t("uploadPhoto")}
@@ -113,6 +123,7 @@ export function ProfilePicture({
               size="sm"
               className="text-destructive hover:text-destructive"
               type="button"
+              data-testid="remove-button"
             >
               <X className="h-4 w-4 mr-2" />
               {selectedFile ? "Cancel" : t("removePhoto")}
@@ -123,7 +134,10 @@ export function ProfilePicture({
 
       {/* Selection Status */}
       {selectedFile && (
-        <div className="text-sm text-center lg:text-left">
+        <div
+          className="text-sm text-center lg:text-left"
+          data-testid="selection-status"
+        >
           <p className="text-green-600 font-medium">New image selected</p>
           <p className="text-muted-foreground">
             Click "{t("updateProfile")}" to save changes
@@ -138,6 +152,7 @@ export function ProfilePicture({
         accept="image/*"
         onChange={handleFileSelect}
         className="hidden"
+        data-testid="file-input"
       />
     </div>
   );

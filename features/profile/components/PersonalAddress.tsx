@@ -33,16 +33,23 @@ export function PersonalAddress({ user: _user }: PersonalAddressProps) {
   const t = useTranslations("profile.form");
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div
+      className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+      data-testid="personal-address"
+    >
       {/* Street */}
       <FormField
         control={form.control}
         name="street"
         render={({ field }) => (
-          <FormItem className="lg:col-span-2">
-            <FormLabel>{t("street")}</FormLabel>
+          <FormItem className="lg:col-span-2" data-testid="street-field">
+            <FormLabel data-testid="street-label">{t("street")}</FormLabel>
             <FormControl>
-              <Input placeholder={t("streetPlaceholder")} {...field} />
+              <Input
+                placeholder={t("streetPlaceholder")}
+                {...field}
+                data-testid="street-input"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -54,10 +61,14 @@ export function PersonalAddress({ user: _user }: PersonalAddressProps) {
         control={form.control}
         name="city"
         render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t("city")}</FormLabel>
+          <FormItem data-testid="city-field">
+            <FormLabel data-testid="city-label">{t("city")}</FormLabel>
             <FormControl>
-              <Input placeholder={t("cityPlaceholder")} {...field} />
+              <Input
+                placeholder={t("cityPlaceholder")}
+                {...field}
+                data-testid="city-input"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -69,10 +80,14 @@ export function PersonalAddress({ user: _user }: PersonalAddressProps) {
         control={form.control}
         name="region"
         render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t("region")}</FormLabel>
+          <FormItem data-testid="region-field">
+            <FormLabel data-testid="region-label">{t("region")}</FormLabel>
             <FormControl>
-              <Input placeholder={t("regionPlaceholder")} {...field} />
+              <Input
+                placeholder={t("regionPlaceholder")}
+                {...field}
+                data-testid="region-input"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -84,13 +99,16 @@ export function PersonalAddress({ user: _user }: PersonalAddressProps) {
         control={form.control}
         name="postalCode"
         render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t("postalCode")}</FormLabel>
+          <FormItem data-testid="postal-code-field">
+            <FormLabel data-testid="postal-code-label">
+              {t("postalCode")}
+            </FormLabel>
             <FormControl>
               <Input
                 type="number"
                 placeholder={t("postalCodePlaceholder")}
                 {...field}
+                data-testid="postal-code-input"
               />
             </FormControl>
             <FormMessage />
@@ -103,21 +121,25 @@ export function PersonalAddress({ user: _user }: PersonalAddressProps) {
         control={form.control}
         name="country"
         render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t("country")}</FormLabel>
+          <FormItem data-testid="country-field">
+            <FormLabel data-testid="country-label">{t("country")}</FormLabel>
             <Select
               onValueChange={field.onChange}
               value={field.value || ""}
               key={`country-${field.value || "empty"}`}
             >
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger data-testid="country-select">
                   <SelectValue placeholder={t("countryPlaceholder")} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent className="max-h-60">
                 {COUNTRIES.map((country) => (
-                  <SelectItem key={country.code} value={country.name}>
+                  <SelectItem
+                    key={country.code}
+                    value={country.name}
+                    data-testid={`country-option-${country.name}`}
+                  >
                     {country.name}
                   </SelectItem>
                 ))}

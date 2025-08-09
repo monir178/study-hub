@@ -39,33 +39,41 @@ export function PersonalInformation({ user: _user }: PersonalInformationProps) {
   const t = useTranslations("profile.form");
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div
+      className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+      data-testid="personal-information"
+    >
       {/* Gender */}
       <FormField
         control={form.control}
         name="gender"
         render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t("gender")}</FormLabel>
+          <FormItem data-testid="gender-field">
+            <FormLabel data-testid="gender-label">{t("gender")}</FormLabel>
             <Select
               onValueChange={field.onChange}
               value={field.value || ""}
               key={`gender-${field.value || "empty"}`}
             >
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger data-testid="gender-select">
                   <SelectValue placeholder={t("genderPlaceholder")} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="MALE">{t("genderOptions.male")}</SelectItem>
-                <SelectItem value="FEMALE">
+                <SelectItem value="MALE" data-testid="gender-option-male">
+                  {t("genderOptions.male")}
+                </SelectItem>
+                <SelectItem value="FEMALE" data-testid="gender-option-female">
                   {t("genderOptions.female")}
                 </SelectItem>
-                <SelectItem value="OTHER">
+                <SelectItem value="OTHER" data-testid="gender-option-other">
                   {t("genderOptions.other")}
                 </SelectItem>
-                <SelectItem value="PREFER_NOT_TO_SAY">
+                <SelectItem
+                  value="PREFER_NOT_TO_SAY"
+                  data-testid="gender-option-prefer-not-to-say"
+                >
                   {t("genderOptions.preferNotToSay")}
                 </SelectItem>
               </SelectContent>
@@ -80,8 +88,10 @@ export function PersonalInformation({ user: _user }: PersonalInformationProps) {
         control={form.control}
         name="dateOfBirth"
         render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t("dateOfBirth")}</FormLabel>
+          <FormItem data-testid="date-of-birth-field">
+            <FormLabel data-testid="date-of-birth-label">
+              {t("dateOfBirth")}
+            </FormLabel>
             <Popover>
               <PopoverTrigger asChild>
                 <FormControl>
@@ -91,6 +101,7 @@ export function PersonalInformation({ user: _user }: PersonalInformationProps) {
                       "w-full pl-3 text-left font-normal",
                       !field.value && "text-muted-foreground",
                     )}
+                    data-testid="date-of-birth-button"
                   >
                     {field.value ? (
                       format(field.value, "PPP")
@@ -109,6 +120,7 @@ export function PersonalInformation({ user: _user }: PersonalInformationProps) {
                   disabled={(date) =>
                     date > new Date() || date < new Date("1900-01-01")
                   }
+                  data-testid="date-calendar"
                 />
               </PopoverContent>
             </Popover>
