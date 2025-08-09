@@ -143,6 +143,10 @@ export interface RoomMember {
     createdAt: string;
     updatedAt: string;
     creatorId: string;
+    creator: {
+      name: string | null;
+      image: string | null;
+    };
     members: Array<{
       id: string;
       role: "MEMBER" | "MODERATOR" | "ADMIN";

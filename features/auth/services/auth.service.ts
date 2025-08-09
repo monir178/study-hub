@@ -7,7 +7,6 @@ import type {
 } from "@/features/auth/types";
 
 export const AuthService = {
-  // Signup (OTP) flow - use fetch to keep API response shape (no data wrapper)
   registerStart: async (data: {
     name: string;
     email: string;

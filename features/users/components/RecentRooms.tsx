@@ -44,7 +44,8 @@ export function RecentRooms({ recentRooms, loading }: RecentRoomsProps) {
               <div className="flex items-center gap-3">
                 <Avatar className="w-8 h-8">
                   <AvatarImage
-                    src={room.room.members[0]?.user.image || undefined}
+                    src={room.room.creator?.image || undefined}
+                    alt={room.room.creator?.name || room.room.name}
                   />
                   <AvatarFallback>
                     {room.room.name.charAt(0).toUpperCase()}

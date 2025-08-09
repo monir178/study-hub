@@ -15,117 +15,230 @@ export async function GET(_request: NextRequest) {
 
     const userId = session.user.id;
 
-    // Get user's study sessions
-    const studySessions = await prisma.studySession.findMany({
-      where: { userId },
-      orderBy: { startedAt: "desc" },
-      take: 10,
-    });
+    // Define date ranges for efficiency
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const currentWeekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const previousWeekStart = new Date(
+      now.getTime() - 14 * 24 * 60 * 60 * 1000,
+    );
 
-    // Get user's joined rooms
-    const joinedRooms = await prisma.roomMember.findMany({
-      where: { userId },
-      include: {
-        room: {
-          include: {
-            members: {
-              include: {
-                user: {
-                  select: { name: true, image: true },
+    // Execute all database queries in parallel for much better performance
+    const [
+      studySessions,
+      joinedRooms,
+      recentNotes,
+      roomCounts,
+      studyTimeByDay,
+      sessionTypes,
+      roomActivity,
+      dailyStudySessions,
+      weeklyStats,
+    ] = await Promise.all([
+      // Get user's recent study sessions
+      prisma.studySession.findMany({
+        where: { userId },
+        orderBy: { startedAt: "desc" },
+        take: 10,
+        select: {
+          id: true,
+          startedAt: true,
+          duration: true,
+          type: true,
+        },
+      }),
+
+      // Get user's joined rooms
+      prisma.roomMember.findMany({
+        where: { userId },
+        include: {
+          room: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              isPublic: true,
+              maxMembers: true,
+              createdAt: true,
+              updatedAt: true,
+              creatorId: true,
+              creator: {
+                select: {
+                  name: true,
+                  image: true,
+                },
+              },
+              members: {
+                select: {
+                  id: true,
+                  role: true,
+                  status: true,
+                  joinedAt: true,
+                  userId: true,
+                  roomId: true,
+                  user: {
+                    select: {
+                      name: true,
+                      image: true,
+                    },
+                  },
                 },
               },
             },
           },
         },
-      },
-      orderBy: { joinedAt: "desc" },
-      take: 5,
-    });
+        orderBy: { joinedAt: "desc" },
+        take: 5,
+      }),
 
-    // Get user's created notes
-    const recentNotes = await prisma.note.findMany({
-      where: { createdBy: userId },
-      include: {
-        room: {
-          select: { name: true },
+      // Get user's recent notes
+      prisma.note.findMany({
+        where: { createdBy: userId },
+        select: {
+          id: true,
+          title: true,
+          updatedAt: true,
+          room: {
+            select: { name: true },
+          },
         },
-      },
-      orderBy: { updatedAt: "desc" },
-      take: 5,
-    });
+        orderBy: { updatedAt: "desc" },
+        take: 5,
+      }),
 
-    // Calculate statistics
+      // Get all room-related counts in one aggregation
+      prisma.$transaction([
+        prisma.studyRoom.count({ where: { creatorId: userId } }),
+        prisma.studyRoom.count({
+          where: { creatorId: userId, isPublic: false },
+        }),
+        prisma.roomMember.count({ where: { userId } }),
+        prisma.studyRoom.count({
+          where: { creatorId: userId, createdAt: { gte: currentWeekStart } },
+        }),
+        prisma.studyRoom.count({
+          where: {
+            creatorId: userId,
+            createdAt: { gte: previousWeekStart, lt: currentWeekStart },
+          },
+        }),
+        prisma.studyRoom.count({
+          where: {
+            creatorId: userId,
+            isPublic: false,
+            createdAt: { gte: currentWeekStart },
+          },
+        }),
+        prisma.studyRoom.count({
+          where: {
+            creatorId: userId,
+            isPublic: false,
+            createdAt: { gte: previousWeekStart, lt: currentWeekStart },
+          },
+        }),
+        prisma.roomMember.count({
+          where: { userId, joinedAt: { gte: currentWeekStart } },
+        }),
+        prisma.roomMember.count({
+          where: {
+            userId,
+            joinedAt: { gte: previousWeekStart, lt: currentWeekStart },
+          },
+        }),
+      ]),
+
+      // Get study time by day for the last 7 days
+      prisma.studySession.groupBy({
+        by: ["startedAt"],
+        where: {
+          userId,
+          startedAt: { gte: sevenDaysAgo },
+        },
+        _sum: {
+          duration: true,
+        },
+      }),
+
+      // Get session types distribution
+      prisma.studySession.groupBy({
+        by: ["type"],
+        where: { userId },
+        _count: {
+          type: true,
+        },
+      }),
+
+      // Get room activity
+      prisma.roomMember.groupBy({
+        by: ["roomId"],
+        where: { userId },
+        _count: {
+          roomId: true,
+        },
+      }),
+
+      // Get daily study sessions for streak calculation (last 30 days)
+      prisma.studySession.groupBy({
+        by: ["startedAt"],
+        where: {
+          userId,
+          startedAt: { gte: thirtyDaysAgo },
+        },
+        _sum: {
+          duration: true,
+        },
+      }),
+
+      // Get weekly statistics for trends
+      prisma.$transaction([
+        prisma.studySession.aggregate({
+          where: {
+            userId,
+            startedAt: { gte: currentWeekStart },
+          },
+          _sum: { duration: true },
+          _count: true,
+        }),
+        prisma.studySession.aggregate({
+          where: {
+            userId,
+            startedAt: { gte: previousWeekStart, lt: currentWeekStart },
+          },
+          _sum: { duration: true },
+          _count: true,
+        }),
+      ]),
+    ]);
+
+    // Extract room counts from transaction results
+    const [
+      createdRooms,
+      privateRooms,
+      joinedRoomsCount,
+      currentWeekCreatedRooms,
+      previousWeekCreatedRooms,
+      currentWeekPrivateRooms,
+      previousWeekPrivateRooms,
+      currentWeekRooms,
+      previousWeekRooms,
+    ] = roomCounts;
+
+    // Extract weekly stats
+    const [currentWeekStats, previousWeekStats] = weeklyStats;
+    const currentWeekTime = currentWeekStats._sum.duration || 0;
+    const previousWeekTime = previousWeekStats._sum.duration || 0;
+    const currentWeekCount = currentWeekStats._count;
+    const previousWeekCount = previousWeekStats._count;
+
+    // Calculate basic statistics
     const totalStudyTime = studySessions.reduce(
       (total, session) => total + (session.duration || 0),
       0,
     );
-
     const totalSessions = studySessions.length;
 
-    const createdRooms = await prisma.studyRoom.count({
-      where: { creatorId: userId },
-    });
-
-    const privateRooms = await prisma.studyRoom.count({
-      where: {
-        creatorId: userId,
-        isPublic: false,
-      },
-    });
-
-    const joinedRoomsCount = await prisma.roomMember.count({
-      where: { userId },
-    });
-
-    // Get study time by day for the last 7 days
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-    const studyTimeByDay = await prisma.studySession.groupBy({
-      by: ["startedAt"],
-      where: {
-        userId,
-        startedAt: { gte: sevenDaysAgo },
-      },
-      _sum: {
-        duration: true,
-      },
-    });
-
-    // Get session types distribution
-    const sessionTypes = await prisma.studySession.groupBy({
-      by: ["type"],
-      where: { userId },
-      _count: {
-        type: true,
-      },
-    });
-
-    // Get room activity
-    const roomActivity = await prisma.roomMember.groupBy({
-      by: ["roomId"],
-      where: { userId },
-      _count: {
-        roomId: true,
-      },
-    });
-
-    // Calculate study streak
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const dailyStudySessions = await prisma.studySession.groupBy({
-      by: ["startedAt"],
-      where: {
-        userId,
-        startedAt: { gte: thirtyDaysAgo },
-      },
-      _sum: {
-        duration: true,
-      },
-    });
-
-    // Calculate consecutive days with study activity
+    // Calculate study streak efficiently
     let currentStreak = 0;
     let maxStreak = 0;
     let tempStreak = 0;
@@ -152,41 +265,7 @@ export async function GET(_request: NextRequest) {
     }
     maxStreak = Math.max(maxStreak, tempStreak);
 
-    // Calculate trends (current week vs previous week)
-    const currentWeekStart = new Date();
-    currentWeekStart.setDate(currentWeekStart.getDate() - 7);
-    const previousWeekStart = new Date();
-    previousWeekStart.setDate(previousWeekStart.getDate() - 14);
-
-    const currentWeekSessions = await prisma.studySession.findMany({
-      where: {
-        userId,
-        startedAt: { gte: currentWeekStart },
-      },
-    });
-
-    const previousWeekSessions = await prisma.studySession.findMany({
-      where: {
-        userId,
-        startedAt: {
-          gte: previousWeekStart,
-          lt: currentWeekStart,
-        },
-      },
-    });
-
-    const currentWeekTime = currentWeekSessions.reduce(
-      (total, session) => total + (session.duration || 0),
-      0,
-    );
-    const previousWeekTime = previousWeekSessions.reduce(
-      (total, session) => total + (session.duration || 0),
-      0,
-    );
-    const currentWeekCount = currentWeekSessions.length;
-    const previousWeekCount = previousWeekSessions.length;
-
-    // Calculate percentage changes
+    // Calculate percentage changes for trends
     const timeChangePercent =
       previousWeekTime > 0
         ? Math.round(
@@ -206,24 +285,6 @@ export async function GET(_request: NextRequest) {
           ? 100
           : 0;
 
-    // Get recent room activity for trend
-    const currentWeekRooms = await prisma.roomMember.count({
-      where: {
-        userId,
-        joinedAt: { gte: currentWeekStart },
-      },
-    });
-
-    const previousWeekRooms = await prisma.roomMember.count({
-      where: {
-        userId,
-        joinedAt: {
-          gte: previousWeekStart,
-          lt: currentWeekStart,
-        },
-      },
-    });
-
     const roomChangeCount = currentWeekRooms - previousWeekRooms;
     const roomChangePercent =
       previousWeekRooms > 0
@@ -233,26 +294,6 @@ export async function GET(_request: NextRequest) {
         : currentWeekRooms > 0
           ? 100
           : 0;
-
-    // Get private rooms trend
-    const currentWeekPrivateRooms = await prisma.studyRoom.count({
-      where: {
-        creatorId: userId,
-        isPublic: false,
-        createdAt: { gte: currentWeekStart },
-      },
-    });
-
-    const previousWeekPrivateRooms = await prisma.studyRoom.count({
-      where: {
-        creatorId: userId,
-        isPublic: false,
-        createdAt: {
-          gte: previousWeekStart,
-          lt: currentWeekStart,
-        },
-      },
-    });
 
     const privateRoomChangeCount =
       currentWeekPrivateRooms - previousWeekPrivateRooms;
@@ -266,24 +307,6 @@ export async function GET(_request: NextRequest) {
         : currentWeekPrivateRooms > 0
           ? 100
           : 0;
-
-    // Get created rooms trend (total rooms created)
-    const currentWeekCreatedRooms = await prisma.studyRoom.count({
-      where: {
-        creatorId: userId,
-        createdAt: { gte: currentWeekStart },
-      },
-    });
-
-    const previousWeekCreatedRooms = await prisma.studyRoom.count({
-      where: {
-        creatorId: userId,
-        createdAt: {
-          gte: previousWeekStart,
-          lt: currentWeekStart,
-        },
-      },
-    });
 
     const createdRoomChangeCount =
       currentWeekCreatedRooms - previousWeekCreatedRooms;
