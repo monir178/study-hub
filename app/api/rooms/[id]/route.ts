@@ -293,18 +293,30 @@ export async function DELETE(
   try {
     const params = await paramsPromise;
     const session = await auth();
+
+    let userId: string;
     if (!session?.user?.id) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Unauthorized",
-        } satisfies ApiError,
-        { status: 401 },
-      );
+      // Add a small delay and retry once in case session is still being established
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const retrySession = await auth();
+
+      if (!retrySession?.user?.id) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Unauthorized",
+          } satisfies ApiError,
+          { status: 401 },
+        );
+      }
+
+      userId = retrySession.user.id;
+    } else {
+      userId = session.user.id;
     }
 
     // Check if user can delete the room first
-    const canDelete = await checkDeletePermission(session.user.id, params.id);
+    const canDelete = await checkDeletePermission(userId, params.id);
     if (!canDelete) {
       return NextResponse.json(
         {
@@ -336,14 +348,6 @@ export async function DELETE(
       // Delete related records first to avoid cascade issues
       await tx.studySession.deleteMany({
         where: { roomId: params.id },
-      });
-
-      await tx.noteEdit.deleteMany({
-        where: {
-          note: {
-            roomId: params.id,
-          },
-        },
       });
 
       await tx.note.deleteMany({

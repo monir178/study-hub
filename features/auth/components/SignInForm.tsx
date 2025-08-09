@@ -21,6 +21,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, Github, Mail } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { useForgotPassword } from "@/features/auth/hooks/useAuthFlows";
+import { savePendingPasswordReset } from "@/features/auth/utils/pendingPasswordReset";
 
 type SignInFormData = {
   email: string;
@@ -30,9 +32,12 @@ type SignInFormData = {
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isRequestingReset, setIsRequestingReset] = useState(false);
   const router = useRouter();
   const t = useTranslations("auth.signInForm");
   const tAuth = useTranslations("auth");
+
+  const forgotPasswordMutation = useForgotPassword();
 
   // Create validation schema with translations
   const signInSchema = z.object({
@@ -71,9 +76,11 @@ export function SignInForm() {
       if (result?.error) {
         setError(t("invalidCredentials"));
       } else {
-        // Redirect based on user role (will be handled by middleware)
-        router.push("/dashboard");
-        router.refresh();
+        // Small delay to ensure session is properly established
+        setTimeout(() => {
+          router.push("/dashboard");
+          router.refresh();
+        }, 100);
       }
     } catch {
       setError(t("errorOccurred"));
@@ -85,6 +92,40 @@ export function SignInForm() {
       await signIn(provider, { callbackUrl: "/dashboard" });
     } catch {
       setError(t("oauthFailed"));
+    }
+  };
+
+  const handleForgotPassword = async (email: string) => {
+    if (!email) {
+      setError(t("emailRequired") || "Please enter your email address");
+      return;
+    }
+
+    setIsRequestingReset(true);
+    setError("");
+
+    try {
+      await forgotPasswordMutation.mutateAsync({ email });
+      // Save to localStorage with 2 minutes expiry
+      savePendingPasswordReset({ email }, 120);
+      // Redirect to verify OTP page
+      router.push(
+        `/auth/verify-otp?email=${encodeURIComponent(email)}&flow=reset`,
+      );
+    } catch (error: unknown) {
+      const errorMessage = (error as { message?: string })?.message;
+      if (
+        errorMessage?.includes("no user found") ||
+        errorMessage?.includes("not found")
+      ) {
+        setError(t("userNotFound") || "No user found with this email address");
+      } else {
+        setError(
+          t("resetFailed") || "Failed to send reset code. Please try again.",
+        );
+      }
+    } finally {
+      setIsRequestingReset(false);
     }
   };
 
@@ -151,6 +192,25 @@ export function SignInForm() {
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? t("signingIn") : tAuth("signIn")}
           </Button>
+
+          <div className="text-center">
+            <Button
+              type="button"
+              variant="link"
+              className="p-0 h-auto text-sm"
+              onClick={() => {
+                const form = document.getElementById(
+                  "email",
+                ) as HTMLInputElement;
+                handleForgotPassword(form?.value || "");
+              }}
+              disabled={isSubmitting || isRequestingReset}
+            >
+              {isRequestingReset
+                ? t("sendingResetCode") || "Sending reset code..."
+                : t("forgotPassword") || "Forgot password?"}
+            </Button>
+          </div>
         </form>
 
         <div className="relative">

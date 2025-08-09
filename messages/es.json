@@ -46,6 +46,11 @@
       "invalidCredentials": "Correo electrónico o contraseña inválidos",
       "errorOccurred": "Ocurrió un error. Por favor, inténtalo de nuevo.",
       "oauthFailed": "Error al iniciar sesión con OAuth. Por favor, inténtalo de nuevo.",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "sendingResetCode": "Enviando código de restablecimiento...",
+      "emailRequired": "Por favor, ingresa tu correo electrónico",
+      "userNotFound": "No se encontró ningún usuario con este correo electrónico",
+      "resetFailed": "Error al enviar código de restablecimiento. Por favor, inténtalo de nuevo.",
       "validation": {
         "emailInvalid": "Por favor, ingresa un correo electrónico válido",
         "passwordRequired": "La contraseña es requerida"
@@ -88,7 +93,28 @@
       "resendingDisabled": "Espera para reenviar",
       "otpInvalid": "Código inválido o expirado.",
       "timeRemaining": "Tiempo restante:",
-      "secondsAbbrev": "s"
+      "secondsAbbrev": "s",
+      "resetOtpTitle": "Verificar Código de Restablecimiento",
+      "resetOtpDescription": "Enviamos un código de verificación a tu correo electrónico. Ingrésalo a continuación para restablecer tu contraseña.",
+      "otpVerified": "Código verificado exitosamente"
+    },
+    "resetPassword": {
+      "title": "Restablecer Contraseña",
+      "description": "Ingresa tu nueva contraseña a continuación",
+      "newPassword": "Nueva Contraseña",
+      "confirmPassword": "Confirmar Contraseña",
+      "newPasswordPlaceholder": "Ingresa nueva contraseña",
+      "confirmPasswordPlaceholder": "Confirma nueva contraseña",
+      "resetPassword": "Restablecer Contraseña",
+      "resetting": "Restableciendo...",
+      "rememberPassword": "¿Recuerdas tu contraseña?",
+      "validation": {
+        "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+        "passwordWeak": "La contraseña debe contener mayúsculas, minúsculas y números",
+        "passwordMismatch": "Las contraseñas no coinciden"
+      },
+      "tokenExpired": "El token de restablecimiento ha expirado. Por favor, solicita uno nuevo.",
+      "resetFailed": "Error al restablecer la contraseña. Por favor, inténtalo de nuevo."
     }
   },
   "navigation": {

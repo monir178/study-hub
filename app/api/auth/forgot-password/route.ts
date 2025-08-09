@@ -5,9 +5,9 @@ import { z } from "zod";
 
 const schema = z.object({ email: z.string().email() });
 
-function generateResetToken(): string {
-  return Array.from({ length: 32 })
-    .map(() => Math.floor(Math.random() * 16).toString(16))
+function generateOtp(): string {
+  return Array.from({ length: 6 })
+    .map(() => Math.floor(Math.random() * 10))
     .join("");
 }
 
@@ -18,32 +18,34 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      // Return success to prevent user enumeration
-      return NextResponse.json({ success: true });
+      return NextResponse.json(
+        { success: false, message: "No user found with this email address" },
+        { status: 404 },
+      );
     }
 
-    const resetToken = generateResetToken();
-    const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    const otp = generateOtp();
+    const expires = new Date(Date.now() + 2 * 60 * 1000); // 2 minutes
 
     await prisma.emailVerificationCode.upsert({
       where: { email },
       update: {
-        code: resetToken,
+        code: otp,
         purpose: "RESET_PASSWORD",
         expiresAt: expires,
       },
       create: {
         email,
-        code: resetToken,
+        code: otp,
         purpose: "RESET_PASSWORD",
         expiresAt: expires,
       },
     });
 
-    // Send password reset email using unified service
-    const emailResult = await UnifiedEmailService.sendPasswordResetEmail(
+    // Send OTP email using unified service
+    const emailResult = await UnifiedEmailService.sendOtpEmail(
       email,
-      resetToken,
+      otp,
       user.name || undefined,
     );
 
@@ -52,13 +54,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: "Failed to send password reset email",
+          message: "Failed to send reset code email",
         },
         { status: 500 },
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      expiresInSeconds: 120, // 2 minutes
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

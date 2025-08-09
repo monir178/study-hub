@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -50,6 +51,7 @@ export default function LanguageSelector({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   // Use the standard next-intl approach
   const locale = useLocale();
@@ -63,9 +65,15 @@ export default function LanguageSelector({
     if (newLocale === locale) return;
 
     startTransition(() => {
+      // Preserve search parameters when changing locale
+      const searchParamsString = searchParams.toString();
+      const fullPath = searchParamsString
+        ? `${pathname}?${searchParamsString}`
+        : pathname;
+
       // Use the official next-intl navigation API
       // This automatically handles locale prefixes
-      router.replace(pathname, { locale: newLocale });
+      router.replace(fullPath, { locale: newLocale });
       setIsOpen(false);
     });
   };

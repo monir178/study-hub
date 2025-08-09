@@ -73,6 +73,17 @@ export const AuthService = {
   resetPassword: (data: ResetPasswordRequest) =>
     apiClient.post<ApiResult>("/auth/reset-password", data),
 
+  verifyResetOtp: async (data: { email: string; otp: string }) => {
+    const res = await fetch("/api/auth/verify-reset-otp", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (!res.ok) throw json;
+    return json;
+  },
+
   // Unified email service methods
   sendPasswordResetEmail: (
     email: string,

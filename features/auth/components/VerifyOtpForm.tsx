@@ -27,12 +27,25 @@ import {
   clearPendingSignup,
   savePendingSignup,
 } from "@/features/auth/utils/pendingSignup";
+import {
+  getPendingPasswordReset,
+  updatePendingPasswordResetToken,
+  updatePendingPasswordResetExpiry,
+} from "@/features/auth/utils/pendingPasswordReset";
 
-interface RegisterResponse {
+interface AuthResponse {
   success: boolean;
-  message: string;
+  message?: string;
   requireOtp?: boolean;
   expiresInSeconds?: number;
+  token?: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    createdAt: string;
+  };
 }
 
 export function VerifyOtpForm() {
@@ -44,20 +57,35 @@ export function VerifyOtpForm() {
   const [serverError, setServerError] = useState("");
   const [countdown, setCountdown] = useState<number>(0);
 
-  const pending = useMemo(() => getPendingSignup(), []);
+  const flow = searchParams.get("flow") || "signup"; // 'signup' or 'reset'
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  const pending = useMemo(() => {
+    if (flow === "reset") {
+      return getPendingPasswordReset();
+    }
+    return getPendingSignup();
+  }, [flow]);
 
   useEffect(() => {
-    if (!pending) {
-      router.replace("/auth/signup");
-      return;
+    // Only redirect on initial load, not on locale changes
+    if (!isInitialized) {
+      setIsInitialized(true);
+      if (!pending) {
+        router.replace(flow === "reset" ? "/auth/signin" : "/auth/signup");
+        return;
+      }
     }
-    const remaining = Math.max(
-      0,
-      Math.floor((pending.expiresAt - Date.now()) / 1000),
-    );
-    setCountdown(remaining);
+
+    if (pending) {
+      const remaining = Math.max(
+        0,
+        Math.floor((pending.expiresAt - Date.now()) / 1000),
+      );
+      setCountdown(remaining);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pending, isInitialized]);
 
   useEffect(() => {
     if (countdown <= 0) return;
@@ -68,37 +96,63 @@ export function VerifyOtpForm() {
     return () => clearInterval(id);
   }, [countdown]);
 
-  const verifyMutation = useApiMutation<RegisterResponse, { otp: string }>({
+  const verifyMutation = useApiMutation<AuthResponse, { otp: string }>({
     mutationFn: async ({ otp }) => {
       if (!pending) throw { message: t("registrationFailed") };
-      return AuthService.registerVerify({
-        name: pending.name,
-        email: pending.email,
-        password: pending.password,
-        role: "USER",
-        otp,
-      });
+
+      if (flow === "reset") {
+        // For password reset, verify OTP and get reset token
+        const response = await AuthService.verifyResetOtp({
+          email: pending.email,
+          otp,
+        });
+        return response;
+      } else {
+        // For signup, verify registration
+        return AuthService.registerVerify({
+          name: (pending as { name: string }).name,
+          email: pending.email,
+          password: (pending as { password: string }).password,
+          role: "USER",
+          otp,
+        });
+      }
     },
-    successMessage: t("accountCreated"),
+    successMessage: flow === "reset" ? t("otpVerified") : t("accountCreated"),
   });
 
   const onVerify = async () => {
     setServerError("");
     try {
       const result = await verifyMutation.mutateAsync({ otp });
-      if (result.success && pending) {
-        clearPendingSignup();
-        const signInResult = await signIn("credentials", {
-          email: pending.email,
-          password: pending.password,
-          redirect: false,
-        });
-        if (signInResult?.ok) {
-          router.push("/dashboard");
-          router.refresh();
+
+      if (result && result.success && pending) {
+        if (flow === "reset") {
+          // For password reset flow
+          const resetToken = result.token || otp; // Use returned token or OTP as token
+          updatePendingPasswordResetToken(resetToken);
+
+          // Redirect to reset password page
+          router.push(
+            `/auth/reset-password?email=${encodeURIComponent(pending.email)}&token=${encodeURIComponent(resetToken)}`,
+          );
         } else {
-          router.push("/auth/signin");
+          // For signup flow
+          clearPendingSignup();
+          const signInResult = await signIn("credentials", {
+            email: pending.email,
+            password: (pending as { password: string }).password,
+            redirect: false,
+          });
+          if (signInResult?.ok) {
+            router.push("/dashboard");
+            router.refresh();
+          } else {
+            router.push("/auth/signin");
+          }
         }
+      } else {
+        setServerError("Verification failed. Please try again.");
       }
     } catch (error: unknown) {
       setServerError(
@@ -107,15 +161,22 @@ export function VerifyOtpForm() {
     }
   };
 
-  const resendMutation = useApiMutation<RegisterResponse, void>({
+  const resendMutation = useApiMutation<AuthResponse, void>({
     mutationFn: async () => {
       if (!pending) throw { message: t("registrationFailed") };
-      return AuthService.registerStart({
-        name: pending.name,
-        email: pending.email,
-        password: pending.password,
-        role: "USER",
-      });
+
+      if (flow === "reset") {
+        // For password reset, resend reset OTP
+        return AuthService.forgotPassword(pending.email);
+      } else {
+        // For signup, resend registration OTP
+        return AuthService.registerStart({
+          name: (pending as { name: string }).name,
+          email: pending.email,
+          password: (pending as { password: string }).password,
+          role: "USER",
+        });
+      }
     },
   });
 
@@ -125,14 +186,20 @@ export function VerifyOtpForm() {
       const result = await resendMutation.mutateAsync();
       const expires = result.expiresInSeconds ?? 120;
       if (pending) {
-        savePendingSignup(
-          {
-            name: pending.name,
-            email: pending.email,
-            password: pending.password,
-          },
-          expires,
-        );
+        if (flow === "reset") {
+          // Update password reset expiry
+          updatePendingPasswordResetExpiry(expires);
+        } else {
+          // Update signup expiry
+          savePendingSignup(
+            {
+              name: (pending as { name: string }).name,
+              email: pending.email,
+              password: (pending as { password: string }).password,
+            },
+            expires,
+          );
+        }
       }
       setCountdown(expires);
     } catch (error: unknown) {
@@ -147,11 +214,18 @@ export function VerifyOtpForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("otpTitle")}</CardTitle>
+        <CardTitle>
+          {flow === "reset"
+            ? t("resetOtpTitle") || "Verify Reset Code"
+            : t("otpTitle")}
+        </CardTitle>
         <CardDescription>
-          {t.rich("otpDescription", {
-            email: () => <span className="font-medium">{email}</span>,
-          })}
+          {flow === "reset"
+            ? t("resetOtpDescription") ||
+              `We sent a verification code to ${email}. Enter it below to reset your password.`
+            : t.rich("otpDescription", {
+                email: () => <span className="font-medium">{email}</span>,
+              })}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

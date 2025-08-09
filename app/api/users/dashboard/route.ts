@@ -6,14 +6,24 @@ export async function GET(_request: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 },
-      );
-    }
+    let userId: string;
 
-    const userId = session.user.id;
+    if (!session?.user?.id) {
+      // Add a small delay and retry once in case session is still being established
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const retrySession = await auth();
+
+      if (!retrySession?.user?.id) {
+        return NextResponse.json(
+          { success: false, error: "Unauthorized" },
+          { status: 401 },
+        );
+      }
+
+      userId = retrySession.user.id;
+    } else {
+      userId = session.user.id;
+    }
 
     // Define date ranges for efficiency
     const now = new Date();

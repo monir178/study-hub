@@ -46,6 +46,11 @@
       "invalidCredentials": "Invalid email or password",
       "errorOccurred": "An error occurred. Please try again.",
       "oauthFailed": "OAuth sign in failed. Please try again.",
+      "forgotPassword": "Forgot password?",
+      "sendingResetCode": "Sending reset code...",
+      "emailRequired": "Please enter your email address",
+      "userNotFound": "No user found with this email address",
+      "resetFailed": "Failed to send reset code. Please try again.",
       "validation": {
         "emailInvalid": "Please enter a valid email address",
         "passwordRequired": "Password is required"
@@ -88,7 +93,28 @@
       "resendingDisabled": "Wait to resend",
       "otpInvalid": "Invalid or expired code.",
       "timeRemaining": "Time remaining:",
-      "secondsAbbrev": "s"
+      "secondsAbbrev": "s",
+      "resetOtpTitle": "Verify Reset Code",
+      "resetOtpDescription": "We sent a verification code to your email. Enter it below to reset your password.",
+      "otpVerified": "Code verified successfully"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "description": "Enter your new password below",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "resetPassword": "Reset Password",
+      "resetting": "Resetting...",
+      "rememberPassword": "Remember your password?",
+      "validation": {
+        "passwordTooShort": "Password must be at least 8 characters",
+        "passwordWeak": "Password must contain uppercase, lowercase and number",
+        "passwordMismatch": "Passwords do not match"
+      },
+      "tokenExpired": "Reset token has expired. Please request a new one.",
+      "resetFailed": "Failed to reset password. Please try again."
     }
   },
   "navigation": {

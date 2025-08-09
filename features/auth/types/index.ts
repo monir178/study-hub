@@ -13,7 +13,7 @@ export interface VerifyEmailCodeRequest {
 
 export interface ResetPasswordRequest {
   email: string;
-  code: string;
+  token: string;
   newPassword: string;
 }
 
