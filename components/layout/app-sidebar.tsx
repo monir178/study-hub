@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { signOut } from "next-auth/react";
 import { Link } from "@/i18n/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { SignOutDialog } from "@/features/shared/components/SignOutDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -32,6 +34,10 @@ interface NavItem {
 }
 
 export function AppSidebar() {
+  const [signOutDialog, setSignOutDialog] = useState({
+    isOpen: false,
+    isSigningOut: false,
+  });
   const { user, isAuthenticated } = useAuth();
   const pathname = usePathname();
   const t = useTranslations("sidebar");
@@ -75,6 +81,19 @@ export function AppSidebar() {
   };
 
   const navItems = getNavItems();
+
+  // Handle sign out with loading state
+  const handleSignOut = async () => {
+    setSignOutDialog((prev) => ({ ...prev, isSigningOut: true }));
+    try {
+      await signOut({ callbackUrl: "/" });
+      // Dialog will close automatically when the page redirects
+    } catch (error) {
+      console.error("Sign out error:", error);
+      // Reset the signing out state if there's an error
+      setSignOutDialog((prev) => ({ ...prev, isSigningOut: false }));
+    }
+  };
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -195,9 +214,7 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => {
-                    if (confirm(t("signOutConfirm"))) {
-                      signOut({ callbackUrl: "/" });
-                    }
+                    setSignOutDialog((prev) => ({ ...prev, isOpen: true }));
                   }}
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950"
                 >
@@ -243,6 +260,16 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
+
+      {/* Sign Out Dialog */}
+      <SignOutDialog
+        state={signOutDialog}
+        onOpenChange={(open) =>
+          setSignOutDialog((prev) => ({ ...prev, isOpen: open }))
+        }
+        onSignOut={handleSignOut}
+        translationNamespace="sidebar"
+      />
     </Sidebar>
   );
 }

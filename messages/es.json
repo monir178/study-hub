@@ -468,6 +468,10 @@
     "settings": "Configuración",
     "signOut": "Cerrar Sesión",
     "signOutConfirm": "¿Estás seguro de que quieres cerrar sesión?",
+    "signOutConfirmTitle": "Cerrar Sesión",
+    "signOutConfirmDescription": "¿Estás seguro de que quieres cerrar sesión? Necesitarás iniciar sesión nuevamente para acceder a tu cuenta.",
+    "signingOut": "Cerrando sesión...",
+    "cancel": "Cancelar",
     "collaborativeLearning": "Aprendizaje Colaborativo"
   },
   "dashboard": {
@@ -574,7 +578,11 @@
     "logOut": "Cerrar sesión",
     "toggleTheme": "Cambiar tema",
     "signOut": "Cerrar sesión",
-    "signOutConfirm": "¿Estás seguro de que quieres cerrar sesión?"
+    "signOutConfirm": "¿Estás seguro de que quieres cerrar sesión?",
+    "signOutConfirmTitle": "Cerrar sesión",
+    "signOutConfirmDescription": "¿Estás seguro de que quieres cerrar sesión? Necesitarás iniciar sesión nuevamente para acceder a tu cuenta.",
+    "signingOut": "Cerrando sesión...",
+    "cancel": "Cancelar"
   },
   "landing": {
     "hero": {

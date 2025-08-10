@@ -468,6 +468,10 @@
     "settings": "Settings",
     "signOut": "Sign Out",
     "signOutConfirm": "Are you sure you want to sign out?",
+    "signOutConfirmTitle": "Sign Out",
+    "signOutConfirmDescription": "Are you sure you want to sign out? You will need to sign in again to access your account.",
+    "signingOut": "Signing out...",
+    "cancel": "Cancel",
     "collaborativeLearning": "Collaborative Learning"
   },
   "dashboard": {
@@ -573,7 +577,11 @@
     "logOut": "Log out",
     "toggleTheme": "Toggle theme",
     "signOut": "Sign Out",
-    "signOutConfirm": "Are you sure you want to sign out?"
+    "signOutConfirm": "Are you sure you want to sign out?",
+    "signOutConfirmTitle": "Sign Out",
+    "signOutConfirmDescription": "Are you sure you want to sign out? You will need to sign in again to access your account.",
+    "signingOut": "Signing out...",
+    "cancel": "Cancel"
   },
   "landing": {
     "hero": {
