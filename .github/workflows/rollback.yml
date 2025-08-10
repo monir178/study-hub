@@ -1,0 +1,45 @@
+name: Rollback Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_id:
+        description: 'Deployment ID to rollback to'
+        required: true
+        type: string
+
+jobs:
+  rollback:
+    name: Rollback to Previous Deployment
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install Vercel CLI
+        run: pnpm add -g vercel@latest
+
+      - name: Rollback Deployment
+        run: |
+          echo "🔄 Rolling back to deployment: ${{ github.event.inputs.deployment_id }}"
+          vercel rollback ${{ github.event.inputs.deployment_id }} --token=${{ secrets.VERCEL_TOKEN }} --yes
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Rollback Success Notification
+        run: |
+          echo "🔄 Rollback completed successfully"
+          echo "📊 Deployment ID: ${{ github.event.inputs.deployment_id }}"
+          echo "🚨 Application has been rolled back"

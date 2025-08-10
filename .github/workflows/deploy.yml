@@ -33,15 +33,43 @@ jobs:
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Build Project Artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Deploy Project Artifacts to Vercel
+        id: deploy
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Get Deployment URL
+        id: deployment-url
+        run: |
+          URL=$(vercel ls --token=${{ secrets.VERCEL_TOKEN }} | grep ${{ secrets.VERCEL_PROJECT_ID }} | head -1 | awk '{print $2}')
+          echo "url=$URL" >> $GITHUB_OUTPUT
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Run Smoke Tests
+        run: |
+          echo "🧪 Running smoke tests on deployed application..."
+          sleep 10  # Wait for deployment to be ready
+          curl -f ${{ steps.deployment-url.outputs.url }} || exit 1
+          echo "✅ Smoke tests passed"
 
       - name: Deployment Success Notification
         run: |
           echo "🎉 Deployment successful!"
-          echo "🌐 Your application is now live on Vercel"
+          echo "🌐 Application URL: ${{ steps.deployment-url.outputs.url }}"
           echo "📊 CI/CD Pipeline completed successfully"
+          echo "✅ All quality gates passed"
+          echo "🧪 Smoke tests passed"
