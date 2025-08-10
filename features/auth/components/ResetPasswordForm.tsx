@@ -16,7 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { Eye, EyeOff } from "lucide-react";
 import { useResetPassword } from "@/features/auth/hooks/useAuthFlows";
 import {
@@ -32,7 +32,7 @@ type ResetPasswordFormData = {
 export function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
+
   const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -96,8 +96,6 @@ export function ResetPasswordForm() {
   }
 
   const onSubmit = async (data: ResetPasswordFormData) => {
-    setError("");
-
     try {
       await resetPasswordMutation.mutateAsync({
         email,
@@ -110,22 +108,7 @@ export function ResetPasswordForm() {
 
       // Redirect to signin with success message
       router.push("/auth/signin?message=password-reset-success");
-    } catch (error: unknown) {
-      const errorMessage = (error as { message?: string })?.message;
-      if (
-        errorMessage?.includes("expired") ||
-        errorMessage?.includes("invalid")
-      ) {
-        setError(
-          t("tokenExpired") ||
-            "Reset token has expired. Please request a new one.",
-        );
-      } else {
-        setError(
-          t("resetFailed") || "Failed to reset password. Please try again.",
-        );
-      }
-    }
+    } catch {}
   };
 
   return (
@@ -137,12 +120,6 @@ export function ResetPasswordForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="newPassword">

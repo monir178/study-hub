@@ -27,12 +27,12 @@ export function Providers({ children }: ProvidersProps) {
             >
               {children}
               <Toaster
-                position="top-right"
+                position="bottom-right"
                 toastOptions={{
                   style: {
-                    background: "hsl(var(--card))",
-                    color: "hsl(var(--card-foreground))",
-                    border: "1px solid hsl(var(--border))",
+                    background: "var(--card)",
+                    color: "var(--card-foreground)",
+                    border: "1px solid var(--border)",
                   },
                 }}
               />

@@ -3,7 +3,8 @@ import { AxiosError } from "axios";
 import { toast } from "sonner";
 
 interface ErrorResponse {
-  message: string;
+  message?: string;
+  error?: string;
 }
 
 interface MutationConfig<TData, TVariables> {
@@ -29,7 +30,12 @@ export function useApiMutation<TData, TVariables>({
       options?.onSuccess?.(data, variables, context);
     },
     onError: async (error: AxiosError<ErrorResponse>, variables, context) => {
-      const errorMessage = error.response?.data?.message || "An error occurred";
+      // Extract error message from API response
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "An error occurred";
       toast.error(errorMessage);
       options?.onError?.(error, variables, context);
     },

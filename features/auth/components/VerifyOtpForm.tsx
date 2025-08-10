@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import {
   Card,
   CardContent,
@@ -54,7 +54,7 @@ export function VerifyOtpForm() {
   const searchParams = useSearchParams();
 
   const [otp, setOtp] = useState("");
-  const [serverError, setServerError] = useState("");
+
   const [countdown, setCountdown] = useState<number>(0);
 
   const flow = searchParams.get("flow") || "signup"; // 'signup' or 'reset'
@@ -122,7 +122,6 @@ export function VerifyOtpForm() {
   });
 
   const onVerify = async () => {
-    setServerError("");
     try {
       const result = await verifyMutation.mutateAsync({ otp });
 
@@ -151,14 +150,8 @@ export function VerifyOtpForm() {
             router.push("/auth/signin");
           }
         }
-      } else {
-        setServerError("Verification failed. Please try again.");
       }
-    } catch (error: unknown) {
-      setServerError(
-        (error as { message?: string })?.message || t("otpInvalid"),
-      );
-    }
+    } catch {}
   };
 
   const resendMutation = useApiMutation<AuthResponse, void>({
@@ -181,7 +174,6 @@ export function VerifyOtpForm() {
   });
 
   const onResend = async () => {
-    setServerError("");
     try {
       const result = await resendMutation.mutateAsync();
       const expires = result.expiresInSeconds ?? 120;
@@ -202,11 +194,7 @@ export function VerifyOtpForm() {
         }
       }
       setCountdown(expires);
-    } catch (error: unknown) {
-      setServerError(
-        (error as { message?: string })?.message || t("registrationFailed"),
-      );
-    }
+    } catch {}
   };
 
   const email = searchParams.get("email") || pending?.email || "";
@@ -229,12 +217,6 @@ export function VerifyOtpForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {serverError && (
-          <Alert variant="destructive">
-            <AlertDescription>{serverError}</AlertDescription>
-          </Alert>
-        )}
-
         <div className="space-y-2">
           <Label htmlFor="otp">{t("otpLabel")}</Label>
           <div className="flex justify-center">

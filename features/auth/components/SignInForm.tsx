@@ -10,13 +10,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, Github, Mail } from "lucide-react";
@@ -112,18 +106,7 @@ export function SignInForm() {
       router.push(
         `/auth/verify-otp?email=${encodeURIComponent(email)}&flow=reset`,
       );
-    } catch (error: unknown) {
-      const errorMessage = (error as { message?: string })?.message;
-      if (
-        errorMessage?.includes("no user found") ||
-        errorMessage?.includes("not found")
-      ) {
-        setError(t("userNotFound") || "No user found with this email address");
-      } else {
-        setError(
-          t("resetFailed") || "Failed to send reset code. Please try again.",
-        );
-      }
+    } catch {
     } finally {
       setIsRequestingReset(false);
     }
@@ -131,11 +114,7 @@ export function SignInForm() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
-        <CardDescription>{t("description")}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-6">
         {error && (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>
