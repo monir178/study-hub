@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       deployment_id:
-        description: 'Deployment ID to rollback to'
+        description: "Deployment ID to rollback to"
         required: true
         type: string
 
@@ -12,7 +12,7 @@ jobs:
   rollback:
     name: Rollback to Previous Deployment
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
