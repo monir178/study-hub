@@ -561,6 +561,7 @@
   },
 
   "navbar": {
+    "home": "Inicio",
     "features": "Características",
     "pricing": "Precios",
     "about": "Acerca de",
@@ -623,6 +624,46 @@
       "securePrivate": {
         "title": "Seguro y Privado",
         "description": "Tus datos están protegidos con seguridad de nivel empresarial, encriptación y controles de privacidad"
+      }
+    },
+    "about": {
+      "badge": "Acerca de Nosotros",
+      "title": "Empoderando Estudiantes en Todo el Mundo",
+      "description": "StudyHub nació de una creencia simple: el aprendizaje es más efectivo, agradable y sostenible cuando se hace en conjunto. Estamos en una misión para crear la plataforma de aprendizaje colaborativo definitiva.",
+      "mission": {
+        "title": "Nuestra Misión",
+        "description": "Democratizar la educación proporcionando a estudiantes de todo el mundo herramientas poderosas y accesibles que fomenten la colaboración, mejoren el enfoque y construyan comunidades de aprendizaje duraderas. Creemos que cada estudiante merece la oportunidad de aprender, crecer y tener éxito juntos."
+      },
+      "values": {
+        "title": "Nuestros Valores Fundamentales",
+        "collaboration": {
+          "title": "Colaboración Primero",
+          "description": "Creemos que el mejor aprendizaje ocurre cuando los estudiantes trabajan juntos, comparten conocimiento y se apoyan mutuamente."
+        },
+        "innovation": {
+          "title": "Innovación Continua",
+          "description": "Evolucionamos constantemente nuestra plataforma con características de vanguardia que mejoran la experiencia de aprendizaje."
+        },
+        "community": {
+          "title": "Comunidad Fuerte",
+          "description": "Construyendo comunidades inclusivas y solidarias donde cada estudiante se siente valorado y empoderado para tener éxito."
+        },
+        "accessibility": {
+          "title": "Acceso Universal",
+          "description": "Haciendo herramientas educativas de calidad accesibles para estudiantes en todas partes, sin importar su origen o recursos."
+        }
+      },
+      "stats": {
+        "title": "Nuestro Impacto",
+        "users": "Usuarios Activos",
+        "sessions": "Sesiones de Estudio",
+        "countries": "Países",
+        "satisfaction": "Satisfacción del Usuario"
+      },
+      "story": {
+        "title": "Nuestra Historia",
+        "paragraph1": "Fundada por un equipo de educadores y tecnólogos, StudyHub surgió de nuestras propias experiencias luchando con métodos de estudio aislados durante la universidad. Fuimos testigos de primera mano de cuán poderoso podía ser el aprendizaje colaborativo, pero las herramientas existentes eran fragmentadas y difíciles de usar.",
+        "paragraph2": "Hoy, StudyHub sirve a estudiantes en más de 25 países, facilitando más de 100,000 sesiones de estudio y fomentando comunidades de aprendizaje que se extienden mucho más allá de las salas de estudio virtuales. Estamos orgullosos de ser parte del viaje de cada estudiante hacia el éxito académico."
       }
     },
     "cta": {

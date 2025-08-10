@@ -20,15 +20,7 @@ import {
 import { useAuth } from "@/lib/hooks/useAuth";
 import { usePersistentAnimation } from "@/lib/hooks/usePersistentAnimation";
 import LanguageSelector from "./LanguageSelector";
-import {
-  BookOpen,
-  Users,
-  Clock,
-  MessageSquare,
-  LogOut,
-  User,
-  Shield,
-} from "lucide-react";
+import { BookOpen, LogOut, User, Shield } from "lucide-react";
 
 interface NavItem {
   name: string;
@@ -73,16 +65,16 @@ export default function Navbar() {
 
   // Create nav items with translations
   const landingNavItems: NavItem[] = [
+    { name: t("home"), href: "/" },
     { name: t("features"), href: "#features" },
-    { name: t("pricing"), href: "#pricing" },
     { name: t("about"), href: "#about" },
   ];
 
   const appNavItems: NavItem[] = [
+    { name: t("home"), href: "/" },
+    { name: t("features"), href: "#features" },
+    { name: t("about"), href: "#about" },
     { name: t("dashboard"), href: "/dashboard", icon: BookOpen },
-    { name: t("rooms"), href: "/dashboard/rooms", icon: Users },
-    { name: t("timer"), href: "/timer", icon: Clock },
-    { name: t("chat"), href: "/chat", icon: MessageSquare },
   ];
 
   // Determine which nav items to show based on authentication
@@ -105,6 +97,42 @@ export default function Navbar() {
   };
 
   const closeMenu = () => setIsMenuOpen(false);
+
+  // Handle smooth scrolling to sections
+  const handleSmoothScroll = (href: string) => {
+    // Check if it's a hash link (section scroll)
+    if (href.startsWith("#")) {
+      const targetElement = document.querySelector(href) as HTMLElement;
+      if (targetElement) {
+        // Use custom smooth scrolling
+        const targetPosition = targetElement.offsetTop - 80; // Account for navbar height
+        const startPosition = window.pageYOffset;
+        const distance = targetPosition - startPosition;
+        const duration = 1200; // 1.2 seconds
+        let start: number | null = null;
+
+        const easeOutExpo = (t: number): number => {
+          return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+        };
+
+        const animateScroll = (timestamp: number) => {
+          if (!start) start = timestamp;
+          const progress = Math.min((timestamp - start) / duration, 1);
+          const easeProgress = easeOutExpo(progress);
+
+          window.scrollTo(0, startPosition + distance * easeProgress);
+
+          if (progress < 1) {
+            requestAnimationFrame(animateScroll);
+          }
+        };
+
+        requestAnimationFrame(animateScroll);
+      }
+      return true; // Indicate that we handled the scroll
+    }
+    return false; // Let the Link component handle regular navigation
+  };
 
   return (
     <motion.nav
@@ -136,7 +164,12 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             {navItems.map((item) => (
-              <NavLink key={item.name} href={item.href} label={item.name} />
+              <NavLink
+                key={item.name}
+                href={item.href}
+                label={item.name}
+                onSmoothScroll={handleSmoothScroll}
+              />
             ))}
           </div>
 
@@ -207,7 +240,7 @@ export default function Navbar() {
 
                   {user?.role === "ADMIN" && (
                     <DropdownMenuItem asChild>
-                      <Link href="/admin">
+                      <Link href="/dashboard/users">
                         <Shield className="mr-2 h-4 w-4" />
                         <span>{t("adminPanel")}</span>
                       </Link>
@@ -295,7 +328,13 @@ export default function Navbar() {
                       <Link
                         href={item.href}
                         className="px-4 py-3 font-semibold transition-all duration-300 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted w-full text-center flex items-center justify-center space-x-3"
-                        onClick={closeMenu}
+                        onClick={(e) => {
+                          // Handle smooth scroll for hash links
+                          if (handleSmoothScroll(item.href)) {
+                            e.preventDefault();
+                          }
+                          closeMenu();
+                        }}
                       >
                         {Icon && <Icon className="h-5 w-5" />}
                         <span>{item.name}</span>
@@ -374,7 +413,7 @@ export default function Navbar() {
                         className="w-full justify-start"
                         asChild
                       >
-                        <Link href="/profile" onClick={closeMenu}>
+                        <Link href="/dashboard/profile" onClick={closeMenu}>
                           <User className="h-4 w-4 mr-2" />
                           {tProfile("title")}
                         </Link>
@@ -394,7 +433,7 @@ export default function Navbar() {
                           className="w-full justify-start"
                           asChild
                         >
-                          <Link href="/admin" onClick={closeMenu}>
+                          <Link href="/dashboard/users" onClick={closeMenu}>
                             <Shield className="h-4 w-4 mr-2" />
                             {t("adminPanel")}
                           </Link>
@@ -425,12 +464,26 @@ export default function Navbar() {
   );
 }
 
-// Nav link component with animated underline
-const NavLink = ({ href, label }: { href: string; label: string }) => {
+// Nav link component with animated underline and smooth scrolling
+const NavLink = ({
+  href,
+  label,
+  onSmoothScroll,
+}: {
+  href: string;
+  label: string;
+  onSmoothScroll: (href: string) => boolean;
+}) => {
   return (
     <Link
       href={href}
       className="text-muted-foreground hover:text-foreground font-medium transition-colors relative group"
+      onClick={(e) => {
+        // Handle smooth scroll for hash links
+        if (onSmoothScroll(href)) {
+          e.preventDefault();
+        }
+      }}
     >
       <span className="relative">
         {label}

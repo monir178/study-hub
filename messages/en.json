@@ -560,6 +560,7 @@
     "trendingUp": "Trending up by {percentage}% this week"
   },
   "navbar": {
+    "home": "Home",
     "features": "Features",
     "pricing": "Pricing",
     "about": "About",
@@ -622,6 +623,46 @@
       "securePrivate": {
         "title": "Secure & Private",
         "description": "Your data is protected with enterprise-grade security, encryption, and privacy controls"
+      }
+    },
+    "about": {
+      "badge": "About Us",
+      "title": "Empowering Students Worldwide",
+      "description": "StudyHub was born from a simple belief: learning is more effective, enjoyable, and sustainable when done together. We're on a mission to create the ultimate collaborative learning platform.",
+      "mission": {
+        "title": "Our Mission",
+        "description": "To democratize education by providing students worldwide with powerful, accessible tools that foster collaboration, enhance focus, and build lasting learning communities. We believe every student deserves the opportunity to learn, grow, and succeed together."
+      },
+      "values": {
+        "title": "Our Core Values",
+        "collaboration": {
+          "title": "Collaboration First",
+          "description": "We believe the best learning happens when students work together, share knowledge, and support each other."
+        },
+        "innovation": {
+          "title": "Continuous Innovation",
+          "description": "We constantly evolve our platform with cutting-edge features that enhance the learning experience."
+        },
+        "community": {
+          "title": "Strong Community",
+          "description": "Building inclusive, supportive communities where every student feels valued and empowered to succeed."
+        },
+        "accessibility": {
+          "title": "Universal Access",
+          "description": "Making quality educational tools accessible to students everywhere, regardless of their background or resources."
+        }
+      },
+      "stats": {
+        "title": "Our Impact",
+        "users": "Active Users",
+        "sessions": "Study Sessions",
+        "countries": "Countries",
+        "satisfaction": "User Satisfaction"
+      },
+      "story": {
+        "title": "Our Story",
+        "paragraph1": "Founded by a team of educators and technologists, StudyHub emerged from our own experiences struggling with isolated study methods during university. We witnessed firsthand how powerful collaborative learning could be, but existing tools were fragmented and difficult to use.",
+        "paragraph2": "Today, StudyHub serves students across 25+ countries, facilitating over 100,000 study sessions and fostering learning communities that extend far beyond virtual study rooms. We're proud to be part of each student's journey toward academic success."
       }
     },
     "cta": {
