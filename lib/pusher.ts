@@ -57,6 +57,12 @@ export const triggerTimerUpdate = async (
   controlledBy: string,
 ) => {
   try {
+    // Skip pusher only during build time or if environment variables are missing
+    if (!process.env.PUSHER_SECRET) {
+      console.log("Skipping Pusher trigger - missing environment variables");
+      return;
+    }
+
     await pusherServer.trigger(`room-${roomId}-timer`, "update", {
       timer,
       action,
@@ -74,6 +80,12 @@ export const triggerChatMessage = async (
   message: Record<string, unknown>,
 ) => {
   try {
+    // Skip pusher only during build time or if environment variables are missing
+    if (!process.env.PUSHER_SECRET) {
+      console.log("Skipping Pusher trigger - missing environment variables");
+      return;
+    }
+
     await pusherServer.trigger(`room-${roomId}-chat`, "new-message", {
       message,
       timestamp: new Date().toISOString(),
