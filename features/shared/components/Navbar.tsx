@@ -30,11 +30,6 @@ import {
   Shield,
 } from "lucide-react";
 
-interface NavbarProps {
-  locale?: string;
-  _variant?: "landing" | "app"; // Mark as unused since we now use authentication state
-}
-
 interface NavItem {
   name: string;
   href: string;
@@ -61,10 +56,7 @@ const navbarAnimations = {
   },
 };
 
-export default function Navbar({
-  locale: _locale = "en",
-  _variant = "landing", // Now unused since we determine from auth state
-}: NavbarProps) {
+export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { user, isAuthenticated } = useAuth();
