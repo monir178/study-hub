@@ -383,10 +383,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Documentation** - [docs.studyhub.com](https://docs.studyhub.com)
-- **Issues** - [GitHub Issues](https://github.com/yourusername/studyhub/issues)
-- **Discussions** - [GitHub Discussions](https://github.com/yourusername/studyhub/discussions)
-- **Email** - support@studyhub.com
+- **Issues** - [GitHub Issues](https://github.com/monir178/studyhub/issues)
+
+- **Email** - monir.mzs17@gmail.com
 
 ---
 
