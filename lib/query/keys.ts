@@ -78,15 +78,26 @@ export const queryKeys = {
 } as const; // Query key factory functions for dynamic keys
 export const createQueryKeys = {
   // Paginated queries
-  usersPaginated: (
-    page: number,
-    limit: number,
-    filters?: Record<string, unknown>,
-  ) => [...queryKeys.users, "paginated", { page, limit, filters }] as const,
+  usersPaginated: (page: number, pageSize: number) =>
+    [...queryKeys.users, "paginated", { page, pageSize }] as const,
 
   // Search queries
   usersSearch: (searchTerm: string, role?: string) =>
     [...queryKeys.users, "search", searchTerm, role || ""] as const,
+
+  // Paginated search queries
+  usersSearchPaginated: (
+    searchTerm: string,
+    role?: string,
+    page: number = 1,
+    pageSize: number = 10,
+  ) =>
+    [
+      ...queryKeys.users,
+      "search",
+      "paginated",
+      { searchTerm, role: role || "", page, pageSize },
+    ] as const,
 
   // Filtered queries
   usersFiltered: (filters: Record<string, unknown>) =>

@@ -1,26 +1,44 @@
 import { apiClient } from "@/lib/api/client";
-import { User, CreateUserData, UpdateUserData } from "../types";
+import {
+  User,
+  CreateUserData,
+  UpdateUserData,
+  PaginatedUsersResponse,
+} from "../types";
 
 export class UserService {
   private static readonly BASE_PATH = "/users";
 
-  // Get all users (admin only)
-  static async getUsers(): Promise<User[]> {
-    return apiClient.get<User[]>(this.BASE_PATH);
+  // Get all users (admin only) - with pagination
+  static async getUsers(
+    page: number = 1,
+    pageSize: number = 10,
+  ): Promise<PaginatedUsersResponse> {
+    const params = new URLSearchParams();
+    params.append("page", page.toString());
+    params.append("pageSize", pageSize.toString());
+
+    return apiClient.get<PaginatedUsersResponse>(
+      `${this.BASE_PATH}?${params.toString()}`,
+    );
   }
 
-  // Search users (admin/moderator only)
-  static async searchUsers(query: string, role?: string): Promise<User[]> {
+  // Search users (admin/moderator only) - with pagination
+  static async searchUsers(
+    query: string,
+    role?: string,
+    page: number = 1,
+    pageSize: number = 10,
+  ): Promise<PaginatedUsersResponse> {
     const params = new URLSearchParams();
     if (query) params.append("q", query);
     if (role && role !== "all") params.append("role", role);
+    params.append("page", page.toString());
+    params.append("pageSize", pageSize.toString());
 
-    const queryString = params.toString();
-    const url = queryString
-      ? `${this.BASE_PATH}/search?${queryString}`
-      : `${this.BASE_PATH}/search`;
-
-    return apiClient.get<User[]>(url);
+    return apiClient.get<PaginatedUsersResponse>(
+      `${this.BASE_PATH}/search?${params.toString()}`,
+    );
   }
 
   // Get user by ID

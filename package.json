@@ -47,6 +47,7 @@
     "@reduxjs/toolkit": "^2.8.2",
     "@tanstack/react-query": "^5.83.0",
     "@tanstack/react-query-devtools": "^5.83.0",
+    "@tanstack/react-table": "^8.21.3",
     "@types/bcryptjs": "^3.0.0",
     "@types/nodemailer": "^6.4.17",
     "@types/react-select-country-list": "^2.2.3",

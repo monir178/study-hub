@@ -2,7 +2,12 @@ import { useApiQuery } from "@/lib/api/hooks/use-api-query";
 import { useApiMutation } from "@/lib/api/hooks/use-api-mutation";
 import { useCacheUtils } from "@/lib/api/hooks/use-cache-utils";
 import { UserService } from "../services/user.service";
-import { User, CreateUserData, UpdateUserData } from "../types";
+import {
+  User,
+  CreateUserData,
+  UpdateUserData,
+  PaginatedUsersResponse,
+} from "../types";
 import { queryKeys, createQueryKeys } from "@/lib/query/keys";
 import { useDispatch } from "react-redux";
 import { updateUser as updateAuthUser } from "@/features/auth/store/authSlice";
@@ -13,19 +18,24 @@ import { updateCurrentUser } from "@/features/users/store/usersSlice";
 // ===============================================
 
 /**
- * Hook to fetch all users (admin only)
+ * Hook to fetch all users (admin only) - with pagination
  */
-export function useUsers(options?: { enabled?: boolean }) {
-  return useApiQuery<User[]>({
-    queryKey: queryKeys.users,
-    queryFn: () => UserService.getUsers(),
+export function useUsers(
+  page: number = 1,
+  pageSize: number = 10,
+  options?: { enabled?: boolean },
+) {
+  return useApiQuery<PaginatedUsersResponse>({
+    queryKey: createQueryKeys.usersPaginated(page, pageSize),
+    queryFn: () => UserService.getUsers(page, pageSize),
     options: {
       // Users data is fairly stable - increased stale time
       staleTime: 15 * 60 * 1000, // 15 minutes
       // Keep data in cache longer
       gcTime: 30 * 60 * 1000, // 30 minutes
       // Keep previous data while loading new data
-      placeholderData: (previousData: User[] | undefined) => previousData,
+      placeholderData: (previousData: PaginatedUsersResponse | undefined) =>
+        previousData,
       // Conditional enabling
       enabled: options?.enabled !== false,
     },
@@ -69,11 +79,13 @@ export function useUserProfile() {
 }
 
 /**
- * Hook to search users
+ * Hook to search users - with pagination
  */
 export function useSearchUsers(
   query: string,
   role?: string,
+  page: number = 1,
+  pageSize: number = 10,
   options?: { enabled?: boolean },
 ) {
   const hasQuery = query && query.trim().length > 0;
@@ -82,16 +94,17 @@ export function useSearchUsers(
     options?.enabled !== false && (hasQuery || hasRoleFilter),
   );
 
-  return useApiQuery<User[]>({
-    queryKey: createQueryKeys.usersSearch(query, role),
-    queryFn: () => UserService.searchUsers(query, role),
+  return useApiQuery<PaginatedUsersResponse>({
+    queryKey: createQueryKeys.usersSearchPaginated(query, role, page, pageSize),
+    queryFn: () => UserService.searchUsers(query, role, page, pageSize),
     options: {
       // Search results should be fresh
       staleTime: 2 * 60 * 1000, // 2 minutes
       // Only search if enabled and has query or role filter
       enabled: shouldEnable,
       // Keep previous data while loading new data
-      placeholderData: (previousData: User[] | undefined) => previousData,
+      placeholderData: (previousData: PaginatedUsersResponse | undefined) =>
+        previousData,
     },
   });
 }

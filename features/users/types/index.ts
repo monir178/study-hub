@@ -26,6 +26,20 @@ export interface User {
   updatedAt: string; // ISO string instead of Date
 }
 
+export interface PaginationInfo {
+  page: number;
+  pageSize: number;
+  totalUsers: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface PaginatedUsersResponse {
+  data: User[];
+  pagination: PaginationInfo;
+}
+
 export interface UserProfile {
   id: string;
   name: string | null;

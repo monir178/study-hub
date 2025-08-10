@@ -18,6 +18,17 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q");
     const roleFilter = searchParams.get("role");
+    const page = parseInt(searchParams.get("page") ?? "1");
+    const pageSize = parseInt(searchParams.get("pageSize") ?? "10");
+    const offset = (page - 1) * pageSize;
+
+    // Validate pagination parameters
+    if (page < 1 || pageSize < 1 || pageSize > 100) {
+      return NextResponse.json(
+        { error: "Invalid pagination parameters" },
+        { status: 400 },
+      );
+    }
 
     // Build the where clause for searching
     const whereClause: {
@@ -54,6 +65,12 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Get total count for pagination
+    const totalUsers = await prisma.user.count({
+      where: whereClause,
+    });
+
+    // Get paginated users
     const users = await prisma.user.findMany({
       where: whereClause,
       select: {
@@ -69,10 +86,25 @@ export async function GET(request: NextRequest) {
         { role: "asc" }, // Admin first, then moderator, then user
         { createdAt: "desc" },
       ],
-      take: 100, // Limit results to avoid performance issues
+      skip: offset,
+      take: pageSize,
     });
 
-    return NextResponse.json(users);
+    const totalPages = Math.ceil(totalUsers / pageSize);
+    const hasNextPage = page < totalPages;
+    const hasPreviousPage = page > 1;
+
+    return NextResponse.json({
+      data: users,
+      pagination: {
+        page,
+        pageSize,
+        totalUsers,
+        totalPages,
+        hasNextPage,
+        hasPreviousPage,
+      },
+    });
   } catch (error) {
     console.error("Error searching users:", error);
     return NextResponse.json(

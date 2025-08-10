@@ -86,18 +86,46 @@ export async function PATCH(
 
       // Moderator can only promote users to moderator, not to admin
       if (session.user.role === "MODERATOR") {
+        console.log("Moderator attempting role change:", {
+          sessionUserRole: session.user.role,
+          targetUserId: id,
+          targetUserRole: targetUser.role,
+          requestedRole: validatedData.role,
+        });
+
         if (validatedData.role === "ADMIN") {
+          console.log("❌ Blocked: Moderator trying to assign admin role");
           return NextResponse.json(
             { error: "Forbidden: Moderator cannot assign admin role" },
             { status: 403 },
           );
         }
-        if (targetUser.role !== "USER" && validatedData.role === "MODERATOR") {
+
+        // Moderator can only promote USER to MODERATOR
+        if (targetUser.role !== "USER") {
+          console.log(
+            "❌ Blocked: Target user is not USER role, target role:",
+            targetUser.role,
+          );
           return NextResponse.json(
             { error: "Forbidden: Can only promote users to moderator" },
             { status: 403 },
           );
         }
+
+        // Moderator can only assign MODERATOR role to users
+        if (validatedData.role !== "MODERATOR") {
+          console.log(
+            "❌ Blocked: Trying to assign non-moderator role:",
+            validatedData.role,
+          );
+          return NextResponse.json(
+            { error: "Forbidden: Can only promote users to moderator role" },
+            { status: 403 },
+          );
+        }
+
+        console.log("✅ Moderator role change approved");
       }
     }
 
@@ -105,9 +133,23 @@ export async function PATCH(
     const profileFields = { ...validatedData };
     delete profileFields.role;
 
+    console.log("Profile fields check:", {
+      profileFieldsCount: Object.keys(profileFields).length,
+      profileFields: Object.keys(profileFields),
+      sessionUserId: session.user.id,
+      targetUserId: id,
+      sessionUserRole: session.user.role,
+    });
+
     if (Object.keys(profileFields).length > 0) {
-      // Check if user can update profile fields (own profile or admin)
-      if (session.user.id !== id && session.user.role !== "ADMIN") {
+      // Check if user can update profile fields (own profile, admin, or moderator changing roles)
+      const canUpdateProfile =
+        session.user.id === id || // Own profile
+        session.user.role === "ADMIN" || // Admin can update anyone
+        (session.user.role === "MODERATOR" && validatedData.role); // Moderator changing roles
+
+      if (!canUpdateProfile) {
+        console.log("❌ Blocked: Profile update permission denied");
         return NextResponse.json(
           { error: "Forbidden: Cannot update other user's profile" },
           { status: 403 },
