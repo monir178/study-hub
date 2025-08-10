@@ -25,7 +25,19 @@ export function useAuth() {
   }, [session, authUser, currentUser, isInitialized, dispatch]);
 
   // Return currentUser if available (complete profile), fallback to authUser (basic info)
-  const user = currentUser?.id === authUser?.id ? currentUser : authUser;
+  // Always ensure we have the latest image from the session
+  let user = currentUser?.id === authUser?.id ? currentUser : authUser;
+
+  // If we have a session with image but user has no image, use the session image
+  if (session?.user?.image && (!user?.image || user.image === null)) {
+    user = user ? { ...user, image: session.user.image } : user;
+  }
+
+  // Ensure Google images have proper size parameter
+  if (user?.image && user.image.includes("googleusercontent.com")) {
+    // Replace size parameter with a larger one for better quality
+    user = { ...user, image: user.image.replace(/=s\d+-c$/, "=s200-c") };
+  }
 
   return {
     user,

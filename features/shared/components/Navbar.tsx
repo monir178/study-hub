@@ -172,6 +172,10 @@ export default function Navbar({
                       <AvatarImage
                         src={user?.image || ""}
                         alt={user?.name || "User"}
+                        className="object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
                       />
                       <AvatarFallback>
                         {user?.name
@@ -345,6 +349,13 @@ export default function Navbar({
                           <AvatarImage
                             src={user?.image || ""}
                             alt={user?.name || "User"}
+                            onError={(e) => {
+                              console.error(
+                                "Failed to load mobile avatar image:",
+                                user?.image,
+                              );
+                              e.currentTarget.style.display = "none";
+                            }}
                           />
                           <AvatarFallback>
                             {user?.name

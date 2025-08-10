@@ -45,7 +45,16 @@ export class UserService {
 
   // Update current user profile
   static async updateProfile(userData: Partial<UpdateUserData>): Promise<User> {
-    return apiClient.patch<User>(`${this.BASE_PATH}/profile`, userData);
+    // When updating profile image via upload, mark it as UPLOAD source
+    const updateData = { ...userData };
+    if (
+      updateData.image &&
+      !updateData.image.includes("googleusercontent.com") &&
+      !updateData.image.includes("githubusercontent.com")
+    ) {
+      (updateData as { imageSource?: string }).imageSource = "UPLOAD";
+    }
+    return apiClient.patch<User>(`${this.BASE_PATH}/profile`, updateData);
   }
 
   // Upload profile picture

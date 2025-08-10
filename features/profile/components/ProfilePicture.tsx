@@ -76,6 +76,14 @@ export function ProfilePicture({
   };
 
   const displayImage = previewUrl || user.image;
+  const isOAuthImage =
+    user.imageSource === "GOOGLE" || user.imageSource === "GITHUB";
+  const oAuthProvider =
+    user.imageSource === "GOOGLE"
+      ? "Google"
+      : user.imageSource === "GITHUB"
+        ? "GitHub"
+        : null;
 
   return (
     <div
@@ -93,6 +101,9 @@ export function ProfilePicture({
               className="object-cover"
               src={displayImage || undefined}
               alt={user.name || "Profile"}
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
             />
             <AvatarFallback
               className="text-lg md:text-xl"
@@ -102,6 +113,13 @@ export function ProfilePicture({
             </AvatarFallback>
           </Avatar>
         </div>
+
+        {/* OAuth Image Info */}
+        {isOAuthImage && !selectedFile && (
+          <div className="text-xs text-muted-foreground text-center bg-muted/50 px-3 py-1 rounded-md max-w-sm mx-auto">
+            📷 Image from {oAuthProvider}. Upload a new photo to replace it.
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex justify-center lg:justify-start gap-2">

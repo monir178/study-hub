@@ -24,7 +24,7 @@ export function useSessionSync() {
         id: session.user.id!,
         email: session.user.email!,
         name: session.user.name || undefined,
-        image: session.user.image || undefined,
+        image: session.user.image || undefined, // Ensure image is properly passed
         role: session.user.role || ("USER" as const),
       };
 

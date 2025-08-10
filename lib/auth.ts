@@ -12,10 +12,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          role: "USER" as const,
+        };
+      },
     }),
     GitHub({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
+      profile(profile) {
+        return {
+          id: profile.id.toString(),
+          name: profile.name || profile.login,
+          email: profile.email,
+          image: profile.avatar_url,
+          role: "USER" as const,
+        };
+      },
     }),
     Credentials({
       name: "credentials",
@@ -94,21 +112,75 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     },
     async signIn({ user, account, profile: _profile }) {
-      // For OAuth providers, ensure user has a role
+      // For OAuth providers, handle account linking and image storage
       if (
         account &&
         (account.provider === "google" || account.provider === "github")
       ) {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-        });
+        if (!user.email) return false;
 
-        if (!existingUser) {
-          // Set default role for new OAuth users
-          await prisma.user.update({
-            where: { email: user.email! },
-            data: { role: "USER" },
+        try {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email },
+            include: { accounts: true },
           });
+
+          if (existingUser) {
+            // Check if this OAuth provider is already linked
+            const existingAccount = existingUser.accounts.find(
+              (acc) => acc.provider === account.provider,
+            );
+
+            if (!existingAccount) {
+              // Link the new OAuth account to existing user
+              await prisma.account.create({
+                data: {
+                  userId: existingUser.id,
+                  type: account.type,
+                  provider: account.provider,
+                  providerAccountId: account.providerAccountId,
+                  refresh_token: account.refresh_token as string | null,
+                  access_token: account.access_token as string | null,
+                  expires_at: account.expires_at as number | null,
+                  token_type: account.token_type as string | null,
+                  scope: account.scope as string | null,
+                  id_token: account.id_token as string | null,
+                  session_state: account.session_state as string | null,
+                },
+              });
+            }
+
+            // Update existing user's image if they don't have a custom uploaded one
+            const shouldUpdateImage = existingUser.imageSource !== "UPLOAD";
+            if (shouldUpdateImage && user.image) {
+              const imageSource =
+                account.provider === "google" ? "GOOGLE" : "GITHUB";
+              await prisma.user.update({
+                where: { email: user.email },
+                data: {
+                  image: user.image,
+                  imageSource: imageSource as "GOOGLE" | "GITHUB",
+                  name: user.name || existingUser.name,
+                },
+              });
+            }
+          } else {
+            // For new users created by PrismaAdapter, update image source
+            setTimeout(async () => {
+              try {
+                const imageSource =
+                  account.provider === "google" ? "GOOGLE" : "GITHUB";
+                await prisma.user.update({
+                  where: { email: user.email! },
+                  data: { imageSource: imageSource as "GOOGLE" | "GITHUB" },
+                });
+              } catch {
+                // Silently handle error - user creation still succeeds
+              }
+            }, 100);
+          }
+        } catch {
+          return false;
         }
       }
 
@@ -119,12 +191,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/auth/signin",
     error: "/auth/error",
   },
-  events: {
-    async signIn({ user, account, isNewUser: _isNewUser }) {
-      console.log(`User ${user.email} signed in with ${account?.provider}`);
-    },
-    async createUser({ user }) {
-      console.log(`New user created: ${user.email}`);
-    },
-  },
+  debug: process.env.NODE_ENV === "development",
 });

@@ -4,6 +4,7 @@ export interface User {
   email: string;
   emailVerified: string | null; // ISO string instead of Date
   image: string | null;
+  imageSource: "UPLOAD" | "GOOGLE" | "GITHUB";
   password: string | null;
   role: "USER" | "MODERATOR" | "ADMIN";
   locale: string;
@@ -31,6 +32,7 @@ export interface UserProfile {
   email: string;
   emailVerified: Date | null;
   image: string | null;
+  imageSource: "UPLOAD" | "GOOGLE" | "GITHUB";
   role: "USER" | "MODERATOR" | "ADMIN";
   locale: string;
   theme: "LIGHT" | "DARK" | "SYSTEM";
