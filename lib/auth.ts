@@ -150,33 +150,44 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               });
             }
 
-            // Update existing user's image if they don't have a custom uploaded one
+            // Update existing user's image and email verification if they don't have a custom uploaded one
             const shouldUpdateImage = existingUser.imageSource !== "UPLOAD";
+            const updateData: any = {};
+
             if (shouldUpdateImage && user.image) {
               const imageSource =
                 account.provider === "google" ? "GOOGLE" : "GITHUB";
+              updateData.image = user.image;
+              updateData.imageSource = imageSource;
+              updateData.name = user.name || existingUser.name;
+            }
+
+            // Set emailVerified if not already set (OAuth emails are pre-verified)
+            if (!existingUser.emailVerified) {
+              updateData.emailVerified = new Date();
+            }
+
+            // Only update if we have data to update
+            if (Object.keys(updateData).length > 0) {
               await prisma.user.update({
                 where: { email: user.email },
-                data: {
-                  image: user.image,
-                  imageSource: imageSource as "GOOGLE" | "GITHUB",
-                  name: user.name || existingUser.name,
-                },
+                data: updateData,
               });
             }
           } else {
-            // For new users created by PrismaAdapter, update image source
+            // For new users created by PrismaAdapter, update image source and email verification
             setTimeout(async () => {
               try {
                 const imageSource =
                   account.provider === "google" ? "GOOGLE" : "GITHUB";
                 await prisma.user.update({
                   where: { email: user.email! },
-                  data: { imageSource: imageSource as "GOOGLE" | "GITHUB" },
+                  data: {
+                    imageSource: imageSource as "GOOGLE" | "GITHUB",
+                    emailVerified: new Date(), // OAuth emails are pre-verified
+                  },
                 });
-              } catch {
-                // Silently handle error - user creation still succeeds
-              }
+              } catch {}
             }, 100);
           }
         } catch {
