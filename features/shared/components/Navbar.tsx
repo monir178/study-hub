@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { usePersistentAnimation } from "@/lib/hooks/usePersistentAnimation";
 import LanguageSelector from "./LanguageSelector";
 import {
   BookOpen,
@@ -69,6 +70,12 @@ export default function Navbar({
   const [isScrolled, setIsScrolled] = useState(false);
   const { user, isAuthenticated } = useAuth();
 
+  const { initial, animate } = usePersistentAnimation({
+    animationKey: "navbar",
+    resetOnLocaleChange: false,
+    resetOnRouteChange: false,
+  });
+
   const t = useTranslations("navbar");
   const tAuth = useTranslations("auth");
   const tProfile = useTranslations("profile");
@@ -111,8 +118,8 @@ export default function Navbar({
 
   return (
     <motion.nav
-      initial={navbarAnimations.navbar.initial}
-      animate={navbarAnimations.navbar.animate}
+      initial={initial}
+      animate={animate}
       transition={navbarAnimations.navbar.transition}
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         isAuthenticated || isScrolled

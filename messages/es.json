@@ -535,7 +535,10 @@
       }
     },
     "features": {
-      "title": "Transforma Tu Experiencia de Aprendizaje",
+      "title": {
+        "part1": "Transforma Tu",
+        "part2": "Experiencia de Aprendizaje"
+      },
       "subtitle": "Descubre herramientas poderosas que revolucionan cómo estudias, colaboras y alcanzas tus metas académicas",
       "synchronizedTimers": {
         "title": "Temporizadores Sincronizados",

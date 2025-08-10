@@ -4,6 +4,7 @@ import { motion, Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Zap } from "lucide-react";
+import { usePersistentAnimation } from "@/lib/hooks/usePersistentAnimation";
 
 const fadeUpVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
@@ -20,14 +21,29 @@ const fadeUpVariants: Variants = {
 
 export function HeroContent() {
   const t = useTranslations("landing.hero");
+  const badgeAnimation = usePersistentAnimation({
+    animationKey: "hero-badge",
+    resetOnLocaleChange: false,
+    resetOnRouteChange: false,
+  });
+  const titleAnimation = usePersistentAnimation({
+    animationKey: "hero-title",
+    resetOnLocaleChange: false,
+    resetOnRouteChange: false,
+  });
+  const subtitleAnimation = usePersistentAnimation({
+    animationKey: "hero-subtitle",
+    resetOnLocaleChange: false,
+    resetOnRouteChange: false,
+  });
 
   return (
     <>
       <motion.div
         custom={1}
         variants={fadeUpVariants}
-        initial="hidden"
-        animate="visible"
+        initial={badgeAnimation.initial}
+        animate={badgeAnimation.animate}
       >
         <Badge
           variant="secondary"
@@ -41,8 +57,8 @@ export function HeroContent() {
       <motion.div
         custom={1.2}
         variants={fadeUpVariants}
-        initial="hidden"
-        animate="visible"
+        initial={titleAnimation.initial}
+        animate={titleAnimation.animate}
       >
         <h1 className="text-5xl  md:text-6xl  xl:text-8xl  font-bold mb-6 sm:mb-8 leading-[1.05] tracking-tight">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/40 from-1% via-foreground/95 to-foreground/80">
@@ -58,8 +74,8 @@ export function HeroContent() {
       <motion.div
         custom={1.4}
         variants={fadeUpVariants}
-        initial="hidden"
-        animate="visible"
+        initial={subtitleAnimation.initial}
+        animate={subtitleAnimation.animate}
       >
         <p className="text-sm sm:text-lg md:text-xl   mb-8 sm:mb-12 leading-relaxed font-light tracking-wide max-w-4xl mx-auto px-4">
           {t("subtitle")}

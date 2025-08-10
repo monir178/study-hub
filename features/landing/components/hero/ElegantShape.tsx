@@ -12,6 +12,7 @@ interface ElegantShapeProps {
   rotate?: number;
   gradient?: string;
   borderRadius?: number;
+  skipInitialAnimation?: boolean;
 }
 
 export function ElegantShape({
@@ -22,27 +23,40 @@ export function ElegantShape({
   rotate = 0,
   gradient = "from-primary/[0.08]",
   borderRadius = 16,
+  skipInitialAnimation = false,
 }: ElegantShapeProps) {
   const { theme } = useTheme();
 
   return (
     <motion.div
-      initial={{
-        opacity: 0,
-        y: -150,
-        rotate: rotate - 15,
-      }}
+      initial={
+        skipInitialAnimation
+          ? {
+              opacity: 1,
+              y: 0,
+              rotate: rotate,
+            }
+          : {
+              opacity: 0,
+              y: -150,
+              rotate: rotate - 15,
+            }
+      }
       animate={{
         opacity: 1,
         y: 0,
         rotate: rotate,
       }}
-      transition={{
-        duration: 2.4,
-        delay,
-        ease: [0.23, 0.86, 0.39, 0.96],
-        opacity: { duration: 1.2 },
-      }}
+      transition={
+        skipInitialAnimation
+          ? {}
+          : {
+              duration: 2.4,
+              delay,
+              ease: [0.23, 0.86, 0.39, 0.96],
+              opacity: { duration: 1.2 },
+            }
+      }
       className={cn("absolute", className)}
     >
       <motion.div

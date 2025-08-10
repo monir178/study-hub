@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ArrowRight, BookOpen, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { usePersistentAnimation } from "@/lib/hooks/usePersistentAnimation";
 
 const fadeUpVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
@@ -21,13 +22,18 @@ const fadeUpVariants: Variants = {
 
 export function HeroButtons() {
   const t = useTranslations("landing.hero");
+  const { initial, animate } = usePersistentAnimation({
+    animationKey: "hero-buttons",
+    resetOnLocaleChange: false,
+    resetOnRouteChange: false,
+  });
 
   return (
     <motion.div
       custom={1.6}
       variants={fadeUpVariants}
-      initial="hidden"
-      animate="visible"
+      initial={initial}
+      animate={animate}
       className="flex flex-col md:flex-row gap-3 sm:gap-6 justify-center mb-8 sm:mb-12 px-4"
     >
       {/* Primary Button - Default variant */}

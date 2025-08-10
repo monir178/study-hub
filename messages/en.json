@@ -534,7 +534,10 @@
       }
     },
     "features": {
-      "title": "Transform Your Learning Experience",
+      "title": {
+        "part1": "Transform Your",
+        "part2": "Learning Experience"
+      },
       "subtitle": "Discover powerful tools that revolutionize how you study, collaborate, and achieve your academic goals",
       "synchronizedTimers": {
         "title": "Synchronized Timers",

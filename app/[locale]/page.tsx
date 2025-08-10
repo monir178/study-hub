@@ -41,15 +41,15 @@ export default async function Home({
       />
 
       {/* Hero Section - Full width, no container */}
-      <HeroSection key={`hero-${locale}`} />
+      <HeroSection />
 
       {/* Main Content */}
 
       {/* Features Section */}
-      <FeaturesSection key={`features-${locale}`} />
+      <FeaturesSection />
 
       {/* CTA Section */}
-      <CTASection key={`cta-${locale}`} locale={locale} />
+      <CTASection locale={locale} />
     </div>
   );
 }

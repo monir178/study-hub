@@ -4,10 +4,11 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface FloatingStudyIconProps {
-  icon: any;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   className?: string;
   delay?: number;
   size?: number;
+  skipInitialAnimation?: boolean;
 }
 
 export function FloatingStudyIcon({
@@ -15,24 +16,37 @@ export function FloatingStudyIcon({
   className,
   delay = 0,
   size = 24,
+  skipInitialAnimation = false,
 }: FloatingStudyIconProps) {
   return (
     <motion.div
-      initial={{
-        opacity: 0,
-        y: 20,
-        scale: 0.8,
-      }}
+      initial={
+        skipInitialAnimation
+          ? {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+            }
+          : {
+              opacity: 0,
+              y: 20,
+              scale: 0.8,
+            }
+      }
       animate={{
         opacity: 1,
         y: 0,
         scale: 1,
       }}
-      transition={{
-        duration: 2,
-        delay,
-        ease: [0.23, 0.86, 0.39, 0.96],
-      }}
+      transition={
+        skipInitialAnimation
+          ? {}
+          : {
+              duration: 2,
+              delay,
+              ease: [0.23, 0.86, 0.39, 0.96],
+            }
+      }
       className={cn("absolute", className)}
     >
       <motion.div

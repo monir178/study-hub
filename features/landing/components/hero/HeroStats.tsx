@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Users, Clock, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CountUp from "@/components/ui/counter-up";
+import { usePersistentAnimation } from "@/lib/hooks/usePersistentAnimation";
 
 const fadeUpVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
@@ -21,6 +22,26 @@ const fadeUpVariants: Variants = {
 
 export function HeroStats() {
   const t = useTranslations("landing.hero.stats");
+  const containerAnimation = usePersistentAnimation({
+    animationKey: "hero-stats-container",
+    resetOnLocaleChange: false,
+    resetOnRouteChange: false,
+  });
+  const stat1Animation = usePersistentAnimation({
+    animationKey: "hero-stats-1",
+    resetOnLocaleChange: false,
+    resetOnRouteChange: false,
+  });
+  const stat2Animation = usePersistentAnimation({
+    animationKey: "hero-stats-2",
+    resetOnLocaleChange: false,
+    resetOnRouteChange: false,
+  });
+  const stat3Animation = usePersistentAnimation({
+    animationKey: "hero-stats-3",
+    resetOnLocaleChange: false,
+    resetOnRouteChange: false,
+  });
 
   const stats = [
     {
@@ -46,13 +67,15 @@ export function HeroStats() {
     },
   ];
 
+  const statAnimations = [stat1Animation, stat2Animation, stat3Animation];
+
   return (
     <motion.div
       className="flex flex-row justify-center gap-2 sm:gap-4 md:gap-6 mt-12 sm:mt-16 px-2 sm:px-4"
       custom={4}
       variants={fadeUpVariants}
-      initial="hidden"
-      animate="visible"
+      initial={containerAnimation.initial}
+      animate={containerAnimation.animate}
     >
       {stats.map((stat, index) => (
         <motion.div
@@ -60,8 +83,8 @@ export function HeroStats() {
           className="group relative w-fit"
           custom={4 + index * 0.1}
           variants={fadeUpVariants}
-          initial="hidden"
-          animate="visible"
+          initial={statAnimations[index]?.initial || "hidden"}
+          animate={statAnimations[index]?.animate || "visible"}
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 300 }}
         >

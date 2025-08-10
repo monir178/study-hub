@@ -2,9 +2,17 @@
 
 import { useTheme } from "next-themes";
 import { ElegantShape } from "./ElegantShape";
+import { usePersistentAnimation } from "@/lib/hooks/usePersistentAnimation";
 
 export function HeroBackground() {
   const { theme } = useTheme();
+
+  // Use persistent animation to prevent re-triggering on language change
+  const { hasPlayed } = usePersistentAnimation({
+    animationKey: "hero-background",
+    resetOnLocaleChange: false,
+    resetOnRouteChange: false,
+  });
 
   return (
     <>
@@ -23,6 +31,7 @@ export function HeroBackground() {
               : "from-primary/[0.25] via-primary/[0.15] to-transparent"
           }
           className="left-[-12%] top-[-8%]"
+          skipInitialAnimation={hasPlayed}
         />
 
         <ElegantShape
@@ -37,6 +46,7 @@ export function HeroBackground() {
               : "from-secondary/[0.25] via-secondary/[0.15] to-transparent"
           }
           className="right-[-18%] bottom-[-3%]"
+          skipInitialAnimation={hasPlayed}
         />
 
         <ElegantShape
@@ -51,6 +61,7 @@ export function HeroBackground() {
               : "from-accent/[0.20] via-accent/[0.12] to-transparent"
           }
           className="left-[-3%] top-[35%]"
+          skipInitialAnimation={hasPlayed}
         />
 
         <ElegantShape
@@ -65,6 +76,7 @@ export function HeroBackground() {
               : "from-primary/[0.30] via-primary/[0.18] to-transparent"
           }
           className="right-[8%] top-[8%]"
+          skipInitialAnimation={hasPlayed}
         />
 
         {/* Wide rectangle - middle */}
@@ -80,6 +92,7 @@ export function HeroBackground() {
               : "from-secondary/[0.20] via-secondary/[0.12] to-transparent"
           }
           className="right-[-8%] top-[42%]"
+          skipInitialAnimation={hasPlayed}
         />
       </div>
 

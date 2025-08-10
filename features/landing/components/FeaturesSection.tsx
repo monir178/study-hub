@@ -68,10 +68,16 @@ export default function FeaturesSection() {
     <section id="features" className="py-20 px-4 bg-muted/30">
       <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">
-            {t("title")}
+          <h2 className="text-3xl lg:text-6xl font-black max-w-[20ch] mx-auto pb-2 leading-[1.05] tracking-tight">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/40 from-1% via-foreground/95 to-foreground/80">
+              {t("title.part1")}
+            </span>
+            <br />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-400">
+              {t("title.part2")}
+            </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="lg:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed mt-6">
             {t("subtitle")}
           </p>
         </div>
@@ -115,7 +121,7 @@ function FeatureCard({
   isLarge = false,
 }: {
   feature: {
-    icon: React.ComponentType<any>;
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
     title: string;
     description: string;
     iconColor: string;
@@ -123,12 +129,12 @@ function FeatureCard({
   isLarge?: boolean;
 }) {
   const gradients = [
-    "from-primary via-red-400 to-transparent",
-    "from-purple-500/40 via-purple-500/10 to-transparent",
-    "from-green-500/40 via-green-500/10 to-transparent",
-    "from-orange-500/40 via-orange-500/10 to-transparent",
-    "from-pink-500/40 via-pink-500/10 to-transparent",
-    "from-teal-500/40 via-teal-500/10 to-transparent",
+    "from-primary/10 via-primary/15 to-transparent",
+    "from-primary/10 via-primary/10 to-transparent",
+    "from-primary/10 via-primary/20 to-transparent",
+    "from-primary/10 via-primary/8 to-transparent",
+    "from-primary/10 via-primary/18 to-transparent",
+    "from-primary/10 via-primary/12 to-transparent",
   ];
 
   const gradientIndex = feature.title.length % gradients.length;
@@ -140,7 +146,7 @@ function FeatureCard({
     >
       {/* Blurry gradient background in corner */}
       <div
-        className={`absolute -top-8 -right-8 w-40 h-40 bg-gradient-to-br ${gradient} rounded-full blur-3xl opacity-80`}
+        className={`absolute -top-8 -right-8 w-1/2 h-1/2 bg-gradient-to-br ${gradient} rounded-full blur-3xl opacity-80`}
       />
 
       {/* Hover overlay - only background change */}
