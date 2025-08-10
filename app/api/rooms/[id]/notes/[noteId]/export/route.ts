@@ -69,7 +69,7 @@ export async function GET(
     } else if (format === "pdf") {
       const html = convertSlateToHTML(note.content);
       const pdfBuffer = await convertHTMLToPDF(html, note.title);
-      return new NextResponse(pdfBuffer, {
+      return new NextResponse(new Uint8Array(pdfBuffer), {
         headers: {
           "Content-Type": "application/pdf",
           "Content-Disposition": `attachment; filename="${note.title}.pdf"`,

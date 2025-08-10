@@ -32,7 +32,7 @@ jobs:
         run: echo "key=pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ steps.cache-key.outputs.key }}
@@ -62,7 +62,7 @@ jobs:
           version: 8
 
       - name: Restore dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ needs.setup.outputs.cache-key }}
@@ -99,7 +99,7 @@ jobs:
           version: 8
 
       - name: Restore dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ needs.setup.outputs.cache-key }}
@@ -114,7 +114,7 @@ jobs:
           SKIP_ENV_VALIDATION: true
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-files
           path: .next/
@@ -140,7 +140,7 @@ jobs:
           version: 8
 
       - name: Restore dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ needs.setup.outputs.cache-key }}
@@ -152,7 +152,7 @@ jobs:
         run: pnpm test:ci
 
       - name: Upload test coverage
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: coverage-report
@@ -179,7 +179,7 @@ jobs:
           version: 8
 
       - name: Restore dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ needs.setup.outputs.cache-key }}
