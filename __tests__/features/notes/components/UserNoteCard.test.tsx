@@ -17,7 +17,7 @@ describe("UserNoteCard", () => {
       name: "User",
       email: "u@e.com",
       role: "USER",
-      image: null,
+      image: undefined,
     },
     room: { id: "room-1", name: "Room", isPublic: true, members: [] },
   });

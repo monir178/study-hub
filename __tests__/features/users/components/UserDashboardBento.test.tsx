@@ -51,6 +51,10 @@ describe("UserDashboardBento", () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       creatorId: "c1",
+      creator: {
+        name: "Creator",
+        image: null,
+      },
       members: [],
     },
   });
