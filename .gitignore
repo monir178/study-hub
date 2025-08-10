@@ -27,6 +27,9 @@
 # IDE and editor files
 .vscode/
 
+# Vercel
+.vercel
+
 # build caches and tools
 .swc/
 .kiro/
