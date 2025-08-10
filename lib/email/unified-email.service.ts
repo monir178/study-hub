@@ -17,7 +17,14 @@ if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
 // Email service types
 export interface EmailResponse {
   success: boolean;
-  data?: any;
+  data?: {
+    messageId?: string;
+    envelope?: object;
+    accepted?: string[];
+    rejected?: string[];
+    pending?: string[];
+    response?: string;
+  };
   error?: string;
 }
 

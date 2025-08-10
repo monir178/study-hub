@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api/client";
-import { ModeratorDashboardData } from "../types";
+import { ModeratorDashboardData, ModeratorActivity } from "../types";
 
 export class ModeratorDashboardService {
   private static readonly BASE_PATH = "/moderator/dashboard";
@@ -45,5 +45,15 @@ export class ModeratorDashboardService {
   > {
     const data = await apiClient.get<ModeratorDashboardData>(this.BASE_PATH);
     return data.recentMessages;
+  }
+
+  // Get moderator activity
+  static async getActivity(): Promise<ModeratorActivity[]> {
+    return apiClient.get<ModeratorActivity[]>("/moderator/activity");
+  }
+
+  // Get moderator stats (separate from dashboard stats)
+  static async getModeratorStats(): Promise<ModeratorDashboardData["stats"]> {
+    return apiClient.get<ModeratorDashboardData["stats"]>("/moderator/stats");
   }
 }

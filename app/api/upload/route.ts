@@ -103,14 +103,11 @@ export async function POST(request: NextRequest) {
     };
 
     // Race between upload and timeout
-    const result = await Promise.race([uploadPromise(), timeoutPromise]);
-    return result;
-  } catch (error) {
-    console.error("Error uploading file:", error);
-
-    // Handle specific error types
-    if (error instanceof Error) {
-      if (error.message === "Upload timeout") {
+    try {
+      const result = await Promise.race([uploadPromise(), timeoutPromise]);
+      return result as NextResponse;
+    } catch (error) {
+      if (error instanceof Error && error.message === "Upload timeout") {
         return NextResponse.json(
           {
             success: false,
@@ -119,7 +116,13 @@ export async function POST(request: NextRequest) {
           { status: 408 }, // Request Timeout
         );
       }
+      throw error; // Re-throw other errors to be handled by outer catch
+    }
+  } catch (error) {
+    console.error("Error uploading file:", error);
 
+    // Handle specific error types
+    if (error instanceof Error) {
       if (error.message.includes("File size")) {
         return NextResponse.json(
           {
@@ -143,4 +146,4 @@ export async function POST(request: NextRequest) {
 
 // Configure route segment for larger payloads
 export const runtime = "nodejs";
-export const maxDuration = process.env.NODE_ENV === "development" ? 300 : 120; // 5 minutes for dev, 2 minutes for prod
+export const maxDuration = 300; // 5 minutes max duration

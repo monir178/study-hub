@@ -105,13 +105,11 @@ export async function POST(request: NextRequest) {
     };
 
     // Race between upload and timeout
-    const result = await Promise.race([uploadPromise(), timeoutPromise]);
-    return result;
-  } catch (error) {
-    console.error("Profile upload error:", error);
-
-    if (error instanceof Error) {
-      if (error.message === "Upload timeout") {
+    try {
+      const result = await Promise.race([uploadPromise(), timeoutPromise]);
+      return result as NextResponse;
+    } catch (error) {
+      if (error instanceof Error && error.message === "Upload timeout") {
         return NextResponse.json(
           {
             success: false,
@@ -120,7 +118,12 @@ export async function POST(request: NextRequest) {
           { status: 408 }, // Request Timeout
         );
       }
+      throw error; // Re-throw other errors to be handled by outer catch
+    }
+  } catch (error) {
+    console.error("Profile upload error:", error);
 
+    if (error instanceof Error) {
       return NextResponse.json(
         {
           success: false,

@@ -96,5 +96,26 @@ export interface ModeratorDashboardData {
   recentMessages: RecentMessage[];
 }
 
+export interface ModeratorActivity {
+  id: string;
+  type:
+    | "USER_WARNED"
+    | "USER_BANNED"
+    | "USER_UNBANNED"
+    | "ROOM_MODERATED"
+    | "REPORT_RESOLVED";
+  description: string;
+  timestamp: string;
+  moderator: {
+    name: string | null;
+    email: string;
+  };
+  target?: {
+    type: "USER" | "ROOM" | "REPORT";
+    id: string;
+    name: string;
+  };
+}
+
 // Re-export User type for convenience
 export type { User } from "@/features/users/types";

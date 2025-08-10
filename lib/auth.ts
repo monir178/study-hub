@@ -152,14 +152,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
             // Update existing user's image and email verification if they don't have a custom uploaded one
             const shouldUpdateImage = existingUser.imageSource !== "UPLOAD";
-            const updateData: any = {};
+            const updateData: {
+              image?: string;
+              imageSource?: "GOOGLE" | "GITHUB";
+              name?: string;
+              emailVerified?: Date;
+            } = {};
 
             if (shouldUpdateImage && user.image) {
               const imageSource =
                 account.provider === "google" ? "GOOGLE" : "GITHUB";
               updateData.image = user.image;
               updateData.imageSource = imageSource;
-              updateData.name = user.name || existingUser.name;
+              updateData.name = user.name || existingUser.name || undefined;
             }
 
             // Set emailVerified if not already set (OAuth emails are pre-verified)

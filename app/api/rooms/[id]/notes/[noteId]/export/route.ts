@@ -117,11 +117,19 @@ function slateToMarkdown(
   nodes: Array<{
     type: string;
     children: Array<{
-      text: string;
+      text?: string;
+      type?: string;
       bold?: boolean;
       italic?: boolean;
       underline?: boolean;
       code?: boolean;
+      children?: Array<{
+        text: string;
+        bold?: boolean;
+        italic?: boolean;
+        underline?: boolean;
+        code?: boolean;
+      }>;
     }>;
   }>,
 ): string {
@@ -131,7 +139,7 @@ function slateToMarkdown(
         return (
           node.children
             .map((child) => {
-              let text = child.text;
+              let text = child.text || "";
               if (child.bold) text = `**${text}**`;
               if (child.italic) text = `*${text}*`;
               if (child.underline) text = `<u>${text}</u>`;
@@ -142,26 +150,37 @@ function slateToMarkdown(
         );
       } else if (node.type === "heading-one") {
         return (
-          "# " + node.children.map((child) => child.text).join("") + "\n\n"
+          "# " +
+          node.children.map((child) => child.text || "").join("") +
+          "\n\n"
         );
       } else if (node.type === "heading-two") {
         return (
-          "## " + node.children.map((child) => child.text).join("") + "\n\n"
+          "## " +
+          node.children.map((child) => child.text || "").join("") +
+          "\n\n"
         );
       } else if (node.type === "heading-three") {
         return (
-          "### " + node.children.map((child) => child.text).join("") + "\n\n"
+          "### " +
+          node.children.map((child) => child.text || "").join("") +
+          "\n\n"
         );
       } else if (node.type === "block-quote") {
         return (
-          "> " + node.children.map((child) => child.text).join("") + "\n\n"
+          "> " +
+          node.children.map((child) => child.text || "").join("") +
+          "\n\n"
         );
       } else if (node.type === "bulleted-list") {
         return (
           node.children
             .map(
               (item) =>
-                "- " + item.children.map((child) => child.text).join(""),
+                "- " +
+                (item.children?.map((child) => child.text || "").join("") ||
+                  item.text ||
+                  ""),
             )
             .join("\n") + "\n\n"
         );
@@ -171,7 +190,9 @@ function slateToMarkdown(
             .map(
               (item, _index) =>
                 `${_index + 1}. ` +
-                item.children.map((child) => child.text).join(""),
+                (item.children?.map((child) => child.text || "").join("") ||
+                  item.text ||
+                  ""),
             )
             .join("\n") + "\n\n"
         );
@@ -186,11 +207,19 @@ function slateToHTML(
   nodes: Array<{
     type: string;
     children: Array<{
-      text: string;
+      text?: string;
+      type?: string;
       bold?: boolean;
       italic?: boolean;
       underline?: boolean;
       code?: boolean;
+      children?: Array<{
+        text: string;
+        bold?: boolean;
+        italic?: boolean;
+        underline?: boolean;
+        code?: boolean;
+      }>;
     }>;
   }>,
 ): string {
@@ -199,7 +228,7 @@ function slateToHTML(
       if (node.type === "paragraph") {
         return `<p>${node.children
           .map((child) => {
-            let text = child.text;
+            let text = child.text || "";
             if (child.bold) text = `<strong>${text}</strong>`;
             if (child.italic) text = `<em>${text}</em>`;
             if (child.underline) text = `<u>${text}</u>`;
@@ -208,25 +237,25 @@ function slateToHTML(
           })
           .join("")}</p>`;
       } else if (node.type === "heading-one") {
-        return `<h1>${node.children.map((child) => child.text).join("")}</h1>`;
+        return `<h1>${node.children.map((child) => child.text || "").join("")}</h1>`;
       } else if (node.type === "heading-two") {
-        return `<h2>${node.children.map((child) => child.text).join("")}</h2>`;
+        return `<h2>${node.children.map((child) => child.text || "").join("")}</h2>`;
       } else if (node.type === "heading-three") {
-        return `<h3>${node.children.map((child) => child.text).join("")}</h3>`;
+        return `<h3>${node.children.map((child) => child.text || "").join("")}</h3>`;
       } else if (node.type === "block-quote") {
-        return `<blockquote>${node.children.map((child) => child.text).join("")}</blockquote>`;
+        return `<blockquote>${node.children.map((child) => child.text || "").join("")}</blockquote>`;
       } else if (node.type === "bulleted-list") {
         return `<ul>${node.children
           .map(
             (item) =>
-              `<li>${item.children.map((child) => child.text).join("")}</li>`,
+              `<li>${item.children?.map((child) => child.text || "").join("") || item.text || ""}</li>`,
           )
           .join("")}</ul>`;
       } else if (node.type === "numbered-list") {
         return `<ol>${node.children
           .map(
             (item) =>
-              `<li>${item.children.map((child) => child.text).join("")}</li>`,
+              `<li>${item.children?.map((child) => child.text || "").join("") || item.text || ""}</li>`,
           )
           .join("")}</ol>`;
       }

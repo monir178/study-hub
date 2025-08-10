@@ -115,7 +115,7 @@ export function MainLayout({ children, locale = "en" }: MainLayoutProps) {
   if (isPublicPage) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar key={`navbar-${locale}`} locale={locale} />
+        <Navbar key={`navbar-${locale}`} />
         <main className="pt-16">{children}</main>
       </div>
     );
@@ -181,7 +181,7 @@ export function MainLayout({ children, locale = "en" }: MainLayoutProps) {
   // Fallback for unauthenticated users on protected pages
   return (
     <div className="min-h-screen bg-background">
-      <Navbar key={`navbar-fallback-${locale}`} locale={locale} />
+      <Navbar key={`navbar-fallback-${locale}`} />
       <main className="pt-16">{children}</main>
     </div>
   );

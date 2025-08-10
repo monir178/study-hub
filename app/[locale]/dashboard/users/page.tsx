@@ -5,13 +5,14 @@ import { UserManagement } from "@/features/admin/dashboard/components/user-manag
 export default async function UsersPage({
   params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   const session = await auth();
 
   // Check if user is authenticated and has proper role
   if (!session || !["ADMIN", "MODERATOR"].includes(session.user.role)) {
-    redirect({ href: "/dashboard", locale: params.locale });
+    redirect({ href: "/dashboard", locale });
   }
 
   return <UserManagement />;

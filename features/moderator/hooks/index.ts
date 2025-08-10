@@ -6,11 +6,12 @@ export {
   useRecentSessions,
 } from "./useModeratorDashboard";
 export { useModeratorStats } from "./useModeratorStats";
-export {
-  useReports,
-  useReport,
-  useCreateReport,
-  useUpdateReport,
-  useDeleteReport,
-} from "./useReports";
+// TODO: Implement report hooks when Report model is added to Prisma schema
+// export {
+//   useReports,
+//   useReport,
+//   useCreateReport,
+//   useUpdateReport,
+//   useDeleteReport,
+// } from "./useReports";
 export { useModeratorActivity } from "./useModeratorActivity";

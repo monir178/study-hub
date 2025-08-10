@@ -64,7 +64,8 @@ export function FloatingStudyIcon({
       >
         <div className="relative p-3 rounded-2xl bg-white/10 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg">
           <Icon
-            size={size}
+            width={size}
+            height={size}
             className="text-primary/80 dark:text-primary/90 drop-shadow-sm"
           />
           <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-transparent dark:from-white/10 dark:to-transparent" />
