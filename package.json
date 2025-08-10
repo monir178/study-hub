@@ -26,7 +26,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
     "@hookform/resolvers": "^5.2.0",
-    "@prisma/client": "^6.12.0",
+    "@prisma/client": "^6.13.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -51,7 +51,6 @@
     "@tanstack/react-query": "^5.83.0",
     "@tanstack/react-query-devtools": "^5.83.0",
     "@tanstack/react-table": "^8.21.3",
-    "@types/bcryptjs": "^3.0.0",
     "@types/nodemailer": "^6.4.17",
     "@types/react-select-country-list": "^2.2.3",
     "axios": "^1.11.0",
@@ -76,7 +75,7 @@
     "next-themes": "^0.4.6",
     "nodemailer": "^7.0.5",
     "ogl": "^1.0.11",
-    "prisma": "^6.12.0",
+    "prisma": "^6.13.0",
     "pusher": "^5.2.0",
     "pusher-js": "^8.4.0",
     "react": "19.1.0",
@@ -98,7 +97,7 @@
     "slate-react": "^0.117.4",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
-    "zod": "^4.0.10"
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -117,7 +116,6 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/storybook__react": "^5.2.1",
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
     "eslint-config-prettier": "^10.1.8",

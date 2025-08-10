@@ -1,21 +1,21 @@
 import PusherClient from "pusher-js";
 import PusherServer from "pusher";
 
-// Initialize Pusher client (for client-side)
+// Initialize Pusher client (for client-side) with fallbacks for build time
 export const pusherClient = new PusherClient(
-  process.env.NEXT_PUBLIC_PUSHER_KEY!,
+  process.env.NEXT_PUBLIC_PUSHER_KEY || "dummy-key",
   {
-    cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+    cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "us2",
     forceTLS: true,
   },
 );
 
-// Initialize Pusher server (for server-side)
+// Initialize Pusher server (for server-side) with fallbacks for build time
 export const pusherServer = new PusherServer({
-  appId: process.env.PUSHER_APP_ID!,
-  key: process.env.NEXT_PUBLIC_PUSHER_KEY!,
-  secret: process.env.PUSHER_SECRET!,
-  cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+  appId: process.env.PUSHER_APP_ID || "dummy-app-id",
+  key: process.env.NEXT_PUBLIC_PUSHER_KEY || "dummy-key",
+  secret: process.env.PUSHER_SECRET || "dummy-secret",
+  cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "us2",
   useTLS: true,
 });
 

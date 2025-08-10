@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+.pnpm/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Lock files (auto-generated, shouldn't be formatted)
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Generated files
+.vercel/
+.env.local
+.env.production.local
+
+# Coverage
+coverage/
+
+# Storybook
+storybook-static/
