@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -29,6 +29,7 @@ export function UserNotesList({
   onNoteSelect,
   onLoadMore,
 }: UserNotesListProps) {
+  const t = useTranslations("notes");
   const [isLoadMoreLoading, setIsLoadMoreLoading] = useState(false);
 
   // Reset local loading state when global loading finishes
@@ -51,12 +52,13 @@ export function UserNotesList({
         <CardHeader className="flex-shrink-0">
           <CardTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
-            Public Notes
-            {pagination && (
+            {t("userNotes.title")}
+            {/* {pagination && (
               <Badge variant="secondary" className="ml-2">
-                {pagination.totalCount} total
+                {pagination.totalCount}{" "}
+                {t("common.total", { defaultValue: "total" })}
               </Badge>
-            )}
+            )} */}
           </CardTitle>
         </CardHeader>
 
@@ -65,13 +67,17 @@ export function UserNotesList({
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center py-12">
                 <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No notes found</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  {t("userNotes.noNotes")}
+                </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Join some study rooms to start creating notes
+                  {t("userNotes.createFirstNote")}
                 </p>
                 <Button asChild>
                   <Link href="/dashboard/rooms">
-                    Browse Study Rooms
+                    {t("common.browseRooms", {
+                      defaultValue: "Browse Study Rooms",
+                    })}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
@@ -106,10 +112,10 @@ export function UserNotesList({
                         {showLoadMoreLoading ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Loading...
+                            {t("loading")}
                           </>
                         ) : (
-                          "Load More Notes"
+                          t("loadMore")
                         )}
                       </Button>
                     </div>

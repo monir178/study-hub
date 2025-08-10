@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -20,17 +21,17 @@ interface RecentUsersProps {
 }
 
 export function RecentUsers({ users, loading }: RecentUsersProps) {
+  const t = useTranslations("moderator.dashboard.recentUsers");
+
   if (loading) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" />
-            Recent Users
+            {t("title")}
           </CardTitle>
-          <CardDescription>
-            Latest users who joined the platform
-          </CardDescription>
+          <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -64,16 +65,16 @@ export function RecentUsers({ users, loading }: RecentUsersProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="w-5 h-5" />
-          Recent Users
+          {t("title")}
         </CardTitle>
-        <CardDescription>Latest users who joined the platform</CardDescription>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
           {users.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No recent users</p>
+              <p className="text-sm">{t("noUsers")}</p>
             </div>
           ) : (
             users.map((user) => (
@@ -86,8 +87,8 @@ export function RecentUsers({ users, loading }: RecentUsersProps) {
                     {user.name || "Anonymous User"}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {user.email} • Joined{" "}
-                    {formatDistanceToNow(new Date(user.createdAt))} ago
+                    {user.email} • {t("joined")}{" "}
+                    {formatDistanceToNow(new Date(user.createdAt))} {t("ago")}
                   </p>
                 </div>
                 <Badge variant={getRoleColor(user.role)}>{user.role}</Badge>
@@ -98,7 +99,7 @@ export function RecentUsers({ users, loading }: RecentUsersProps) {
         {users.length > 0 && (
           <Link href="/dashboard/users">
             <Button variant="outline" className="w-full mt-4" size="sm">
-              View All Users
+              {t("viewAll")}
             </Button>
           </Link>
         )}

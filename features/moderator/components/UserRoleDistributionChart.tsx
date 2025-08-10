@@ -100,7 +100,7 @@ export function UserRoleDistributionChart() {
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: "rgba(67, 56, 202, 1)" }}
               />
-              <span className="text-sm font-medium">Admins</span>
+              <span className="text-sm font-medium">{t("roles.admins")}</span>
               <span className="text-sm font-bold text-foreground">
                 {data.stats.users.byRole.admins}
               </span>
@@ -110,7 +110,9 @@ export function UserRoleDistributionChart() {
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: "rgba(79, 70, 229, 0.8)" }}
               />
-              <span className="text-sm font-medium">Moderators</span>
+              <span className="text-sm font-medium">
+                {t("roles.moderators")}
+              </span>
               <span className="text-sm font-bold text-foreground">
                 {data.stats.users.byRole.moderators}
               </span>
@@ -120,7 +122,7 @@ export function UserRoleDistributionChart() {
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: "rgba(99, 102, 241, 0.6)" }}
               />
-              <span className="text-sm font-medium">Users</span>
+              <span className="text-sm font-medium">{t("roles.users")}</span>
               <span className="text-sm font-bold text-foreground">
                 {data.stats.users.byRole.users}
               </span>
@@ -152,7 +154,7 @@ export function UserRoleDistributionChart() {
           <div className="flex items-center gap-2 text-sm">
             <TrendingUp className="h-4 w-4 text-emerald-500" />
             <span className="font-medium">
-              Trending up by {growthPercentage}% this week
+              {t("trendingUp", { percentage: growthPercentage })}
             </span>
           </div>
         </div>

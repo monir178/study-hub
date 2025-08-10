@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -35,6 +36,8 @@ export function NotesToolbar({
   onExportMarkdown,
   onExportPDF,
 }: NotesToolbarProps) {
+  const t = useTranslations("notes");
+
   return (
     <div className="flex items-center gap-1 p-2 border-b mb-2 flex-wrap">
       <TooltipProvider>
@@ -49,7 +52,7 @@ export function NotesToolbar({
               <Bold className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Bold</TooltipContent>
+          <TooltipContent>{t("bold")}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -63,7 +66,7 @@ export function NotesToolbar({
               <Italic className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Italic</TooltipContent>
+          <TooltipContent>{t("italic")}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -77,7 +80,7 @@ export function NotesToolbar({
               <Underline className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Underline</TooltipContent>
+          <TooltipContent>{t("underline")}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -91,7 +94,7 @@ export function NotesToolbar({
               <Code className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Code</TooltipContent>
+          <TooltipContent>{t("code")}</TooltipContent>
         </Tooltip>
 
         <Separator orientation="vertical" className="h-6" />
@@ -107,7 +110,7 @@ export function NotesToolbar({
               <Heading1 className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Heading 1</TooltipContent>
+          <TooltipContent>{t("heading1")}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -121,7 +124,7 @@ export function NotesToolbar({
               <Heading2 className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Heading 2</TooltipContent>
+          <TooltipContent>{t("heading2")}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -135,7 +138,7 @@ export function NotesToolbar({
               <Heading3 className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Heading 3</TooltipContent>
+          <TooltipContent>{t("heading3")}</TooltipContent>
         </Tooltip>
 
         <Separator orientation="vertical" className="h-6" />
@@ -151,7 +154,7 @@ export function NotesToolbar({
               <List className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Bullet List</TooltipContent>
+          <TooltipContent>{t("bulletList")}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -165,7 +168,7 @@ export function NotesToolbar({
               <ListOrdered className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Numbered List</TooltipContent>
+          <TooltipContent>{t("numberedList")}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -179,14 +182,14 @@ export function NotesToolbar({
               <Quote className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Quote</TooltipContent>
+          <TooltipContent>{t("blockquote")}</TooltipContent>
         </Tooltip>
 
         {!permissions.canEdit && (
           <div className="ml-auto">
             <Badge variant="secondary" className="flex items-center gap-1">
               <Lock className="w-3 h-3" />
-              Read Only
+              {t("common.readOnly", { defaultValue: "Read Only" })}
             </Badge>
           </div>
         )}
@@ -199,7 +202,7 @@ export function NotesToolbar({
                   <FileText className="w-4 h-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Export as Markdown</TooltipContent>
+              <TooltipContent>{t("exportMarkdown")}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -208,7 +211,7 @@ export function NotesToolbar({
                   <FileDown className="w-4 h-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Export as PDF</TooltipContent>
+              <TooltipContent>{t("exportPDF")}</TooltipContent>
             </Tooltip>
           </div>
         )}

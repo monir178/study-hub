@@ -25,7 +25,6 @@ import {
   Users,
   Clock,
   MessageSquare,
-  Settings,
   LogOut,
   User,
   Shield,
@@ -79,7 +78,6 @@ export default function Navbar({
   const t = useTranslations("navbar");
   const tAuth = useTranslations("auth");
   const tProfile = useTranslations("profile");
-  const tSettings = useTranslations("settings");
 
   // Create nav items with translations
   const landingNavItems: NavItem[] = [
@@ -209,17 +207,12 @@ export default function Navbar({
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/profile">
+                    <Link href="/dashboard/profile">
                       <User className="mr-2 h-4 w-4" />
                       <span>{tProfile("title")}</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings">
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>{tSettings("title")}</span>
-                    </Link>
-                  </DropdownMenuItem>
+
                   {user?.role === "ADMIN" && (
                     <DropdownMenuItem asChild>
                       <Link href="/admin">
@@ -394,16 +387,15 @@ export default function Navbar({
                           {tProfile("title")}
                         </Link>
                       </Button>
-                      <Button
+                      {/* <Button
                         variant="ghost"
                         className="w-full justify-start"
-                        asChild
-                      >
+                        asChild>
                         <Link href="/settings" onClick={closeMenu}>
                           <Settings className="h-4 w-4 mr-2" />
                           {tSettings("title")}
                         </Link>
-                      </Button>
+                      </Button> */}
                       {user?.role === "ADMIN" && (
                         <Button
                           variant="ghost"

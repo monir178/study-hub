@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { useUserNotes } from "../hooks/useUserNotes";
 import { UserNote } from "../types";
 import { useRoomMembers } from "@/features/rooms/hooks/useRoomMembers";
@@ -20,6 +21,7 @@ export function UserNotesContainer({
   initialPage = 1,
   limit = 10,
 }: UserNotesContainerProps) {
+  const t = useTranslations("notes");
   const router = useRouter();
   const { user: currentUser } = useAuth();
   const [page, setPage] = useState(initialPage);
@@ -64,7 +66,7 @@ export function UserNotesContainer({
   }, []);
 
   const handleTitleCancel = useCallback(() => {
-    setTitleValue(selectedNote?.title || "Untitled Note");
+    setTitleValue(selectedNote?.title || t("untitled"));
     setIsEditingTitle(false);
   }, [selectedNote?.title]);
 
@@ -139,10 +141,12 @@ export function UserNotesContainer({
       <div className="space-y-6">
         <div className="text-center py-12">
           <h3 className="text-lg font-semibold text-destructive">
-            Failed to load notes
+            {t("userNotes.failedToLoad")}
           </h3>
           <p className="text-sm text-muted-foreground mt-2">
-            Please try refreshing the page
+            {t("common.tryRefresh", {
+              defaultValue: "Please try refreshing the page",
+            })}
           </p>
         </div>
       </div>

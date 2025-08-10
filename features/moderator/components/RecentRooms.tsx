@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -20,17 +21,17 @@ interface RecentRoomsProps {
 }
 
 export function RecentRooms({ rooms, loading }: RecentRoomsProps) {
+  const t = useTranslations("moderator.dashboard.recentRooms");
+
   if (loading) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Home className="w-5 h-5" />
-            Recent Rooms
+            {t("title")}
           </CardTitle>
-          <CardDescription>
-            Latest study rooms created on the platform
-          </CardDescription>
+          <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -51,18 +52,16 @@ export function RecentRooms({ rooms, loading }: RecentRoomsProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Home className="w-5 h-5" />
-          Recent Rooms
+          {t("title")}
         </CardTitle>
-        <CardDescription>
-          Latest study rooms created on the platform
-        </CardDescription>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
           {rooms.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Home className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No recent rooms</p>
+              <p className="text-sm">{t("noRooms")}</p>
             </div>
           ) : (
             rooms.map((room) => (
@@ -80,12 +79,14 @@ export function RecentRooms({ rooms, loading }: RecentRoomsProps) {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    By {room.creator.name || room.creator.email} •{" "}
-                    {formatDistanceToNow(new Date(room.createdAt))} ago
+                    {t("by")} {room.creator.name || room.creator.email} •{" "}
+                    {formatDistanceToNow(new Date(room.createdAt))} {t("ago")}
                   </p>
                 </div>
                 <div className="text-right">
-                  <Badge variant="outline">{room._count.members} members</Badge>
+                  <Badge variant="outline">
+                    {room._count.members} {t("members")}
+                  </Badge>
                 </div>
               </div>
             ))
@@ -94,7 +95,7 @@ export function RecentRooms({ rooms, loading }: RecentRoomsProps) {
         {rooms.length > 0 && (
           <Link href="/dashboard/rooms">
             <Button variant="outline" className="w-full mt-4" size="sm">
-              View All Rooms
+              {t("viewAll")}
             </Button>
           </Link>
         )}

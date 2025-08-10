@@ -1,17 +1,20 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FileText } from "lucide-react";
 
 export function UserNotesListSkeleton() {
+  const t = useTranslations("notes");
+
   return (
     <div className="w-1/2 border-r">
       <Card className="h-full flex flex-col">
         <CardHeader className="flex-shrink-0">
           <CardTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
-            My Notes
+            {t("myNotes")}
             <Skeleton className="h-5 w-16 ml-2" />
           </CardTitle>
         </CardHeader>

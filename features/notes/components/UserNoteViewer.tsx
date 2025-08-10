@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { FileText, Download, FileDown, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
@@ -45,6 +46,8 @@ export function UserNoteViewer({
   renderSlateContent,
   slateToMarkdown,
 }: UserNoteViewerProps) {
+  const t = useTranslations("notes");
+
   const handleExportMarkdown = () => {
     if (selectedNote) {
       // Convert Slate content to markdown with formatting
@@ -139,7 +142,11 @@ export function UserNoteViewer({
           if (document.body.contains(tempDiv)) {
             document.body.removeChild(tempDiv);
           }
-          alert("Failed to generate PDF. Please try again.");
+          alert(
+            t("common.failedToGeneratePDF", {
+              defaultValue: "Failed to generate PDF. Please try again.",
+            }),
+          );
         });
     }
   };
@@ -154,9 +161,13 @@ export function UserNoteViewer({
         <div className="h-full flex items-center justify-center">
           <div className="text-center">
             <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Select a Note</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              {t("userNotes.selectNote")}
+            </h3>
             <p className="text-sm text-muted-foreground">
-              Choose a note from the list to view its content
+              {t("userNotes.selectNote", {
+                defaultValue: "Choose a note from the list to view its content",
+              })}
             </p>
           </div>
         </div>
@@ -173,17 +184,17 @@ export function UserNoteViewer({
             <DropdownMenuTrigger asChild>
               <Button size="sm">
                 <Download className="w-4 h-4 mr-2" />
-                Download
+                {t("export")}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleExportPDF}>
                 <FileDown className="w-4 h-4 mr-2" />
-                Download as PDF
+                {t("exportPDF")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleExportMarkdown}>
                 <FileText className="w-4 h-4 mr-2" />
-                Download as Markdown
+                {t("exportMarkdown")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -220,7 +231,9 @@ export function UserNoteViewer({
               dangerouslySetInnerHTML={{
                 __html:
                   renderSlateContent(selectedNote.content) ||
-                  "No content available",
+                  t("common.noContentAvailable", {
+                    defaultValue: "No content available",
+                  }),
               }}
             />
           </div>
@@ -235,10 +248,10 @@ export function UserNoteViewer({
           >
             <ExternalLink className="w-4 h-4 mr-2" />
             {isJoining
-              ? "Joining..."
+              ? t("joining")
               : isUserMemberOfRoom
-                ? `Enter Room: ${selectedNote.room.name}`
-                : `Join Room: ${selectedNote.room.name}`}
+                ? `${t("viewRoom")}: ${selectedNote.room.name}`
+                : `${t("joinRoom")}: ${selectedNote.room.name}`}
           </Button>
         </div>
       </div>

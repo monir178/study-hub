@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -25,17 +26,17 @@ interface RecentSessionsProps {
 }
 
 export function RecentSessions({ sessions, loading }: RecentSessionsProps) {
+  const t = useTranslations("moderator.dashboard.recentSessions");
+
   if (loading) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5" />
-            Recent Sessions
+            {t("title")}
           </CardTitle>
-          <CardDescription>
-            Latest study sessions on the platform
-          </CardDescription>
+          <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -95,16 +96,16 @@ export function RecentSessions({ sessions, loading }: RecentSessionsProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calendar className="w-5 h-5" />
-          Recent Sessions
+          {t("title")}
         </CardTitle>
-        <CardDescription>Latest study sessions on the platform</CardDescription>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
           {sessions.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No recent sessions</p>
+              <p className="text-sm">{t("noSessions")}</p>
             </div>
           ) : (
             sessions.map((session) => (
@@ -115,14 +116,15 @@ export function RecentSessions({ sessions, loading }: RecentSessionsProps) {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-sm font-medium">
-                      {session.type} Session
+                      {session.type} {t("session")}
                     </p>
                     {getStatusIcon(session.status)}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {session.user.name || session.user.email} in{" "}
+                    {session.user.name || session.user.email} {t("in")}{" "}
                     {session.room.name} •{" "}
-                    {formatDistanceToNow(new Date(session.startedAt))} ago
+                    {formatDistanceToNow(new Date(session.startedAt))}{" "}
+                    {t("ago")}
                   </p>
                 </div>
                 <div className="text-right space-y-1">
@@ -137,6 +139,13 @@ export function RecentSessions({ sessions, loading }: RecentSessionsProps) {
             ))
           )}
         </div>
+        {sessions.length > 0 && (
+          <div className="mt-4">
+            <button className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors">
+              {t("viewAll")}
+            </button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

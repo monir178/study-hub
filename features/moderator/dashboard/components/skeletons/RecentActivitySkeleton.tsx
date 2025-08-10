@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -7,17 +8,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Activity } from "lucide-react";
+import { Calendar } from "lucide-react";
 
 export function RecentActivitySkeleton() {
+  const t = useTranslations("moderator.dashboard.recentSessions");
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Activity className="w-5 h-5" />
-          Recent Activity
+          <Calendar className="w-5 h-5" />
+          {t("title")}
         </CardTitle>
-        <CardDescription>Your recent moderation activities</CardDescription>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">

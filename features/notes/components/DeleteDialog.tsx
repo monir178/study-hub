@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +25,8 @@ export function DeleteDialog({
   onOpenChange,
   onDelete,
 }: DeleteDialogProps) {
+  const t = useTranslations("notes");
+
   return (
     <AlertDialog
       open={state.isOpen}
@@ -35,15 +38,14 @@ export function DeleteDialog({
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Note</AlertDialogTitle>
+          <AlertDialogTitle>{t("deleteConfirmTitle")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete "{state.noteTitle}"? This action
-            cannot be undone.
+            {t("deleteConfirmDescription", { noteTitle: state.noteTitle })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={state.isDeleting}>
-            Cancel
+            {t("cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onDelete}
@@ -53,10 +55,10 @@ export function DeleteDialog({
             {state.isDeleting ? (
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                Deleting...
+                {t("deleting")}
               </div>
             ) : (
-              "Delete"
+              t("delete")
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

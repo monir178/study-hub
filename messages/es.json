@@ -21,7 +21,13 @@
     "selectLanguage": "Seleccionar Idioma",
     "email": "Correo Electrónico",
     "refresh": "Actualizar",
-    "loadMore": "Cargar Más"
+    "loadMore": "Cargar Más",
+    "readOnly": "Solo Lectura",
+    "total": "total",
+    "browseRooms": "Explorar Salas de Estudio",
+    "tryRefresh": "Por favor, intenta actualizar la página",
+    "noContentAvailable": "No hay contenido disponible",
+    "failedToGeneratePDF": "Error al generar PDF. Por favor, inténtalo de nuevo."
   },
   "auth": {
     "signIn": "Iniciar Sesión",
@@ -311,7 +317,55 @@
     "saveNote": "Guardar Nota",
     "deleteNote": "Eliminar Nota",
     "noteTitle": "Título de la Nota",
-    "noteContent": "Contenido de la Nota"
+    "noteContent": "Contenido de la Nota",
+    "myNotes": "Mis Notas",
+    "newNote": "Nueva Nota",
+    "back": "Atrás",
+    "searchNotes": "Buscar notas...",
+    "noNotesFound": "No se encontraron notas",
+    "noNotesYet": "Aún no hay notas",
+    "tryAdjustingSearch": "Intenta ajustar tus términos de búsqueda",
+    "createFirstNote": "Crea la primera nota para esta sala",
+    "noNotesAvailable": "No hay notas disponibles en esta sala",
+    "needLoginToCreate": "Necesitas iniciar sesión para crear notas",
+    "onlyMembersCanCreate": "Solo los miembros de la sala pueden crear notas en salas privadas",
+    "deleting": "Eliminando...",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "deleteConfirmTitle": "Eliminar Nota",
+    "deleteConfirmDescription": "¿Estás seguro de que quieres eliminar \"{noteTitle}\"? Esta acción no se puede deshacer.",
+    "saving": "Guardando...",
+    "save": "Guardar",
+    "export": "Exportar",
+    "exportMarkdown": "Exportar como Markdown",
+    "exportPDF": "Exportar como PDF",
+    "formatting": "Formato",
+    "bold": "Negrita",
+    "italic": "Cursiva",
+    "underline": "Subrayado",
+    "strikethrough": "Tachado",
+    "code": "Código",
+    "heading1": "Encabezado 1",
+    "heading2": "Encabezado 2",
+    "heading3": "Encabezado 3",
+    "bulletList": "Lista con Viñetas",
+    "numberedList": "Lista Numerada",
+    "blockquote": "Cita",
+    "codeBlock": "Bloque de Código",
+    "loadMore": "Cargar Más",
+    "joinRoom": "Unirse a la Sala",
+    "viewRoom": "Ver Sala",
+    "joining": "Uniéndose...",
+    "loading": "Cargando...",
+    "userNotes": {
+      "title": "Notas publicas",
+      "description": "Todas tus notas de salas de estudio públicas",
+      "noNotes": "No se encontraron notas",
+      "createFirstNote": "Crea tu primera nota en una sala de estudio",
+      "selectNote": "Selecciona una nota para ver",
+      "loadingNotes": "Cargando tus notas...",
+      "failedToLoad": "Error al cargar las notas"
+    }
   },
   "profile": {
     "title": "Perfil",
@@ -497,7 +551,13 @@
     "totalUsers": "Usuarios Totales",
     "sessionActivity": "Actividad de Sesiones",
     "last30Days": "Últimos 30 días",
-    "sessionTrendsLast30Days": "Tendencias de sesiones en los últimos 30 días"
+    "sessionTrendsLast30Days": "Tendencias de sesiones en los últimos 30 días",
+    "roles": {
+      "admins": "Administradores",
+      "moderators": "Moderadores",
+      "users": "Usuarios"
+    },
+    "trendingUp": "Tendencia al alza del {percentage}% esta semana"
   },
 
   "navbar": {

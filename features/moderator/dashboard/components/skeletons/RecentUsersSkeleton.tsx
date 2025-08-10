@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -10,14 +11,16 @@ import {
 import { Users } from "lucide-react";
 
 export function RecentUsersSkeleton() {
+  const t = useTranslations("moderator.dashboard.recentUsers");
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="w-5 h-5" />
-          Recent Users
+          {t("title")}
         </CardTitle>
-        <CardDescription>Latest users who joined the platform</CardDescription>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
