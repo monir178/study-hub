@@ -474,9 +474,9 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
             {/* Settings Button */}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="absolute bottom-0 right-0 w-6 h-6 bg-background border rounded-full shadow-md flex items-center justify-center hover:bg-muted/50 transition-colors opacity-0 group-hover:opacity-100 settings-button"
+              className="absolute bottom-1 right-1 w-7 h-7 bg-primary text-primary-foreground rounded-full shadow-md flex items-center justify-center hover:bg-primary/90 transition-colors border border-primary/50 settings-button"
             >
-              <Settings className="w-3 h-3" />
+              <Settings className="w-[1rem] h-[1rem]" />
             </button>
           </div>
         </div>
