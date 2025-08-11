@@ -35,15 +35,13 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const search = searchParams.get("search") || "";
     const myRooms = searchParams.get("myRooms") === "true";
+    const joinedRooms = searchParams.get("joinedRooms") === "true";
 
     const skip = (page - 1) * limit;
 
     const where = myRooms
       ? {
           creatorId: session.user.id, // Only rooms created by the current user
-        }
-      : {
-          isPublic: true,
           ...(search && {
             OR: [
               { name: { contains: search, mode: "insensitive" as const } },
@@ -52,7 +50,37 @@ export async function GET(request: NextRequest) {
               },
             ],
           }),
-        };
+        }
+      : joinedRooms
+        ? {
+            // Rooms where the current user is a member (public or private)
+            members: { some: { userId: session.user.id } },
+            ...(search && {
+              OR: [
+                { name: { contains: search, mode: "insensitive" as const } },
+                {
+                  description: {
+                    contains: search,
+                    mode: "insensitive" as const,
+                  },
+                },
+              ],
+            }),
+          }
+        : {
+            isPublic: true,
+            ...(search && {
+              OR: [
+                { name: { contains: search, mode: "insensitive" as const } },
+                {
+                  description: {
+                    contains: search,
+                    mode: "insensitive" as const,
+                  },
+                },
+              ],
+            }),
+          };
 
     const [rooms, total] = await Promise.all([
       prisma.studyRoom.findMany({

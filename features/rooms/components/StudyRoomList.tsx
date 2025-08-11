@@ -16,9 +16,11 @@ import {
   Users,
   Globe,
   AlertCircle,
+  Lock,
 } from "lucide-react";
 import { StudyRoomCard } from "./StudyRoomCard";
 import { CreateRoomForm } from "./CreateRoomForm";
+import { JoinPrivateRoomDialog } from "./JoinPrivateRoomDialog";
 import { useRooms, useJoinRoom, useLeaveRoom } from "../hooks/useRooms";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 
@@ -31,6 +33,7 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
   const tCommon = useTranslations("common");
   const [search, setSearch] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showJoinPrivateDialog, setShowJoinPrivateDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("public");
   const [page, setPage] = useState(1);
   const searchParams = useSearchParams();
@@ -56,6 +59,7 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
     limit: 12,
     search: debouncedSearch,
     myRooms: activeTab === "my-rooms",
+    joinedRooms: activeTab === "joined",
   });
 
   const joinRoom = useJoinRoom();
@@ -112,10 +116,19 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
           <h2 className="text-2xl font-bold">{t("title")}</h2>
           <p className="text-muted-foreground">{t("subtitle")}</p>
         </div>
-        <Button onClick={() => setShowCreateForm(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          {t("createRoom")}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowJoinPrivateDialog(true)}
+          >
+            <Lock className="w-4 h-4 mr-2" />
+            {t("joinPrivateRoom")}
+          </Button>
+          <Button onClick={() => setShowCreateForm(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            {t("createRoom")}
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -126,7 +139,7 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
             placeholder={t("searchRooms")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
+            className="pl-10 max-w-lg"
           />
         </div>
         <Button
@@ -147,6 +160,10 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
           <TabsTrigger value="public">
             <Globe className="w-4 h-4 mr-2" />
             {t("publicRooms")}
+          </TabsTrigger>
+          <TabsTrigger value="joined">
+            <Users className="w-4 h-4 mr-2" />
+            {t("joinedRooms")}
           </TabsTrigger>
           <TabsTrigger value="my-rooms">
             <Users className="w-4 h-4 mr-2" />
@@ -216,10 +233,19 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
                     ? t("tryAdjustingSearch")
                     : t("beFirstToCreate")}
                 </p>
-                <Button onClick={() => setShowCreateForm(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t("createFirstRoomShort")}
-                </Button>
+                <div className="flex gap-2 justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowJoinPrivateDialog(true)}
+                  >
+                    <Lock className="w-4 h-4 mr-2" />
+                    {t("joinPrivateRoom")}
+                  </Button>
+                  <Button onClick={() => setShowCreateForm(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    {t("createFirstRoomShort")}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -256,6 +282,51 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
           )}
         </TabsContent>
 
+        <TabsContent value="joined" className="space-y-4">
+          {/* Joined Rooms */}
+          {!isLoading && !error && rooms.length === 0 && (
+            <Card>
+              <CardContent className="text-center py-12">
+                <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-medium mb-2">{t("noRoomsYet")}</h3>
+                <p className="text-muted-foreground mb-4">
+                  {t("joinOrCreateToSee", {
+                    default: "Join or create a room to see it here.",
+                  })}
+                </p>
+                <div className="flex gap-2 justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowJoinPrivateDialog(true)}
+                  >
+                    <Lock className="w-4 h-4 mr-2" />
+                    {t("joinPrivateRoom")}
+                  </Button>
+                  <Button onClick={() => setShowCreateForm(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    {t("createRoom")}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {!isLoading && !error && rooms.length > 0 && (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {rooms.map((room) => (
+                <StudyRoomCard
+                  key={room.id}
+                  room={room}
+                  onJoin={handleJoinRoom}
+                  onLeave={handleLeaveRoom}
+                  onView={onRoomSelect}
+                  loading={joinRoom.isPending || leaveRoom.isPending}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
         <TabsContent value="my-rooms" className="space-y-4">
           {/* My Rooms Content - Similar structure but filtered for user's rooms */}
           {!isLoading && !error && rooms.length === 0 && (
@@ -266,10 +337,19 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
                 <p className="text-muted-foreground mb-4">
                   {t("createOrJoinToSee")}
                 </p>
-                <Button onClick={() => setShowCreateForm(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t("createRoom")}
-                </Button>
+                <div className="flex gap-2 justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowJoinPrivateDialog(true)}
+                  >
+                    <Lock className="w-4 h-4 mr-2" />
+                    {t("joinPrivateRoom")}
+                  </Button>
+                  <Button onClick={() => setShowCreateForm(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    {t("createRoom")}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -290,6 +370,12 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Join Private Room Dialog */}
+      <JoinPrivateRoomDialog
+        isOpen={showJoinPrivateDialog}
+        onOpenChange={setShowJoinPrivateDialog}
+      />
     </div>
   );
 }

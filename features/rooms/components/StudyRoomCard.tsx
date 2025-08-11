@@ -42,11 +42,18 @@ import {
   MoreVertical,
   Trash2,
   // Edit,
+  Copy,
+  Check,
 } from "lucide-react";
 import { StudyRoom, useDeleteRoom } from "../hooks/useRooms";
 // import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Progress } from "@/components/ui/progress";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface StudyRoomCardProps {
   room: StudyRoom;
@@ -79,6 +86,7 @@ export function StudyRoomCard({
   });
   const [isJoining, setIsJoining] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -230,6 +238,23 @@ export function StudyRoomCard({
 
   const deletePermission = canDeleteRoom();
 
+  const truncateId = (id: string) => {
+    if (!id) return "";
+    const halfLength = Math.ceil(id.length / 2);
+    return `${id.slice(0, halfLength)}.....`;
+  };
+
+  const handleCopyId = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(room.id);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // no-op
+    }
+  };
+
   return (
     <Card className="hover:shadow-md transition-shadow cursor-pointer group">
       <CardHeader className="pb-3">
@@ -240,14 +265,46 @@ export function StudyRoomCard({
                 {room.name}
               </CardTitle>
               {room.isPublic ? (
-                <Globe className="w-4 h-4 text-green-600" />
+                <div title="Public Room">
+                  <Globe className="w-4 h-4 text-green-600" />
+                </div>
               ) : (
-                <Lock className="w-4 h-4 text-orange-600" />
+                <div title="Private Room">
+                  <Lock className="w-4 h-4 text-orange-600" />
+                </div>
               )}
             </div>
             <CardDescription className="line-clamp-2">
               {room.description || tRooms("roomOverview.noDescription")}
+              {!room.isPublic && (
+                <span className="block text-xs text-orange-600 mt-1">
+                  🔒 {t("privateRoom")} - {t("passwordRequired")}
+                </span>
+              )}
             </CardDescription>
+            {/* Room ID with copy */}
+            <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground font-mono">
+              <span>{truncateId(room.id)}</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 p-0"
+                    onClick={handleCopyId}
+                  >
+                    {copied ? (
+                      <Check className="w-3 h-3 text-green-600" />
+                    ) : (
+                      <Copy className="w-3 h-3" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent sideOffset={6}>
+                  {copied ? "Copied" : "Copy room ID"}
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {room.userRole && (

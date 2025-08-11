@@ -31,6 +31,8 @@ export async function POST(
     const body = await request.json();
     const { password } = joinRoomSchema.parse(body);
 
+    // For private rooms, require a password value
+
     const room = await prisma.studyRoom.findUnique({
       where: { id: params.id },
       include: {
@@ -81,14 +83,25 @@ export async function POST(
     }
 
     // Check password if room is private
-    if (!room.isPublic && room.password && room.password !== password) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid password",
-        } satisfies ApiError,
-        { status: 401 },
-      );
+    if (!room.isPublic && room.password) {
+      if (!password || password.trim().length === 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Password is required",
+          } satisfies ApiError,
+          { status: 400 },
+        );
+      }
+      if (room.password !== password) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Invalid password",
+          } satisfies ApiError,
+          { status: 400 },
+        );
+      }
     }
 
     // Add user to room

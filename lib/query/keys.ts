@@ -36,6 +36,7 @@ export const queryKeys = {
     [...queryKeys.room(roomId), "members"] as const,
   myRooms: () => [...queryKeys.rooms, "my"] as const,
   publicRooms: () => [...queryKeys.rooms, "public"] as const,
+  joinedRooms: () => [...queryKeys.rooms, "joined"] as const,
 
   // Messages
   messages: ["messages"] as const,

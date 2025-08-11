@@ -74,10 +74,13 @@ export function useRooms(params?: {
   limit?: number;
   search?: string;
   myRooms?: boolean;
+  joinedRooms?: boolean;
 }) {
-  const queryKey = params?.myRooms
-    ? queryKeys.myRooms()
-    : queryKeys.publicRooms();
+  const queryKey = params?.joinedRooms
+    ? queryKeys.joinedRooms()
+    : params?.myRooms
+      ? queryKeys.myRooms()
+      : queryKeys.publicRooms();
 
   return useApiQuery<RoomsResponse>({
     queryKey: [...queryKey, params],
@@ -87,6 +90,7 @@ export function useRooms(params?: {
       if (params?.limit) searchParams.set("limit", params.limit.toString());
       if (params?.search) searchParams.set("search", params.search);
       if (params?.myRooms) searchParams.set("myRooms", "true");
+      if (params?.joinedRooms) searchParams.set("joinedRooms", "true");
 
       return apiClient.get(`/rooms?${searchParams.toString()}`);
     },
@@ -125,6 +129,7 @@ export function useCreateRoom() {
         cache.invalidate(queryKeys.rooms);
         cache.invalidate(queryKeys.myRooms());
         cache.invalidate(queryKeys.publicRooms());
+        cache.invalidate(queryKeys.joinedRooms());
         // Add new room to cache
         cache.update(queryKeys.room(newRoom.id), newRoom);
 
@@ -154,6 +159,7 @@ export function useUpdateRoom(roomId: string) {
         cache.invalidate(queryKeys.rooms);
         cache.invalidate(queryKeys.myRooms());
         cache.invalidate(queryKeys.publicRooms());
+        cache.invalidate(queryKeys.joinedRooms());
       },
     },
   });
@@ -177,6 +183,7 @@ export function useDeleteRoom() {
         cache.invalidate(queryKeys.rooms);
         cache.invalidate(queryKeys.myRooms());
         cache.invalidate(queryKeys.publicRooms());
+        cache.invalidate(queryKeys.joinedRooms());
         // Navigate back to rooms list
         router.push("/dashboard/rooms");
       },
@@ -208,6 +215,7 @@ export function useJoinRoom() {
         cache.invalidate(queryKeys.rooms);
         cache.invalidate(queryKeys.myRooms());
         cache.invalidate(queryKeys.publicRooms());
+        cache.invalidate(queryKeys.joinedRooms());
       },
     },
   });
@@ -228,6 +236,7 @@ export function useLeaveRoom() {
         invalidate(queryKeys.rooms);
         invalidate(queryKeys.myRooms());
         invalidate(queryKeys.publicRooms());
+        invalidate(queryKeys.joinedRooms());
         invalidate(queryKeys.room(roomId));
 
         // Navigate to rooms list
