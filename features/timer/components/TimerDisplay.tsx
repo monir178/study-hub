@@ -1,6 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { TimerData } from "../types";
-import { formatTime, getPhaseLabel, getPhaseColor } from "../utils/timer.utils";
+import {
+  formatTime,
+  getPhaseLabel,
+  getPhaseColorLegacy as getPhaseColor,
+} from "../utils/timer-display.utils";
 import { TimerIcons } from "./TimerIcons";
 
 interface TimerDisplayProps {

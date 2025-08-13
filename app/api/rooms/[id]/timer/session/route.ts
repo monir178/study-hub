@@ -44,6 +44,7 @@ export async function GET(
         startedAt: activeSession.startedAt.toISOString(),
         remainingTime: activeSession.remaining,
         status: activeSession.status,
+        controlledBy: activeSession.controlledBy,
       },
     });
   } catch (error) {

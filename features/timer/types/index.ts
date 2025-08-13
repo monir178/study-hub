@@ -1,3 +1,24 @@
+// Re-export new timer types
+export * from "./timer-events";
+export * from "./timer-state";
+
+// Import types we need for the return interface
+import { TimerState, TimerPermissions, TimerActions } from "./timer-state";
+
+// Export services
+export { TimerApiService } from "../services/timer-api.service";
+export {
+  subscribeToTimerEvents,
+  checkTimerPermissions,
+} from "../services/timer-pusher.service";
+
+// Export hooks
+export { useRoomTimer } from "../hooks/useRoomTimer";
+
+// Export utilities
+export * from "../utils/timer-display.utils";
+
+// Legacy types (keeping for backward compatibility during migration)
 export interface TimerData {
   roomId: string;
   phase: "focus" | "break" | "long_break";
@@ -18,43 +39,19 @@ export interface TimerConfig {
   sessionsBeforeLongBreak: number;
 }
 
-export interface TimerAction {
-  action: "start" | "pause" | "reset" | "tick" | "complete";
-  controlledBy: string;
-  timestamp: string;
-}
+export interface UsePomodoroTimerReturn {
+  // Timer state
+  state: TimerState;
+  permissions: TimerPermissions;
+  actions: TimerActions;
 
-export interface TimerUpdate {
-  timer: TimerData;
-  action: string;
-  controlledBy: string;
-  timestamp: string;
-}
-
-export interface TimerPermissions {
-  canControl: boolean;
-  isModerator: boolean;
-  isAdmin: boolean;
-  isRoomOwner: boolean;
-}
-
-export interface TimerState {
-  timer: TimerData | null;
+  // Loading states
   loading: {
     start: boolean;
     pause: boolean;
     reset: boolean;
   };
+
+  // Error handling
   error: string | null;
-  canControl: boolean;
-}
-
-export interface TimerActions {
-  startTimer: () => Promise<void>;
-  pauseTimer: () => Promise<void>;
-  resetTimer: () => Promise<void>;
-}
-
-export interface UsePomodoroTimerReturn extends TimerState {
-  actions: TimerActions;
 }

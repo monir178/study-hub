@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { TimerDatabase } from "@/lib/timer/server/timer-database";
+import { prisma } from "@/lib/prisma";
 
 // GET - Get room session statistics
 export async function GET(
@@ -18,7 +18,40 @@ export async function GET(
       );
     }
 
-    const stats = await TimerDatabase.getRoomStats(roomId);
+    // Get room statistics from database
+    const completedSessions = await prisma.studySession.findMany({
+      where: {
+        roomId,
+        status: "COMPLETED",
+      },
+      select: {
+        duration: true,
+        phase: true,
+        session: true,
+        endedAt: true,
+      },
+    });
+
+    const totalSessions = completedSessions.length;
+    const totalFocusTime = completedSessions
+      .filter((s) => s.phase === "focus")
+      .reduce((acc, s) => acc + (s.duration || 0), 0);
+    const totalBreakTime = completedSessions
+      .filter((s) => s.phase === "break")
+      .reduce((acc, s) => acc + (s.duration || 0), 0);
+
+    const stats = {
+      totalSessions,
+      totalFocusTime,
+      totalBreakTime,
+      totalTime: totalFocusTime + totalBreakTime,
+      completedSessions: completedSessions.map((s) => ({
+        phase: s.phase,
+        duration: s.duration,
+        sessionNumber: s.session,
+        completedAt: s.endedAt,
+      })),
+    };
 
     return NextResponse.json({
       success: true,

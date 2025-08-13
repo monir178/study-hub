@@ -1,5 +1,5 @@
 import { TimerData } from "../types";
-import { getProgress, getCircularProgress } from "../utils/timer.utils";
+import { getProgress, getCircularProgress } from "../utils/timer-display.utils";
 
 interface TimerProgressProps {
   timer: TimerData | null;

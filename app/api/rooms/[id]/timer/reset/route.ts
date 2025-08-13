@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { TimerStore } from "@/lib/timer/server/timer-store";
+import { pusherServer } from "@/lib/pusher";
+import { TimerResetEvent } from "@/features/timer/types/timer-events";
+import { canControlRoomTimer } from "@/lib/utils/timer-permissions";
 
 // POST - Reset timer
 export async function POST(
@@ -11,6 +13,7 @@ export async function POST(
   try {
     const { id: roomId } = await params;
     const session = await auth();
+    const body = await request.json();
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -19,44 +22,59 @@ export async function POST(
       );
     }
 
-    // Get room and check user permissions
-    const room = await prisma.studyRoom.findUnique({
-      where: { id: roomId },
-      include: {
-        creator: true,
-        members: {
-          include: {
-            user: true,
-          },
+    const { sessionId } = body;
+
+    // Check permissions using the new hierarchy system
+    const canControl = await canControlRoomTimer(
+      session.user.id,
+      session.user.role,
+      roomId,
+    );
+
+    if (!canControl) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Insufficient permissions to control this room's timer",
         },
-      },
-    });
-
-    if (!room) {
-      return NextResponse.json(
-        { success: false, error: "Room not found" },
-        { status: 404 },
-      );
-    }
-
-    // Check if user is moderator, admin, or room owner
-    const isModerator = session.user.role === "MODERATOR";
-    const isAdmin = session.user.role === "ADMIN";
-    const isRoomOwner = room.creatorId === session.user.id;
-
-    if (!isModerator && !isAdmin && !isRoomOwner) {
-      return NextResponse.json(
-        { success: false, error: "Insufficient permissions" },
         { status: 403 },
       );
     }
 
-    // Reset the timer (this will trigger Pusher update automatically)
-    const timer = await TimerStore.resetTimer(roomId, session.user.id);
+    // End current session if exists
+    if (sessionId) {
+      await prisma.studySession.update({
+        where: { id: sessionId },
+        data: {
+          status: "COMPLETED",
+          endedAt: new Date(),
+        },
+      });
+    }
+
+    // Create Pusher event
+    const timerEvent: TimerResetEvent = {
+      type: "timer-reset",
+      roomId,
+      userId: session.user.id,
+      timestamp: new Date().toISOString(),
+      sessionId: sessionId || undefined,
+      phase: "focus",
+      sessionNumber: 1,
+    };
+
+    // Emit to all room members
+    await pusherServer.trigger(
+      `room-${roomId}-timer`,
+      "timer-reset",
+      timerEvent,
+    );
 
     return NextResponse.json({
       success: true,
-      data: timer,
+      data: {
+        event: timerEvent,
+      },
     });
   } catch (error) {
     console.error("Error resetting timer:", error);

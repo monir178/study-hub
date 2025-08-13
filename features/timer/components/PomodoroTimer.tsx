@@ -1,26 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useTimer } from "../hooks/useTimer";
+// Replace old hook with new one
+import { useRoomTimer } from "../hooks/useRoomTimer";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useSound } from "@/lib/hooks/useSound";
 import { Button } from "@/components/ui/button";
 
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import {
-  Volume2,
-  VolumeX,
-  Clock,
-  Check,
-  Settings,
-  // Timer,
-  // Coffee,
-  // Play,
-  // Pause,
-  // RotateCcw,
-  // Loader2,
-} from "lucide-react";
+import { Volume2, VolumeX, Clock, Check, Settings } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   TimerDisplay,
@@ -28,7 +17,8 @@ import {
   TimerProgress,
   TimerIcons,
 } from "./index";
-import { formatTime, getCircularProgress } from "../utils/timer.utils";
+// Import new utilities
+import { formatTime, getCircularProgress } from "../utils/timer-display.utils";
 
 interface PomodoroTimerProps {
   roomId: string;
@@ -36,10 +26,18 @@ interface PomodoroTimerProps {
 }
 
 export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
-  const { timer, loading, error, canControl, actions } = useTimer({
+  // Use new hook instead of old one
+  const {
+    state: timer,
+    permissions,
+    actions,
+    loading,
+    error,
+  } = useRoomTimer({
     roomId,
     roomCreatorId,
   });
+
   const {} = useAuth();
   const {
     isEnabled: soundEnabled,
@@ -51,24 +49,34 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
     playPhaseChange,
   } = useSound();
 
-  // Wrap actions with sound effects
-  const actionsWithSound = {
-    startTimer: async () => {
-      if (soundEnabled) {
-        playTimerStart();
+  // Create timer object compatible with existing components
+  const timerForComponents = timer
+    ? {
+        roomId: timer.roomId,
+        phase: timer.phase,
+        remaining: timer.remainingTime,
+        isRunning: timer.isRunning,
+        isPaused: timer.isPaused,
+        updatedAt: timer.startedAt || new Date(),
+        controlledBy: timer.controlledBy || "",
+        session: timer.sessionNumber,
+        totalSessions: 4,
       }
+    : null;
+
+  // Actions with sound effects
+  const actionsWithSound = {
+    ...actions, // This now includes both start/pause/reset AND startTimer/pauseTimer/resetTimer
+    startTimer: async () => {
+      if (soundEnabled) playTimerStart();
       await actions.startTimer();
     },
     pauseTimer: async () => {
-      if (soundEnabled) {
-        playTimerPause();
-      }
+      if (soundEnabled) playTimerPause();
       await actions.pauseTimer();
     },
     resetTimer: async () => {
-      if (soundEnabled) {
-        playTimerReset();
-      }
+      if (soundEnabled) playTimerReset();
       await actions.resetTimer();
     },
   };
@@ -83,6 +91,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
       }
     }, 100);
   };
+
   const [lastRemainingTime, setLastRemainingTime] = useState<number | null>(
     null,
   );
@@ -233,19 +242,24 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
   // Play completion sound when timer finishes
   useEffect(() => {
     if (
-      timer?.remaining === 0 &&
+      timer?.remainingTime === 0 &&
       lastRemainingTime &&
       lastRemainingTime > 0 &&
       soundEnabled
     ) {
       playTimerComplete();
     }
-  }, [timer?.remaining, lastRemainingTime, soundEnabled, playTimerComplete]);
+  }, [
+    timer?.remainingTime,
+    lastRemainingTime,
+    soundEnabled,
+    playTimerComplete,
+  ]);
 
   // Track last remaining time for completion detection
   useEffect(() => {
-    setLastRemainingTime(timer?.remaining || null);
-  }, [timer?.remaining]);
+    setLastRemainingTime(timer?.remainingTime || null);
+  }, [timer?.remainingTime]);
 
   // Track phase changes for sound effects
   useEffect(() => {
@@ -388,12 +402,12 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
 
                 {/* Timer Display */}
                 <div className="text-base font-mono font-bold leading-none tracking-tight">
-                  {formatTime(timer.remaining)}
+                  {formatTime(timer.remainingTime)}
                 </div>
 
                 {/* Session Counter */}
                 <div className="text-xs text-muted-foreground mt-1.5 font-medium">
-                  {timer.session}/{timer.totalSessions}
+                  {timer.sessionNumber}/4
                 </div>
 
                 {/* Status Indicator */}
@@ -426,13 +440,13 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
               >
                 <div className="space-y-4">
                   {/* Phase Info */}
-                  <TimerDisplay timer={timer} variant="desktop" />
+                  <TimerDisplay timer={timerForComponents} variant="desktop" />
 
                   {/* Controls */}
                   <TimerControls
                     actions={actionsWithSound}
                     loading={loading}
-                    canControl={canControl}
+                    canControl={permissions.canControl}
                     isRunning={timer?.isRunning || false}
                     _isPaused={timer?.isPaused || false}
                     variant="desktop"
@@ -497,7 +511,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
         <div className="bg-background/95 backdrop-blur-sm border rounded-lg p-3 shadow-lg">
           <div className="flex items-center justify-between">
             {/* Left: Phase Info & Timer */}
-            <TimerDisplay timer={timer} variant="mobile" />
+            <TimerDisplay timer={timerForComponents} variant="mobile" />
 
             {/* Right: Status & Controls */}
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -516,7 +530,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
               <TimerControls
                 actions={actionsWithSound}
                 loading={loading}
-                canControl={canControl}
+                canControl={permissions.canControl}
                 isRunning={timer?.isRunning || false}
                 _isPaused={timer?.isPaused || false}
                 variant="mobile"
@@ -539,7 +553,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
           </div>
 
           {/* Progress Bar - Compact */}
-          <TimerProgress timer={timer} variant="mobile" />
+          <TimerProgress timer={timerForComponents} variant="mobile" />
 
           {/* Error Display - Compact */}
           {error && (
