@@ -1,16 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import Pusher from "pusher";
-
-// Initialize Pusher
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID!,
-  key: process.env.NEXT_PUBLIC_PUSHER_KEY!,
-  secret: process.env.PUSHER_SECRET!,
-  cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-  useTLS: true,
-});
+import { triggerChatMessage, triggerMemberUpdate } from "@/lib/pusher";
 
 // POST - Leave room
 export async function POST(
@@ -64,6 +55,35 @@ export async function POST(
       where: { id: member.id },
     });
 
+    // Create system message
+    const systemMessage = await prisma.message.create({
+      data: {
+        content: `${session.user.name || session.user.email} left the room`,
+        type: "SYSTEM",
+        authorId: session.user.id,
+        roomId: roomId,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    // Broadcast system message via Pusher
+    await triggerChatMessage(roomId, {
+      id: systemMessage.id,
+      content: systemMessage.content,
+      type: systemMessage.type,
+      createdAt: systemMessage.createdAt,
+      author: systemMessage.author,
+    });
+
     // Get updated room data
     const updatedRoom = await prisma.studyRoom.findUnique({
       where: { id: roomId },
@@ -83,20 +103,22 @@ export async function POST(
       );
     }
 
-    // Trigger Pusher event for member update
-    await pusher.trigger(`room-${roomId}-members`, "member-left", {
-      roomId,
+    // Trigger member update for room
+    await triggerMemberUpdate(roomId, "member-left", {
       member: {
         id: session.user.id,
-        name: session.user.name,
-        email: session.user.email,
-        image: session.user.image,
-        role: session.user.role,
-        status: "OFFLINE",
+        name: session.user.name || session.user.email || "Unknown User",
       },
       memberCount: updatedRoom.members.length,
-      onlineMembers: updatedRoom.members.filter((m) => m.status === "ONLINE")
-        .length,
+      members: updatedRoom.members.map((member) => ({
+        id: member.id,
+        user: {
+          id: member.user.id,
+          name: member.user.name,
+          image: member.user.image,
+        },
+        role: member.role,
+      })),
     });
 
     return NextResponse.json({

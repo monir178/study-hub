@@ -23,7 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ArrowLeft, MoreVertical, Trash2, Edit, Settings } from "lucide-react";
-import { StudyRoom, useLeaveRoom, useDeleteRoom } from "../hooks/useRooms";
+import { StudyRoom, useDeleteRoom } from "../hooks/useRooms";
 import { useAuth } from "@/lib/hooks/useAuth";
 
 interface RoomHeaderProps {
@@ -37,17 +37,7 @@ export function RoomHeader({ room }: RoomHeaderProps) {
   const { user: currentUser } = useAuth();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const leaveRoom = useLeaveRoom();
   const deleteRoom = useDeleteRoom();
-
-  const handleLeaveRoom = async () => {
-    try {
-      await leaveRoom.mutateAsync(room.id);
-      router.push("/dashboard/rooms");
-    } catch {
-      // Error handled by mutation hook
-    }
-  };
 
   const handleDeleteRoom = async () => {
     try {
@@ -96,17 +86,6 @@ export function RoomHeader({ room }: RoomHeaderProps) {
               <span className="ml-1">{room.userRole}</span>
             </Badge>
           )} */}
-
-          {/* Leave Room Button */}
-          {room.creator.id !== currentUser?.id && (
-            <Button
-              variant="outline"
-              onClick={handleLeaveRoom}
-              disabled={leaveRoom.isPending}
-            >
-              {leaveRoom.isPending ? tRooms("leaving") : tRooms("leaveRoom")}
-            </Button>
-          )}
 
           {/* Room Management Dropdown */}
           {(canEditRoom() || canDeleteRoom()) && (

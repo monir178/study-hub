@@ -31,7 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  // Users,
+  Users,
   // MessageSquare,
   Lock,
   Globe,
@@ -48,6 +48,10 @@ import {
 import { StudyRoom, useDeleteRoom } from "../hooks/useRooms";
 // import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useRealTimeMemberCount } from "../hooks/useRealTimeMemberCount";
+import { useRealTimeMembers } from "../hooks/useRealTimeMembers";
+import { useInitializeMemberCount } from "../hooks/useInitializeMemberCount";
+import { useInitializeMembers } from "../hooks/useInitializeMembers";
 import { Progress } from "@/components/ui/progress";
 import {
   Tooltip,
@@ -75,6 +79,13 @@ export function StudyRoomCard({
   const t = useTranslations("rooms.roomCard");
   const tRooms = useTranslations("rooms");
   const deleteRoom = useDeleteRoom();
+  const { memberCount: realtimeMemberCount } = useRealTimeMemberCount(room.id);
+  const { members: realtimeMembers } = useRealTimeMembers(room.id);
+
+  // Initialize member count and member list in Redux
+  useInitializeMemberCount(room.id, room.memberCount);
+  useInitializeMembers(room.id, room.members);
+
   const [deleteDialogState, setDeleteDialogState] = useState<{
     isOpen: boolean;
     isDeleting: boolean;
@@ -87,6 +98,12 @@ export function StudyRoomCard({
   const [isJoining, setIsJoining] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Use real-time member count if available, fallback to room.memberCount
+  const displayMemberCount = realtimeMemberCount ?? room.memberCount;
+  // Use real-time members if available, fallback to room.members
+  const displayMembers =
+    realtimeMembers.length > 0 ? realtimeMembers : room.members;
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -240,8 +257,8 @@ export function StudyRoomCard({
 
   const truncateId = (id: string) => {
     if (!id) return "";
-    const halfLength = Math.ceil(id.length / 2);
-    return `${id.slice(0, halfLength)}.....`;
+    const thirdLength = Math.ceil(id.length / 3);
+    return `${id.slice(0, thirdLength)}.....`;
   };
 
   const handleCopyId = async (e: React.MouseEvent) => {
@@ -388,38 +405,23 @@ export function StudyRoomCard({
         </div>
 
         {/* Room Stats */}
-        {/* <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1">
               <Users className="w-4 h-4" />
-              <span>
-                {room.onlineMembers}/{room.memberCount}
-              </span>
-              <span className="text-xs">online</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <MessageSquare className="w-4 h-4" />
-              <span>{room.messageCount}</span>
+              <span className="text-xs">Max: {room.maxMembers}</span>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            <Calendar className="w-4 h-4" />
-            <span>
-              {formatDistanceToNow(new Date(room.createdAt), {
-                addSuffix: true,
-              })}
-            </span>
-          </div>
-        </div> */}
+        </div>
 
         {/* Member Avatars */}
-        {room.members.length > 0 && (
+        {displayMembers.length > 0 && (
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">
-              {tRooms("members")}:
+              {tRooms("members")} ({displayMembers.length}/{room.maxMembers}):
             </span>
             <div className="flex -space-x-2">
-              {room.members.slice(0, 5).map((member) => (
+              {displayMembers.slice(0, 5).map((member) => (
                 <Avatar
                   key={member.id}
                   className="w-6 h-6 border-2 border-background"
@@ -433,10 +435,10 @@ export function StudyRoomCard({
                   </AvatarFallback>
                 </Avatar>
               ))}
-              {room.members.length > 5 && (
+              {displayMembers.length > 5 && (
                 <div className="w-6 h-6 rounded-full bg-muted border-2 border-background flex items-center justify-center">
                   <span className="text-xs text-muted-foreground">
-                    +{room.members.length - 5}
+                    +{displayMembers.length - 5}
                   </span>
                 </div>
               )}
@@ -446,20 +448,23 @@ export function StudyRoomCard({
 
         {/* Action Buttons */}
         <div className="flex gap-2 pt-2">
-          <Button
-            onClick={handleAction}
-            disabled={loading || isJoining}
-            className="flex-1"
-            variant={room.isJoined ? "outline" : "default"}
-          >
-            {loading || isJoining
-              ? room.isJoined
-                ? tRooms("loading")
-                : tRooms("joining")
-              : room.isJoined
-                ? t("viewRoom")
-                : t("joinRoom")}
-          </Button>
+          {/* Only show join/view button if room is not full or user is already joined */}
+          {(room.isJoined || displayMemberCount < room.maxMembers) && (
+            <Button
+              onClick={handleAction}
+              disabled={loading || isJoining}
+              className="flex-1"
+              variant={room.isJoined ? "outline" : "default"}
+            >
+              {loading || isJoining
+                ? room.isJoined
+                  ? tRooms("loading")
+                  : tRooms("joining")
+                : room.isJoined
+                  ? t("viewRoom")
+                  : t("joinRoom")}
+            </Button>
+          )}
 
           {room.isJoined && room.creator.id !== currentUser?.id && (
             <Button
@@ -474,10 +479,10 @@ export function StudyRoomCard({
         </div>
 
         {/* Room Full Warning */}
-        {!room.isJoined && room.memberCount >= room.maxMembers && (
+        {!room.isJoined && displayMemberCount >= room.maxMembers && (
           <div className="text-center">
             <Badge variant="destructive" className="text-xs">
-              Room Full ({room.memberCount}/{room.maxMembers})
+              Room Full ({displayMemberCount}/{room.maxMembers})
             </Badge>
           </div>
         )}

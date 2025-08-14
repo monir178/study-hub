@@ -203,7 +203,7 @@ export function useJoinRoom() {
       roomId: string;
       data: JoinRoomData;
     }): Promise<void> => {
-      return apiClient.post(`/rooms/${roomId}/join`, data);
+      return apiClient.post(`/rooms/${roomId}/members/join`, data);
     },
     successMessage:
       "🎉 Welcome to the room! You can now participate in discussions and activities.",
@@ -228,7 +228,7 @@ export function useLeaveRoom() {
 
   return useApiMutation<null, string>({
     mutationFn: async (roomId: string): Promise<null> => {
-      return apiClient.delete(`/rooms/${roomId}/join`);
+      return apiClient.post(`/rooms/${roomId}/members/leave`);
     },
     options: {
       onSuccess: (_, roomId) => {

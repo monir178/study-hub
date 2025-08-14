@@ -38,6 +38,8 @@ import { GroupChat } from "./GroupChat";
 import { NotesContainer } from "@/features/notes/components/NotesContainer";
 import { RoomOverview } from "./RoomOverview";
 import { useRoomMembers } from "../hooks/useRoomMembers";
+import { useRealTimeMemberCount } from "../hooks/useRealTimeMemberCount";
+import { useInitializeMemberCount } from "../hooks/useInitializeMemberCount";
 import { Loading } from "@/components/ui/loading";
 
 interface RoomLayoutProps {
@@ -49,6 +51,10 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
   const { user: currentUser } = useAuth();
 
   const { data: room, isLoading, error } = useRoom(roomId);
+  const { memberCount: realtimeMemberCount } = useRealTimeMemberCount(roomId);
+
+  // Initialize member count in Redux when room data loads
+  useInitializeMemberCount(roomId, room?.memberCount);
 
   // Auto-join room when component mounts
   const { actions: memberActions } = useRoomMembers({
@@ -71,7 +77,10 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
     },
   });
 
-  // Auto-join room when user enters
+  // Use real-time member count if available, fallback to room data
+  const displayMemberCount = realtimeMemberCount ?? room?.memberCount ?? 0;
+
+  // Auto-join room when user enters - only on initial load
   useEffect(() => {
     if (room && currentUser?.id) {
       // Check if user is already a member
@@ -84,8 +93,8 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
         memberActions.joinRoom();
       }
     }
-  }, [room, currentUser?.id, memberActions]);
-
+    // Only run on initial mount when room data first loads
+  }, [room?.id, currentUser?.id]);
   if (isLoading) {
     return <Loading />;
   }
@@ -142,9 +151,9 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
                   <div className="flex items-center gap-2">
                     <Badge className="text-xs font-semibold bg-primary/10 text-black dark:text-white">
                       <Users className="w-3 h-3 mr-1" />
-                      {room.onlineMembers > 1
-                        ? `${room.onlineMembers} members`
-                        : `${room.onlineMembers} member`}
+                      {displayMemberCount > 1
+                        ? `${displayMemberCount} members`
+                        : `${displayMemberCount} member`}
                     </Badge>
                   </div>
                 </div>
