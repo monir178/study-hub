@@ -1,5 +1,6 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
+import { renderWithProviders } from "../../../utils/test-utils";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn(), back: jest.fn() }),
@@ -64,6 +65,14 @@ jest.mock("@/features/rooms/hooks/useRooms", () => ({
   useDeleteRoom: () => ({ mutateAsync: jest.fn(), isPending: false }),
 }));
 
+jest.mock("@/lib/pusher", () => ({
+  subscribeToRoomMembers: jest.fn(() => ({
+    bind: jest.fn(),
+    unbind: jest.fn(),
+  })),
+  unsubscribeFromRoomMembers: jest.fn(),
+}));
+
 import { StudyRoomCard } from "@/features/rooms/components/StudyRoomCard";
 
 const baseRoom = {
@@ -86,13 +95,15 @@ const baseRoom = {
 
 describe("StudyRoomCard", () => {
   it("renders", () => {
-    render(<StudyRoomCard room={baseRoom as any} />);
+    renderWithProviders(<StudyRoomCard room={baseRoom as any} />);
     expect(screen.getByTestId("room-card")).toBeInTheDocument();
   });
 
   it("handles primary button click", () => {
     const onJoin = jest.fn().mockResolvedValue(undefined);
-    render(<StudyRoomCard room={baseRoom as any} onJoin={onJoin} />);
+    renderWithProviders(
+      <StudyRoomCard room={baseRoom as any} onJoin={onJoin} />,
+    );
     fireEvent.click(screen.getAllByTestId("room-card-button")[0]);
     expect(screen.getAllByTestId("room-card-button")[0]).toBeInTheDocument();
   });

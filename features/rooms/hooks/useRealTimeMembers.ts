@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/store";
 import {
   setRoomMembers,
@@ -25,10 +25,13 @@ interface MemberUpdateEvent {
 
 export const useRealTimeMembers = (roomId: string) => {
   const dispatch = useAppDispatch();
-  const members = useAppSelector(
-    (state) => state.rooms.roomMembers[roomId] || [],
-  );
+  const roomMembers = useAppSelector((state) => state.rooms.roomMembers);
   const isConnected = useAppSelector((state) => state.rooms.isConnected);
+
+  // Memoize the members array to prevent unnecessary re-renders
+  const members = useMemo(() => {
+    return roomMembers[roomId] || [];
+  }, [roomMembers, roomId]);
 
   useEffect(() => {
     if (!roomId) return;

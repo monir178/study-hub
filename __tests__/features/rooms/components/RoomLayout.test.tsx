@@ -1,5 +1,6 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import { renderWithProviders } from "../../../utils/test-utils";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn(), back: jest.fn() }),
@@ -44,6 +45,14 @@ jest.mock("@/features/rooms/hooks/useRoomMembers", () => ({
   }),
 }));
 
+jest.mock("@/lib/pusher", () => ({
+  subscribeToRoomMembers: jest.fn(() => ({
+    bind: jest.fn(),
+    unbind: jest.fn(),
+  })),
+  unsubscribeFromRoomMembers: jest.fn(),
+}));
+
 jest.mock("@/features/timer/components/PomodoroTimer", () => ({
   PomodoroTimer: () => <div data-testid="pomodoro" />,
 }));
@@ -71,7 +80,7 @@ import { RoomLayout } from "@/features/rooms/components/RoomLayout";
 
 describe("RoomLayout", () => {
   it("renders header and children blocks", () => {
-    render(<RoomLayout roomId="r1" />);
+    renderWithProviders(<RoomLayout roomId="r1" />);
     expect(screen.getByTestId("room-header")).toBeInTheDocument();
     expect(screen.getByTestId("group-chat")).toBeInTheDocument();
     expect(screen.getByTestId("notes-container")).toBeInTheDocument();
