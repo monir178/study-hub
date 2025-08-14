@@ -27,7 +27,18 @@
     "browseRooms": "Browse Study Rooms",
     "tryRefresh": "Please try refreshing the page",
     "noContentAvailable": "No content available",
-    "failedToGeneratePDF": "Failed to generate PDF. Please try again."
+    "failedToGeneratePDF": "Failed to generate PDF. Please try again.",
+    "homepage": "Homepage",
+    "goToHomepage": "Go to Homepage",
+    "signIn": "Sign In",
+    "accessDenied": "Access Denied",
+    "unauthorizedAccess": "You don't have permission to access this page",
+    "unauthorizedMessage": "This page requires authentication or special permissions. Please sign in or contact an administrator if you believe this is an error.",
+    "errorDetails": "Error Details",
+    "contactSupport": "If the problem persists, please contact support",
+    "needHelp": "Need help? Contact our support team",
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundMessage": "The page you requested could not be found. It may have been moved, deleted, or you may have entered an incorrect URL."
   },
   "auth": {
     "signIn": "Sign In",

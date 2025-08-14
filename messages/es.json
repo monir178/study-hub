@@ -27,7 +27,18 @@
     "browseRooms": "Explorar Salas de Estudio",
     "tryRefresh": "Por favor, intenta actualizar la página",
     "noContentAvailable": "No hay contenido disponible",
-    "failedToGeneratePDF": "Error al generar PDF. Por favor, inténtalo de nuevo."
+    "failedToGeneratePDF": "Error al generar PDF. Por favor, inténtalo de nuevo.",
+    "homepage": "Página Principal",
+    "goToHomepage": "Ir a Página Principal",
+    "signIn": "Iniciar Sesión",
+    "accessDenied": "Acceso Denegado",
+    "unauthorizedAccess": "No tienes permisos para acceder a esta página",
+    "unauthorizedMessage": "Esta página requiere autenticación o permisos especiales. Por favor inicia sesión o contacta a un administrador si crees que esto es un error.",
+    "errorDetails": "Detalles del Error",
+    "contactSupport": "Si el problema persiste, por favor contacta al soporte",
+    "needHelp": "¿Necesitas ayuda? Contacta a nuestro equipo de soporte",
+    "pageNotFound": "Página No Encontrada",
+    "pageNotFoundMessage": "La página que solicitaste no pudo ser encontrada. Puede haber sido movida, eliminada, o puedes haber ingresado una URL incorrecta."
   },
   "auth": {
     "signIn": "Iniciar Sesión",
