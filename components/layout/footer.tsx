@@ -2,9 +2,7 @@
 
 import { Link } from "@/i18n/navigation";
 import { usePathname } from "next/navigation";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Github, Twitter, Mail, Heart } from "lucide-react";
+import { Github, Mail } from "lucide-react";
 
 interface FooterProps {
   locale?: string;
@@ -12,35 +10,28 @@ interface FooterProps {
 
 const footerLinks = {
   product: [
-    { name: "Features", href: "/features" },
-    { name: "Pricing", href: "/pricing" },
+    { name: "Study Rooms", href: "/dashboard/rooms" },
     { name: "Documentation", href: "/docs" },
-    { name: "API", href: "/api-docs" },
   ],
-  company: [
-    { name: "About", href: "/about" },
-    { name: "Blog", href: "/blog" },
-    { name: "Careers", href: "/careers" },
-    { name: "Contact", href: "/contact" },
-  ],
+  company: [{ name: "Contact", href: "/contact" }],
   support: [
     { name: "Help Center", href: "/help" },
     { name: "Community", href: "/community" },
-    { name: "Status", href: "/status" },
-    { name: "Feedback", href: "/feedback" },
   ],
   legal: [
     { name: "Privacy", href: "/privacy" },
     { name: "Terms", href: "/terms" },
     { name: "Security", href: "/security" },
-    { name: "Cookies", href: "/cookies" },
   ],
 };
 
 const socialLinks = [
-  { name: "GitHub", href: "https://github.com", icon: Github },
-  { name: "Twitter", href: "https://twitter.com", icon: Twitter },
-  { name: "Email", href: "mailto:hello@studyhub.com", icon: Mail },
+  {
+    name: "GitHub",
+    href: "https://github.com/monir178/study-hub",
+    icon: Github,
+  },
+  { name: "Email", href: "mailto:monir.mzs17@gmail.com", icon: Mail },
 ];
 
 export function Footer({ locale: _locale = "en" }: FooterProps) {
@@ -60,40 +51,34 @@ export function Footer({ locale: _locale = "en" }: FooterProps) {
 
   return (
     <footer className="border-t bg-background">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
+      <div className="container mx-auto px-4 py-8">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-6">
           {/* Brand Section */}
-          <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
+          <div className="col-span-2 md:col-span-1 lg:col-span-2">
+            <div className="flex items-center gap-2 mb-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <span className="text-sm font-bold">SH</span>
               </div>
-              <span className="text-xl font-bold">StudyHub</span>
-            </Link>
-            <p className="text-sm text-muted-foreground mb-4 max-w-xs">
-              A modern collaborative learning platform that connects students,
-              mentors, and educators in real-time.
+              <span className="text-lg font-bold">StudyHub</span>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">
+              Collaborative learning platform for students worldwide.
             </p>
             <div className="flex items-center gap-2">
               {socialLinks.map((social) => {
                 const Icon = social.icon;
                 return (
-                  <Button
+                  <a
                     key={social.name}
-                    variant="ghost"
-                    size="icon"
-                    asChild
-                    className="h-8 w-8"
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    <Link
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span className="sr-only">{social.name}</span>
-                    </Link>
-                  </Button>
+                    <Icon className="h-4 w-4" />
+                    <span className="sr-only">{social.name}</span>
+                  </a>
                 );
               })}
             </div>
@@ -101,7 +86,7 @@ export function Footer({ locale: _locale = "en" }: FooterProps) {
 
           {/* Product Links */}
           <div>
-            <h3 className="font-semibold mb-4">Product</h3>
+            <h4 className="font-semibold mb-3 text-sm">Product</h4>
             <ul className="space-y-2">
               {footerLinks.product.map((link) => (
                 <li key={link.name}>
@@ -118,7 +103,7 @@ export function Footer({ locale: _locale = "en" }: FooterProps) {
 
           {/* Company Links */}
           <div>
-            <h3 className="font-semibold mb-4">Company</h3>
+            <h4 className="font-semibold mb-3 text-sm">Company</h4>
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
@@ -135,7 +120,7 @@ export function Footer({ locale: _locale = "en" }: FooterProps) {
 
           {/* Support Links */}
           <div>
-            <h3 className="font-semibold mb-4">Support</h3>
+            <h4 className="font-semibold mb-3 text-sm">Support</h4>
             <ul className="space-y-2">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
@@ -152,7 +137,7 @@ export function Footer({ locale: _locale = "en" }: FooterProps) {
 
           {/* Legal Links */}
           <div>
-            <h3 className="font-semibold mb-4">Legal</h3>
+            <h4 className="font-semibold mb-3 text-sm">Legal</h4>
             <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
@@ -168,18 +153,32 @@ export function Footer({ locale: _locale = "en" }: FooterProps) {
           </div>
         </div>
 
-        <Separator className="my-8" />
-
         {/* Bottom Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <span>© 2024 StudyHub. Made with</span>
-            <Heart className="h-4 w-4 text-red-500 fill-current" />
-            <span>for learners everywhere.</span>
-          </div>
-
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span>Built with Next.js, Tailwind CSS, and ShadCN</span>
+        <div className="border-t pt-6">
+          <div className="flex flex-col items-center gap-4 text-sm text-muted-foreground">
+            <span>© {new Date().getFullYear()} StudyHub</span>
+            <div className="flex items-center gap-4">
+              <span>
+                Developed by{" "}
+                <a
+                  href="https://www.monir178.live/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline font-medium"
+                >
+                  Moniruzzaman Monir
+                </a>
+              </span>
+              <a
+                href="https://github.com/monir178/study-hub"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-primary hover:underline font-medium"
+              >
+                <Github className="h-4 w-4" />
+                Star
+              </a>
+            </div>
           </div>
         </div>
       </div>

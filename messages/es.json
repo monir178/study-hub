@@ -611,6 +611,402 @@
     "signingOut": "Cerrando sesión...",
     "cancel": "Cancelar"
   },
+  "legal": {
+    "metadata": {
+      "title": "Información Legal - StudyHub",
+      "description": "Política de privacidad, términos de servicio, información de seguridad y detalles de contacto para StudyHub."
+    },
+    "privacy": {
+      "title": "Política de Privacidad",
+      "lastUpdated": "Última actualización: Enero 2024",
+      "informationWeCollect": {
+        "title": "Información que Recopilamos",
+        "description": "Recopilamos información para proporcionar, mejorar y personalizar nuestros servicios:",
+        "personalInfo": "Información personal (nombre, email, datos del perfil)",
+        "usageData": "Datos de uso y análisis",
+        "cookies": "Cookies y tecnologías similares",
+        "thirdParty": "Información de servicios de terceros"
+      },
+      "howWeUseInfo": {
+        "title": "Cómo Usamos tu Información",
+        "description": "Usamos la información recopilada para los siguientes propósitos:",
+        "provideService": "Para proporcionar y mantener nuestros servicios",
+        "communicate": "Para comunicarnos contigo sobre actualizaciones y soporte",
+        "improve": "Para mejorar y personalizar tu experiencia",
+        "security": "Para asegurar la seguridad y prevenir fraudes"
+      },
+      "dataSharing": {
+        "title": "Compartir y Divulgar Datos",
+        "description": "Podemos compartir tu información en las siguientes circunstancias:",
+        "serviceProviders": "Con proveedores de servicios confiables que ayudan en nuestras operaciones",
+        "legalRequirements": "Cuando lo requiera la ley o proceso legal",
+        "businessTransfer": "En conexión con una transferencia o fusión de negocios",
+        "consent": "Con tu consentimiento explícito"
+      },
+      "dataSecurity": {
+        "title": "Seguridad de Datos",
+        "description": "Implementamos medidas de seguridad apropiadas para proteger tu información personal contra acceso no autorizado, alteración, divulgación o destrucción."
+      },
+      "yourRights": {
+        "title": "Tus Derechos",
+        "description": "Tienes los siguientes derechos sobre tu información personal:",
+        "access": "Derecho a acceder a tus datos personales",
+        "correction": "Derecho a corregir datos inexactos",
+        "deletion": "Derecho a eliminar tus datos",
+        "portability": "Derecho a la portabilidad de datos",
+        "objection": "Derecho a objetar el procesamiento"
+      },
+      "cookies": {
+        "title": "Cookies y Seguimiento",
+        "description": "Usamos cookies y tecnologías similares para mejorar tu experiencia y analizar patrones de uso.",
+        "management": "Puedes gestionar tus preferencias de cookies a través de la configuración de tu navegador."
+      },
+      "contact": {
+        "title": "Contáctanos",
+        "description": "Si tienes alguna pregunta sobre esta Política de Privacidad, contáctanos:",
+        "email": "Email"
+      },
+      "backToHome": "Volver al Inicio"
+    },
+    "terms": {
+      "title": "Términos de Servicio",
+      "lastUpdated": "Última actualización: Enero 2024",
+      "acceptance": {
+        "title": "Aceptación de Términos",
+        "description": "Al acceder y usar StudyHub, aceptas y acuerdas estar sujeto a los términos y disposiciones de este acuerdo."
+      },
+      "description": {
+        "title": "Descripción del Servicio",
+        "content": "StudyHub es una plataforma de aprendizaje colaborativo que proporciona salas de estudio, chat en tiempo real, herramientas para tomar notas y temporizadores Pomodoro para estudiantes y educadores."
+      },
+      "userAccounts": {
+        "title": "Cuentas de Usuario",
+        "description": "Cuando creas una cuenta, debes proporcionar información precisa y completa:",
+        "accurateInfo": "Proporcionar información de registro precisa y completa",
+        "security": "Mantener la seguridad de las credenciales de tu cuenta",
+        "notification": "Notificarnos inmediatamente de cualquier uso no autorizado",
+        "termination": "Podemos terminar cuentas que violen estos términos"
+      },
+      "acceptableUse": {
+        "title": "Uso Aceptable",
+        "description": "Acuerdas usar StudyHub solo para propósitos legales y de acuerdo con estos términos:",
+        "compliance": "Cumplir con todas las leyes y regulaciones aplicables",
+        "respectful": "Ser respetuoso y considerado con otros usuarios",
+        "noHarassment": "No acoso, intimidación o comportamiento abusivo",
+        "noSpam": "No spam, publicidad o solicitud comercial",
+        "noIllegal": "No contenido ilegal o dañino",
+        "noMalware": "No virus, malware o código dañino"
+      },
+      "intellectualProperty": {
+        "title": "Propiedad Intelectual",
+        "description": "StudyHub y su contenido original, características y funcionalidad son propiedad de StudyHub y están protegidos por leyes internacionales de derechos de autor, marcas comerciales, patentes, secretos comerciales y otras leyes de propiedad intelectual.",
+        "userContent": "Mantienes la propiedad del contenido que creas, pero nos otorgas una licencia para usarlo para la provisión del servicio."
+      },
+      "privacy": {
+        "title": "Privacidad",
+        "description": "Tu privacidad es importante para nosotros. Por favor revisa nuestra Política de Privacidad, que también rige tu uso del servicio."
+      },
+      "disclaimers": {
+        "title": "Descargos de Responsabilidad",
+        "description": "El servicio se proporciona 'tal como está' y 'según disponibilidad':",
+        "noWarranty": "Sin garantías, expresas o implícitas",
+        "availability": "Sin garantía de disponibilidad ininterrumpida del servicio",
+        "accuracy": "Sin garantía de precisión o integridad del contenido"
+      },
+      "limitationOfLiability": {
+        "title": "Limitación de Responsabilidad",
+        "description": "En ningún caso StudyHub será responsable por daños indirectos, incidentales, especiales, consecuentes o punitivos."
+      },
+      "termination": {
+        "title": "Terminación",
+        "description": "Podemos terminar o suspender tu cuenta inmediatamente, sin previo aviso, por cualquier razón.",
+        "effects": "Al terminar, tu derecho a usar el servicio cesará inmediatamente."
+      },
+      "governingLaw": {
+        "title": "Ley Aplicable",
+        "description": "Estos términos serán gobernados e interpretados de acuerdo con las leyes de la jurisdicción donde opera StudyHub."
+      },
+      "changes": {
+        "title": "Cambios en los Términos",
+        "description": "Nos reservamos el derecho de modificar estos términos en cualquier momento. Notificaremos a los usuarios de cualquier cambio material."
+      },
+      "contact": {
+        "title": "Información de Contacto",
+        "description": "Si tienes alguna pregunta sobre estos Términos de Servicio, contáctanos:",
+        "email": "Email"
+      },
+      "backToHome": "Volver al Inicio"
+    },
+    "security": {
+      "title": "Seguridad",
+      "lastUpdated": "Última actualización: Enero 2024",
+      "overview": {
+        "title": "Resumen de Seguridad",
+        "description": "En StudyHub, tomamos la seguridad en serio. Implementamos medidas de seguridad estándar de la industria para proteger tus datos y asegurar un entorno de aprendizaje seguro.",
+        "commitment": "Nuestro compromiso con la seguridad es fundamental para nuestra misión de proporcionar una plataforma confiable para el aprendizaje colaborativo."
+      },
+      "features": {
+        "title": "Características de Seguridad",
+        "encryption": {
+          "title": "Encriptación de Extremo a Extremo",
+          "description": "Todos los datos sensibles están encriptados en tránsito y en reposo usando protocolos de encriptación estándar de la industria."
+        },
+        "authentication": {
+          "title": "Autenticación Multi-Factor",
+          "description": "Autenticación segura con soporte para proveedores OAuth y medidas de seguridad adicionales."
+        },
+        "monitoring": {
+          "title": "Monitoreo de Seguridad 24/7",
+          "description": "Monitoreo continuo y detección de amenazas para identificar y responder a incidentes de seguridad."
+        },
+        "accessControl": {
+          "title": "Control de Acceso Basado en Roles",
+          "description": "Permisos granulares y controles de acceso para asegurar que los usuarios solo accedan a recursos apropiados."
+        }
+      },
+      "dataProtection": {
+        "title": "Protección de Datos",
+        "description": "Implementamos medidas integrales de protección de datos:",
+        "encryption": "Encriptación de datos en reposo y en tránsito",
+        "access": "Controles de acceso estrictos y autenticación",
+        "backup": "Copias de seguridad regulares y recuperación ante desastres",
+        "compliance": "Cumplimiento con regulaciones de protección de datos"
+      },
+      "bestPractices": {
+        "title": "Mejores Prácticas de Seguridad",
+        "description": "Recomendamos seguir estas mejores prácticas de seguridad:",
+        "strongPassword": "Usar contraseñas fuertes y únicas",
+        "twoFactor": "Habilitar autenticación de dos factores cuando esté disponible",
+        "regularUpdates": "Mantener tu software y dispositivos actualizados",
+        "secureConnection": "Usar conexiones seguras (HTTPS)",
+        "logout": "Cerrar sesión en dispositivos compartidos",
+        "reportIssues": "Reportar problemas de seguridad inmediatamente"
+      },
+      "incidentResponse": {
+        "title": "Respuesta a Incidentes",
+        "description": "Tenemos procedimientos establecidos para responder a incidentes de seguridad:",
+        "reporting": {
+          "title": "Reportar Problemas de Seguridad",
+          "description": "Si descubres una vulnerabilidad de seguridad o incidente, por favor repórtalo inmediatamente.",
+          "email": "Email"
+        }
+      },
+      "compliance": {
+        "title": "Cumplimiento",
+        "description": "Mantenemos cumplimiento con estándares relevantes de seguridad y privacidad:",
+        "gdpr": "Reglamento General de Protección de Datos (GDPR)",
+        "ferpa": "Ley de Derechos Educativos y Privacidad Familiar (FERPA)",
+        "coppa": "Ley de Protección de Privacidad en Línea de Menores (COPPA)",
+        "industry": "Marcos de seguridad estándar de la industria"
+      },
+      "contact": {
+        "title": "Contáctanos",
+        "description": "Para preguntas o inquietudes relacionadas con la seguridad, contáctanos:",
+        "email": "Email"
+      },
+      "backToHome": "Volver al Inicio"
+    }
+  },
+  "contact": {
+    "title": "Contáctanos",
+    "description": "Ponte en contacto con nuestro equipo. Estamos aquí para ayudar con cualquier pregunta, comentario o soporte que necesites.",
+    "getInTouch": "Ponte en Contacto",
+    "getInTouchDescription": "¿Tienes una pregunta o necesitas soporte? Estamos aquí para ayudar. Contáctanos a través de cualquiera de los métodos a continuación.",
+    "methods": {
+      "email": {
+        "title": "Soporte por Email",
+        "description": "Envíanos un email y te responderemos lo antes posible."
+      },
+      "support": {
+        "title": "Respuesta de Soporte",
+        "description": "Típicamente respondemos a solicitudes de soporte dentro de 24 horas.",
+        "responseTime": "Dentro de 24 horas"
+      },
+      "hours": {
+        "title": "Horas de Soporte",
+        "description": "Nuestro equipo de soporte está disponible para ayudarte."
+      }
+    },
+    "form": {
+      "title": "Envíanos un Mensaje",
+      "firstName": "Nombre",
+      "firstNamePlaceholder": "Ingresa tu nombre",
+      "lastName": "Apellido",
+      "lastNamePlaceholder": "Ingresa tu apellido",
+      "email": "Email",
+      "emailPlaceholder": "Ingresa tu dirección de email",
+      "subject": "Asunto",
+      "subjectPlaceholder": "¿De qué se trata?",
+      "message": "Mensaje",
+      "messagePlaceholder": "Dinos cómo podemos ayudarte...",
+      "sendMessage": "Enviar Mensaje"
+    },
+    "quickLinks": {
+      "title": "Enlaces Rápidos",
+      "helpCenter": "Centro de Ayuda",
+      "documentation": "Documentación",
+      "community": "Comunidad",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos de Servicio"
+    },
+    "backToHome": "Volver al Inicio"
+  },
+  "help": {
+    "title": "Centro de Ayuda",
+    "description": "Encuentra respuestas a tus preguntas y aprende cómo usar StudyHub efectivamente.",
+    "search": {
+      "title": "Buscar Ayuda",
+      "description": "¿No encuentras lo que buscas? Busca en nuestros artículos y guías de ayuda.",
+      "placeholder": "Buscar artículos de ayuda..."
+    },
+    "categories": {
+      "title": "Categorías de Ayuda",
+      "learnMore": "Aprender Más",
+      "gettingStarted": {
+        "title": "Comenzar",
+        "description": "Aprende los conceptos básicos de StudyHub y cómo crear tu primera sesión de estudio."
+      },
+      "studyRooms": {
+        "title": "Salas de Estudio",
+        "description": "Todo lo que necesitas saber sobre crear y gestionar salas de estudio."
+      },
+      "timers": {
+        "title": "Temporizadores Pomodoro",
+        "description": "Cómo usar temporizadores sincronizados para sesiones de estudio enfocadas."
+      },
+      "chat": {
+        "title": "Chat en Tiempo Real",
+        "description": "Aprende sobre las características del chat y cómo comunicarte con compañeros de estudio."
+      },
+      "notes": {
+        "title": "Notas y Colaboración",
+        "description": "Cómo crear, compartir y colaborar en notas dentro de las salas de estudio."
+      },
+      "account": {
+        "title": "Cuenta y Configuración",
+        "description": "Gestiona tu cuenta, perfil y configuración de la plataforma."
+      }
+    },
+    "faqs": {
+      "title": "Preguntas Frecuentes",
+      "howToJoin": {
+        "question": "¿Cómo me uno a una sala de estudio?",
+        "answer": "Puedes unirte a una sala de estudio haciendo clic en el nombre de la sala desde la lista de salas, o usando un código de sala si es una sala privada."
+      },
+      "createRoom": {
+        "question": "¿Cómo creo mi propia sala de estudio?",
+        "answer": "Haz clic en el botón 'Crear Sala' en el dashboard, completa los detalles de la sala e invita a tus compañeros de estudio."
+      },
+      "syncTimers": {
+        "question": "¿Cómo funcionan los temporizadores sincronizados?",
+        "answer": "Cuando se inicia un temporizador en una sala de estudio, se sincroniza entre todos los miembros. Todos comienzan y terminan sus sesiones de estudio juntos."
+      },
+      "privateNotes": {
+        "question": "¿Son privadas mis notas?",
+        "answer": "Sí, tus notas personales son privadas para ti. Puedes elegir compartir notas específicas con miembros de la sala si lo deseas."
+      }
+    },
+    "contact": {
+      "title": "¿Aún Necesitas Ayuda?",
+      "description": "¿No encuentras la respuesta que buscas? Nuestro equipo de soporte está aquí para ayudar.",
+      "contactUs": "Contactar Soporte",
+      "sendEmail": "Enviar Email"
+    },
+    "backToHome": "Volver al Inicio"
+  },
+  "community": {
+    "title": "Comunidad",
+    "description": "Únete a miles de estudiantes en todo el mundo que están aprendiendo juntos y alcanzando sus metas.",
+    "stats": {
+      "activeUsers": "Usuarios Activos",
+      "messages": "Mensajes Enviados",
+      "studySessions": "Sesiones de Estudio",
+      "satisfaction": "Tasa de Satisfacción"
+    },
+    "features": {
+      "title": "Características de la Comunidad",
+      "studyGroups": {
+        "title": "Grupos de Estudio",
+        "description": "Forma grupos de estudio con estudiantes que comparten tus intereses académicos y metas."
+      },
+      "discussions": {
+        "title": "Discusiones",
+        "description": "Participa en discusiones significativas sobre materias, comparte ideas y aprende de compañeros."
+      },
+      "resources": {
+        "title": "Recursos Compartidos",
+        "description": "Accede y comparte materiales de estudio, notas y recursos educativos con la comunidad."
+      },
+      "achievements": {
+        "title": "Logros",
+        "description": "Gana insignias y reconocimiento por tu progreso de estudio y contribuciones a la comunidad."
+      }
+    },
+    "join": {
+      "title": "Únete a Nuestra Comunidad",
+      "description": "¿Listo para conectar con otros estudiantes? Únete a StudyHub y comienza tu viaje de aprendizaje colaborativo.",
+      "getStarted": "Comenzar",
+      "exploreRooms": "Explorar Salas"
+    },
+    "backToHome": "Volver al Inicio"
+  },
+  "docs": {
+    "title": "Documentación",
+    "description": "Guías completas y documentación de API para ayudarte a aprovechar al máximo StudyHub.",
+    "quickStart": {
+      "title": "Guía de Inicio Rápido",
+      "step1": "Crea una cuenta e inicia sesión en StudyHub",
+      "step2": "Crea o únete a una sala de estudio",
+      "step3": "Inicia un temporizador Pomodoro sincronizado",
+      "step4": "Comienza a colaborar con tus compañeros de estudio",
+      "readMore": "Leer Guía Completa"
+    },
+    "categories": {
+      "title": "Categorías de Documentación",
+      "readDocs": "Leer Documentación",
+      "userGuide": {
+        "title": "Guía de Usuario",
+        "description": "Guía completa para usar las características y funcionalidad de StudyHub."
+      },
+      "api": {
+        "title": "Referencia de API",
+        "description": "Documentación técnica para integrar con las APIs de StudyHub."
+      },
+      "integration": {
+        "title": "Guía de Integración",
+        "description": "Aprende cómo integrar StudyHub con tus herramientas y flujos de trabajo existentes."
+      },
+      "admin": {
+        "title": "Guía de Administrador",
+        "description": "Herramientas administrativas y configuraciones para gestionar instancias de StudyHub."
+      }
+    },
+    "resources": {
+      "title": "Recursos Adicionales",
+      "examples": {
+        "title": "Ejemplos de Código",
+        "description": "Ejemplos prácticos y fragmentos de código para casos de uso comunes.",
+        "view": "Ver Ejemplos"
+      },
+      "community": {
+        "title": "Comunidad",
+        "description": "Conéctate con otros desarrolladores y usuarios en nuestra comunidad.",
+        "join": "Unirse a la Comunidad"
+      },
+      "tutorials": {
+        "title": "Tutoriales en Video",
+        "description": "Tutoriales paso a paso en video para comenzar con StudyHub.",
+        "watch": "Ver Tutoriales"
+      }
+    },
+    "support": {
+      "title": "¿Necesitas Ayuda?",
+      "description": "¿No encuentras lo que buscas? Nuestro equipo de soporte está aquí para ayudar.",
+      "helpCenter": "Centro de Ayuda",
+      "contactUs": "Contáctanos"
+    },
+    "backToHome": "Volver al Inicio"
+  },
   "landing": {
     "hero": {
       "title": {
