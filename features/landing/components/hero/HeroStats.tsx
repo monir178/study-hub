@@ -47,22 +47,22 @@ export function HeroStats() {
     {
       icon: Users,
       label: t("activeUsers"),
-      value: "10K+",
-      numericValue: "10000", // For CountUp animation
+      value: "50K+",
+      numericValue: "50000", // For CountUp animation
       color: "text-blue-500",
     },
     {
       icon: Clock,
       label: t("studySessions"),
-      value: "50K+",
-      numericValue: "50000", // For CountUp animation
+      value: "100K+",
+      numericValue: "100000", // For CountUp animation
       color: "text-emerald-500",
     },
     {
       icon: MessageSquare,
       label: t("notesShared"),
-      value: "100K+",
-      numericValue: "100000", // For CountUp animation
+      value: "1000K+",
+      numericValue: "1000000", // For CountUp animation
       color: "text-purple-500",
     },
   ];
