@@ -24,6 +24,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { BookOpen, Users, FileText, User, Home, LogOut } from "lucide-react";
+import Image from "next/image";
 
 interface NavItem {
   name: string;
@@ -110,21 +111,17 @@ export function AppSidebar() {
 
   return (
     <Sidebar variant="inset">
-      <Link href="/">
-        <SidebarHeader>
-          <div className="flex items-center gap-2 px-4 py-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <span className="text-sm font-bold">SH</span>
-            </div>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">StudyHub</span>
-              <span className="truncate text-xs text-muted-foreground">
-                {t("collaborativeLearning")}
-              </span>
-            </div>
-          </div>
-        </SidebarHeader>
-      </Link>
+      <SidebarHeader>
+        <Link href="/">
+          <Image
+            src="/logo.png"
+            alt="StudyHub Logo"
+            width={400}
+            height={400}
+            className="w-32 h-12"
+          />
+        </Link>
+      </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>

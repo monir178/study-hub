@@ -22,6 +22,7 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { usePersistentAnimation } from "@/lib/hooks/usePersistentAnimation";
 import LanguageSelector from "./LanguageSelector";
 import { BookOpen, LogOut, User, Shield } from "lucide-react";
+import Image from "next/image";
 
 interface NavItem {
   name: string;
@@ -167,15 +168,14 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2 group">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
-                <span className="text-primary-foreground font-bold text-sm">
-                  S
-                </span>
-              </div>
-              <span className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
-                StudyHub
-              </span>
+            <Link href="/">
+              <Image
+                src="/logo.png"
+                alt="StudyHub Logo"
+                width={400}
+                height={400}
+                className="w-32 h-12"
+              />
             </Link>
           </div>
 

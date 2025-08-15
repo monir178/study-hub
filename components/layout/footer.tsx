@@ -3,6 +3,7 @@
 import { Link } from "@/i18n/navigation";
 import { usePathname } from "next/navigation";
 import { Github, Mail } from "lucide-react";
+import Image from "next/image";
 
 interface FooterProps {
   locale?: string;
@@ -56,13 +57,18 @@ export function Footer({ locale: _locale = "en" }: FooterProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-6">
           {/* Brand Section */}
           <div className="col-span-2 md:col-span-1 lg:col-span-2">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <span className="text-sm font-bold">SH</span>
-              </div>
-              <span className="text-lg font-bold">StudyHub</span>
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center space-x-2 group">
+                <Image
+                  src="/logo.png"
+                  alt="StudyHub Logo"
+                  width={400}
+                  height={400}
+                  className="w-32 h-12"
+                />
+              </Link>
             </div>
-            <p className="text-sm text-muted-foreground mb-3">
+            <p className="text-sm text-muted-foreground mb-3 mt-2">
               Collaborative learning platform for students worldwide.
             </p>
             <div className="flex items-center gap-2">
