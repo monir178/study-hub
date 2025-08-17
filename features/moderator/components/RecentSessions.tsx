@@ -139,13 +139,13 @@ export function RecentSessions({ sessions, loading }: RecentSessionsProps) {
             ))
           )}
         </div>
-        {sessions.length > 0 && (
+        {/* {sessions.length > 0 && (
           <div className="mt-4">
             <button className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors">
               {t("viewAll")}
             </button>
           </div>
-        )}
+        )} */}
       </CardContent>
     </Card>
   );

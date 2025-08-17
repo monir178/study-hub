@@ -348,6 +348,10 @@
     "myNotes": "My Notes",
     "newNote": "New Note",
     "back": "Back",
+    "common": {
+      "back": "Back",
+      "browseRooms": "Browse Study Rooms"
+    },
     "searchNotes": "Search notes...",
     "noNotesFound": "No notes found",
     "noNotesYet": "No notes yet",

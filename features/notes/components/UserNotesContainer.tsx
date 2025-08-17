@@ -30,6 +30,7 @@ export function UserNotesContainer({
   const [titleValue, setTitleValue] = useState("");
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
+  const [showViewer, setShowViewer] = useState(false); // For mobile navigation
 
   const { data, isLoading, error } = useUserNotes(page, limit);
 
@@ -59,6 +60,12 @@ export function UserNotesContainer({
   const handleNoteSelect = (note: UserNote) => {
     setSelectedNote(note);
     setTitleValue(note.title);
+    setShowViewer(true); // Show viewer on mobile/tablet
+  };
+
+  const handleBackToList = () => {
+    setShowViewer(false);
+    setSelectedNote(null);
   };
 
   const handleTitleSave = useCallback(() => {
@@ -162,31 +169,67 @@ export function UserNotesContainer({
   const pagination = data?.pagination;
 
   return (
-    <div className="h-full flex">
-      <UserNotesList
-        notes={notes}
-        selectedNote={selectedNote}
-        pagination={pagination}
-        isLoading={isLoading}
-        onNoteSelect={handleNoteSelect}
-        onLoadMore={handleLoadMore}
-      />
+    <div className="h-full w-full overflow-hidden">
+      {/* Mobile/Tablet: Show either list or viewer */}
+      <div className="lg:hidden h-full w-full">
+        {!showViewer ? (
+          <UserNotesList
+            notes={notes}
+            selectedNote={selectedNote}
+            pagination={pagination}
+            isLoading={isLoading}
+            onNoteSelect={handleNoteSelect}
+            onLoadMore={handleLoadMore}
+          />
+        ) : (
+          <UserNoteViewer
+            selectedNote={selectedNote}
+            titleValue={titleValue}
+            isEditingTitle={isEditingTitle}
+            isJoining={isJoining}
+            isUserMemberOfRoom={isUserMemberOfRoom}
+            loading={isLoading}
+            onTitleChange={setTitleValue}
+            onStartEdit={() => setIsEditingTitle(true)}
+            onTitleSave={handleTitleSave}
+            onTitleCancel={handleTitleCancel}
+            onRoomAction={handleRoomAction}
+            onBackToList={handleBackToList}
+            renderSlateContent={renderSlateContent}
+            slateToMarkdown={slateToMarkdown}
+            showBackButton={true}
+          />
+        )}
+      </div>
 
-      <UserNoteViewer
-        selectedNote={selectedNote}
-        titleValue={titleValue}
-        isEditingTitle={isEditingTitle}
-        isJoining={isJoining}
-        isUserMemberOfRoom={isUserMemberOfRoom}
-        loading={isLoading}
-        onTitleChange={setTitleValue}
-        onStartEdit={() => setIsEditingTitle(true)}
-        onTitleSave={handleTitleSave}
-        onTitleCancel={handleTitleCancel}
-        onRoomAction={handleRoomAction}
-        renderSlateContent={renderSlateContent}
-        slateToMarkdown={slateToMarkdown}
-      />
+      {/* Desktop: Show both side by side */}
+      <div className="hidden lg:flex lg:h-full lg:w-full">
+        <UserNotesList
+          notes={notes}
+          selectedNote={selectedNote}
+          pagination={pagination}
+          isLoading={isLoading}
+          onNoteSelect={handleNoteSelect}
+          onLoadMore={handleLoadMore}
+        />
+
+        <UserNoteViewer
+          selectedNote={selectedNote}
+          titleValue={titleValue}
+          isEditingTitle={isEditingTitle}
+          isJoining={isJoining}
+          isUserMemberOfRoom={isUserMemberOfRoom}
+          loading={isLoading}
+          onTitleChange={setTitleValue}
+          onStartEdit={() => setIsEditingTitle(true)}
+          onTitleSave={handleTitleSave}
+          onTitleCancel={handleTitleCancel}
+          onRoomAction={handleRoomAction}
+          renderSlateContent={renderSlateContent}
+          slateToMarkdown={slateToMarkdown}
+          showBackButton={false}
+        />
+      </div>
     </div>
   );
 }

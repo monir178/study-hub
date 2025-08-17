@@ -47,7 +47,7 @@ export function UserNotesList({
   const showLoadMoreLoading = isLoadMoreLoading || isLoading;
 
   return (
-    <div className="w-1/2 border-r">
+    <div className="w-full lg:w-1/2 lg:border-r">
       <Card className="h-full flex flex-col">
         <CardHeader className="flex-shrink-0">
           <CardTitle className="flex items-center gap-2">

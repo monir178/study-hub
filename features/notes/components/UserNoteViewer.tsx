@@ -22,11 +22,13 @@ interface UserNoteViewerProps {
   isJoining: boolean;
   isUserMemberOfRoom: boolean;
   loading?: boolean;
+  showBackButton?: boolean;
   onTitleChange: (value: string) => void;
   onStartEdit: () => void;
   onTitleSave: () => void;
   onTitleCancel: () => void;
   onRoomAction: () => void;
+  onBackToList?: () => void;
   renderSlateContent: (content: string) => string;
   slateToMarkdown: (content: string) => string;
 }
@@ -38,11 +40,13 @@ export function UserNoteViewer({
   isJoining,
   isUserMemberOfRoom,
   loading,
+  showBackButton = false,
   onTitleChange,
   onStartEdit,
   onTitleSave,
   onTitleCancel,
   onRoomAction,
+  onBackToList,
   renderSlateContent,
   slateToMarkdown,
 }: UserNoteViewerProps) {
@@ -157,7 +161,7 @@ export function UserNoteViewer({
 
   if (!selectedNote) {
     return (
-      <div className="w-1/2">
+      <div className="w-full lg:w-1/2">
         <div className="h-full flex items-center justify-center">
           <div className="text-center">
             <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
@@ -176,49 +180,82 @@ export function UserNoteViewer({
   }
 
   return (
-    <div className="w-1/2">
+    <div className="w-full lg:w-1/2">
       <div className="h-full flex flex-col">
-        {/* Header Row 1: Export dropdown */}
-        <div className="flex items-center justify-end p-4 border-b">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm">
-                <Download className="w-4 h-4 mr-2" />
-                {t("export")}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleExportPDF}>
-                <FileDown className="w-4 h-4 mr-2" />
-                {t("exportPDF")}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportMarkdown}>
-                <FileText className="w-4 h-4 mr-2" />
-                {t("exportMarkdown")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* Header Row 1: Back button (mobile) and Export dropdown */}
+        <div className="flex items-center justify-between p-4 border-b">
+          {showBackButton && onBackToList && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onBackToList}
+              className="flex items-center gap-2"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              {t("common.back", { defaultValue: "Back" })}
+            </Button>
+          )}
+
+          <div className={showBackButton ? "" : "ml-auto"}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm">
+                  <Download className="w-4 h-4 mr-2" />
+                  {t("export")}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleExportPDF}>
+                  <FileDown className="w-4 h-4 mr-2" />
+                  {t("exportPDF")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportMarkdown}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  {t("exportMarkdown")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* Header Row 2: Note title and room info */}
-        <div className="flex items-center justify-between p-4 pb-2">
-          <NotesTitleEditor
-            title={titleValue}
-            isEditing={isEditingTitle}
-            onTitleChange={onTitleChange}
-            onStartEdit={onStartEdit}
-            onSave={onTitleSave}
-            onCancel={onTitleCancel}
-            permissions={{
-              canEdit: false,
-              canDelete: false,
-              canExport: true,
-              canRead: true,
-            }}
-          />
+        <div className="flex items-start justify-between p-4 pb-2">
+          <div>
+            <p>
+              <span className="text-primary text-sm font-medium">
+                Room name:
+              </span>{" "}
+              {selectedNote.room.name}
+            </p>
+            <NotesTitleEditor
+              title={titleValue}
+              isEditing={isEditingTitle}
+              onTitleChange={onTitleChange}
+              onStartEdit={onStartEdit}
+              onSave={onTitleSave}
+              onCancel={onTitleCancel}
+              permissions={{
+                canEdit: false,
+                canDelete: false,
+                canExport: true,
+                canRead: true,
+              }}
+            />
+          </div>
 
-          <div className="text-sm text-muted-foreground">
-            {selectedNote.room.name} •{" "}
+          <div className="text-sm text-muted-foreground w-fit whitespace-nowrap">
             {format(new Date(selectedNote.updatedAt), "MMM dd, yyyy")}
           </div>
         </div>

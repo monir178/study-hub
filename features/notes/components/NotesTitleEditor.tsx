@@ -28,7 +28,7 @@ export function NotesTitleEditor({
               onCancel();
             }
           }}
-          className="text-lg font-semibold"
+          className="text-lg font-semibold "
           autoFocus
         />
         <Button size="sm" variant="ghost" onClick={onSave}>
@@ -42,9 +42,9 @@ export function NotesTitleEditor({
   }
 
   return (
-    <div className="flex items-center gap-2 flex-1">
+    <div className="flex items-center gap-2 flex-1 ">
       <h1
-        className="text-lg font-semibold cursor-pointer hover:text-blue-600 transition-colors"
+        className="text-lg font-semibold cursor-pointer  transition-colors underline"
         onClick={() => permissions.canEdit && onStartEdit()}
       >
         {title}

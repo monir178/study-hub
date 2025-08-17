@@ -348,6 +348,10 @@
     "myNotes": "Mis Notas",
     "newNote": "Nueva Nota",
     "back": "Atrás",
+    "common": {
+      "back": "Atrás",
+      "browseRooms": "Explorar Salas de Estudio"
+    },
     "searchNotes": "Buscar notas...",
     "noNotesFound": "No se encontraron notas",
     "noNotesYet": "Aún no hay notas",
