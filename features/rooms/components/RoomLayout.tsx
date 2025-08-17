@@ -142,18 +142,23 @@ export function RoomLayout({ roomId }: RoomLayoutProps) {
 
             {/* Chat Panel - Main Content */}
             <Card className="h-[calc(100vh-280px)] lg:h-[calc(100vh-200px)] flex flex-col">
-              <CardHeader className="pb-4 border-b flex-shrink-0">
+              <CardHeader className="py-2 shadow-xs rounded-t-2xl flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5" />
-                    {room.name}
+                    <MessageSquare className="text-primary w-4 h-4" />
+                    <span className="text-sm text-primary md:text-base">
+                      {room.name}
+                    </span>
                   </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Badge className="text-xs font-semibold bg-primary/10 text-black dark:text-white">
-                      <Users className="w-3 h-3 mr-1" />
-                      {displayMemberCount > 1
-                        ? `${displayMemberCount} members`
-                        : `${displayMemberCount} member`}
+                  <div className="relative inline-flex items-center">
+                    <Badge
+                      variant="secondary"
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border border-blue-200/50 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 font-medium shadow-sm hover:shadow-md transition-all duration-200"
+                    >
+                      <Users className="w-4 h-4" />
+                      <span className="text-sm font-semibold">
+                        {displayMemberCount}
+                      </span>
                     </Badge>
                   </div>
                 </div>

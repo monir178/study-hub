@@ -346,29 +346,31 @@ export function SlateEditor({
         />
 
         {/* Editor */}
-        <div className="flex-1 overflow-auto">
-          <Slate
-            key={key}
-            editor={editor}
-            initialValue={safeValue}
-            onChange={(newValue) => {
-              setValue(newValue);
-              setSelection(editor.selection);
-              syncActiveTools();
-            }}
-            onSelectionChange={(newSelection) => {
-              setSelection(newSelection);
-              syncActiveTools();
-            }}
-          >
-            <Editable
-              renderElement={renderElement}
-              renderLeaf={renderLeaf}
-              placeholder="Start writing your note..."
-              readOnly={!permissions.canEdit}
-              className="min-h-[400px] p-4 focus:outline-none prose prose-sm max-w-none"
-            />
-          </Slate>
+        <div className="flex-1 min-h-0">
+          <div className="h-full overflow-auto">
+            <Slate
+              key={key}
+              editor={editor}
+              initialValue={safeValue}
+              onChange={(newValue) => {
+                setValue(newValue);
+                setSelection(editor.selection);
+                syncActiveTools();
+              }}
+              onSelectionChange={(newSelection) => {
+                setSelection(newSelection);
+                syncActiveTools();
+              }}
+            >
+              <Editable
+                renderElement={renderElement}
+                renderLeaf={renderLeaf}
+                placeholder="Start writing your note..."
+                readOnly={!permissions.canEdit}
+                className="min-h-full p-4 focus:outline-none prose prose-sm max-w-none"
+              />
+            </Slate>
+          </div>
         </div>
       </div>
     );

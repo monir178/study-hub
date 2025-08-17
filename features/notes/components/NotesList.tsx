@@ -129,10 +129,10 @@ export function NotesList({
   if (isLoading) {
     return (
       <div className="h-full flex flex-col" data-testid="notes-list-loading">
-        <div className="flex-shrink-0 p-6 pb-4 border-b">
+        <div className="flex-shrink-0 p-4 sm:p-6 pb-4 border-b">
           <Skeleton className="h-6 w-32" />
         </div>
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-4 sm:p-6">
           <div className="space-y-3">
             <Skeleton className="h-16 w-full" />
             <Skeleton className="h-16 w-full" />
@@ -163,7 +163,7 @@ export function NotesList({
         />
 
         {/* Scrollable Content Area */}
-        <ScrollArea className="flex-1 px-6 pb-6 overflow-hidden">
+        <ScrollArea className="flex-1 px-4 sm:px-6 pb-4 sm:pb-6 overflow-hidden">
           {filteredNotes.length > 0 ? (
             <div className="space-y-3" data-testid="notes-list-items">
               {filteredNotes.map((note) => (

@@ -39,7 +39,7 @@ export function NotesToolbar({
   const t = useTranslations("notes");
 
   return (
-    <div className="flex items-center gap-1 p-2 border-b mb-2 flex-wrap">
+    <div className="flex items-center gap-1 p-2 border-b mb-2 flex-wrap overflow-x-auto">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -97,7 +97,7 @@ export function NotesToolbar({
           <TooltipContent>{t("code")}</TooltipContent>
         </Tooltip>
 
-        <Separator orientation="vertical" className="h-6" />
+        <Separator orientation="vertical" className="h-6 hidden sm:block" />
 
         <Tooltip>
           <TooltipTrigger asChild>
@@ -141,7 +141,7 @@ export function NotesToolbar({
           <TooltipContent>{t("heading3")}</TooltipContent>
         </Tooltip>
 
-        <Separator orientation="vertical" className="h-6" />
+        <Separator orientation="vertical" className="h-6 hidden sm:block" />
 
         <Tooltip>
           <TooltipTrigger asChild>
@@ -186,16 +186,22 @@ export function NotesToolbar({
         </Tooltip>
 
         {!permissions.canEdit && (
-          <div className="ml-auto">
-            <Badge variant="secondary" className="flex items-center gap-1">
+          <div className="ml-auto flex-shrink-0">
+            <Badge
+              variant="secondary"
+              className="flex items-center gap-1 text-xs sm:text-sm"
+            >
               <Lock className="w-3 h-3" />
-              {t("common.readOnly", { defaultValue: "Read Only" })}
+              <span className="hidden sm:inline">
+                {t("common.readOnly", { defaultValue: "Read Only" })}
+              </span>
+              <span className="sm:hidden">RO</span>
             </Badge>
           </div>
         )}
 
         {permissions.canExport && onExportMarkdown && onExportPDF && (
-          <div className="ml-auto flex items-center gap-1">
+          <div className="ml-auto flex items-center gap-1 flex-shrink-0">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="sm" onClick={onExportMarkdown}>

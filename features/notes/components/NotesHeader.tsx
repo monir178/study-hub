@@ -37,7 +37,6 @@ export function NotesHeader({
         </div>
         {permissions.canEdit && onCreateNote && (
           <Button
-            variant="outline"
             size="sm"
             onClick={onCreateNote}
             className="flex items-center gap-1"

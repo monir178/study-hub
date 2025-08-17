@@ -21,7 +21,7 @@ export function NoteCard({
       onClick={() => onSelect(note)}
       data-testid="note-card"
     >
-      <CardContent className="p-4">
+      <CardContent className="p-3 sm:p-4">
         <div className="flex flex-col">
           {/* Main content */}
           <div className="flex-1">
@@ -36,50 +36,55 @@ export function NoteCard({
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </div>
 
-          {/* Bottom section with metadata and actions */}
-          <div className="flex items-center justify-between mt-3">
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">
-                <Users className="w-3 h-3 mr-1" />
-                Shared
-              </Badge>
-              {!permissions.canEdit && (
-                <Badge variant="secondary" className="text-xs">
-                  <Lock className="w-3 h-3 mr-1" />
-                  Read Only
+          <div className="mt-3">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1 flex-wrap">
+                <Badge variant="outline" className="text-xs">
+                  <Users className="w-3 h-3 mr-1" />
+                  <span>Shared</span>
                 </Badge>
-              )}
-              <span className="text-xs text-muted-foreground">
-                {formatDate(note.updatedAt)}
-              </span>
+                {!permissions.canEdit && (
+                  <Badge variant="secondary" className="text-xs">
+                    <Lock className="w-3 h-3 mr-1" />
+                    <span className="hidden sm:inline">Read Only</span>
+                    <span className="sm:hidden">RO</span>
+                  </Badge>
+                )}
+              </div>
               {note.creator && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                   <User className="w-3 h-3" />
-                  <span>{note.creator.name}</span>
+                  <span className="truncate max-w-20 sm:max-w-none text-xs">
+                    {note.creator.name}
+                  </span>
                 </div>
               )}
             </div>
 
-            {/* Bottom-right delete button */}
-            <div className="flex items-center">
-              {permissions.canEdit && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDeleteClick(note.id, note.title);
-                  }}
-                  disabled={isDeleting}
-                  className="h-6 w-6 p-0 text-destructive hover:text-destructive"
-                >
-                  {isDeleting ? (
-                    <div className="w-3 h-3 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Trash2 className="w-3 h-3" />
-                  )}
-                </Button>
-              )}
+            {/* Second row: Date and creator */}
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span className="truncate">{formatDate(note.updatedAt)}</span>
+              {/* Delete button */}
+              <div className="flex items-center flex-shrink-0">
+                {permissions.canEdit && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteClick(note.id, note.title);
+                    }}
+                    disabled={isDeleting}
+                    className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                  >
+                    {isDeleting ? (
+                      <div className="w-3 h-3 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Trash2 className="w-3 h-3" />
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>

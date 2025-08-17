@@ -157,17 +157,19 @@ export function NotesPanel({
       </div>
 
       {/* Editor */}
-      <div className="flex-1 px-4 pb-4">
-        <SlateEditor
-          note={note}
-          isLoading={isLoading}
-          editorState={editorState}
-          permissions={permissions}
-          onSave={onSave}
-          onChange={handleEditorChange}
-          hideHeader={true}
-          isSaving={isSaving}
-        />
+      <div className="flex-1 min-h-0 px-4 pb-4">
+        <div className="h-full">
+          <SlateEditor
+            note={note}
+            isLoading={isLoading}
+            editorState={editorState}
+            permissions={permissions}
+            onSave={onSave}
+            onChange={handleEditorChange}
+            hideHeader={true}
+            isSaving={isSaving}
+          />
+        </div>
       </div>
     </div>
   );
