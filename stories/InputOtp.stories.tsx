@@ -19,6 +19,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
+  args: {},
   render: () => (
     <InputOTP maxLength={6}>
       <InputOTPGroup>
@@ -34,9 +35,10 @@ export const Default: Story = {
       </InputOTPGroup>
     </InputOTP>
   ),
-};
+} as unknown as Story;
 
 export const Simple: Story = {
+  args: {},
   render: () => (
     <InputOTP maxLength={4}>
       <InputOTPGroup>
@@ -47,9 +49,10 @@ export const Simple: Story = {
       </InputOTPGroup>
     </InputOTP>
   ),
-};
+} as unknown as Story;
 
 export const WithPattern: Story = {
+  args: {},
   render: () => (
     <InputOTP maxLength={6} pattern="^[0-9]+$">
       <InputOTPGroup>
@@ -62,4 +65,4 @@ export const WithPattern: Story = {
       </InputOTPGroup>
     </InputOTP>
   ),
-};
+} as unknown as Story;
