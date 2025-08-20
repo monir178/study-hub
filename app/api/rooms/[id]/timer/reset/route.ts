@@ -43,13 +43,29 @@ export async function POST(
 
     // End current session if exists
     if (sessionId) {
-      await prisma.studySession.update({
+      // First, get the current session to calculate duration
+      const currentSession = await prisma.studySession.findUnique({
         where: { id: sessionId },
-        data: {
-          status: "COMPLETED",
-          endedAt: new Date(),
-        },
+        select: { startedAt: true, duration: true },
       });
+
+      if (currentSession) {
+        // Calculate actual duration: endTime - startTime
+        const startTime = currentSession.startedAt;
+        const endTime = new Date();
+        const actualDuration = Math.floor(
+          (endTime.getTime() - startTime.getTime()) / 1000,
+        );
+
+        await prisma.studySession.update({
+          where: { id: sessionId },
+          data: {
+            status: "COMPLETED",
+            endedAt: endTime,
+            duration: actualDuration, // Store the calculated duration
+          },
+        });
+      }
     }
 
     // Create Pusher event

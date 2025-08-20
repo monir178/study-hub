@@ -41,17 +41,31 @@ export async function POST(
       );
     }
 
-    // End any existing active sessions for this room
-    await prisma.studySession.updateMany({
+    // End any existing active sessions for this room with proper duration calculation
+    const existingSessions = await prisma.studySession.findMany({
       where: {
         roomId,
         status: { in: ["ACTIVE", "PAUSED"] },
       },
-      data: {
-        status: "COMPLETED",
-        endedAt: new Date(),
-      },
+      select: { id: true, startedAt: true },
     });
+
+    // Calculate duration for each existing session and complete them
+    const endTime = new Date();
+    for (const session of existingSessions) {
+      const actualDuration = Math.floor(
+        (endTime.getTime() - session.startedAt.getTime()) / 1000,
+      );
+
+      await prisma.studySession.update({
+        where: { id: session.id },
+        data: {
+          status: "COMPLETED",
+          endedAt: endTime,
+          duration: actualDuration, // Store the calculated duration
+        },
+      });
+    }
 
     // Create new session
     const newSession = await prisma.studySession.create({

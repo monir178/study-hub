@@ -56,7 +56,7 @@ export function StudyTimeChart({ data, loading }: StudyTimeChartProps) {
   return (
     <Card className="h-full" data-testid="study-time">
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="text-sm md:text-lg">
           {t("studyTime")} ({t("last7Days")})
         </CardTitle>
       </CardHeader>

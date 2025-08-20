@@ -114,6 +114,31 @@ export class TimerApiService {
   }
 
   /**
+   * Complete a timer session when it naturally finishes
+   * Marks the session as completed with proper duration calculation
+   */
+  static async completeTimer(
+    roomId: string,
+    sessionId: string,
+    phase: "focus" | "break" | "long_break",
+    sessionNumber: number,
+    nextPhase: "focus" | "break" | "long_break",
+    completedDuration?: number,
+  ): Promise<{ session: SessionResponse }> {
+    const response = await apiClient.post<{
+      session: SessionResponse;
+    }>(`/rooms/${roomId}/timer/complete`, {
+      sessionId,
+      phase,
+      sessionNumber,
+      nextPhase,
+      completedDuration,
+    });
+
+    return response;
+  }
+
+  /**
    * Get current active session for a room
    * Used for initialization/sync
    */

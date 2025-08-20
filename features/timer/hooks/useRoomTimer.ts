@@ -110,7 +110,7 @@ export function useRoomTimer({
         });
 
         // Timer completed
-        if (newRemainingTime === 0) {
+        if (newRemainingTime === 0 && prevState.sessionId) {
           // Stop countdown
           if (countdownIntervalRef.current) {
             clearInterval(countdownIntervalRef.current);
@@ -127,6 +127,23 @@ export function useRoomTimer({
               ? prevState.sessionNumber + 1
               : prevState.sessionNumber;
 
+          // Calculate completed duration for the session
+          const completedDuration = Math.floor(
+            (new Date().getTime() - prevState.startedAt!.getTime()) / 1000,
+          );
+
+          // Call completion API to mark session as completed with proper duration
+          TimerApiService.completeTimer(
+            roomId,
+            prevState.sessionId,
+            prevState.phase,
+            prevState.sessionNumber,
+            nextPhase,
+            completedDuration,
+          ).catch((error) => {
+            console.error("Failed to complete timer session:", error);
+          });
+
           // Auto-transition to next phase
           return {
             ...prevState,
@@ -136,6 +153,7 @@ export function useRoomTimer({
             sessionNumber: nextSessionNumber,
             remainingTime: getPhaseDuration(nextPhase),
             totalDuration: getPhaseDuration(nextPhase),
+            sessionId: undefined, // Clear session ID as current session is complete
             startedAt: undefined,
             pausedAt: undefined,
           };

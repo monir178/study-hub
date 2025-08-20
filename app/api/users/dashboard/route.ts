@@ -54,8 +54,10 @@ export async function GET(_request: NextRequest) {
         select: {
           id: true,
           startedAt: true,
+          endedAt: true,
           duration: true,
           type: true,
+          status: true,
         },
       }),
 
@@ -158,15 +160,17 @@ export async function GET(_request: NextRequest) {
         }),
       ]),
 
-      // Get study time by day for the last 7 days
-      prisma.studySession.groupBy({
-        by: ["startedAt"],
+      // Get study sessions for the last 7 days (we'll aggregate by day in JavaScript)
+      prisma.studySession.findMany({
         where: {
           userId,
           startedAt: { gte: sevenDaysAgo },
         },
-        _sum: {
+        select: {
+          startedAt: true,
+          endedAt: true,
           duration: true,
+          status: true,
         },
       }),
 
@@ -189,34 +193,44 @@ export async function GET(_request: NextRequest) {
       }),
 
       // Get daily study sessions for streak calculation (last 30 days)
-      prisma.studySession.groupBy({
-        by: ["startedAt"],
+      prisma.studySession.findMany({
         where: {
           userId,
           startedAt: { gte: thirtyDaysAgo },
         },
-        _sum: {
+        select: {
+          startedAt: true,
+          endedAt: true,
           duration: true,
+          status: true,
         },
       }),
 
       // Get weekly statistics for trends
       prisma.$transaction([
-        prisma.studySession.aggregate({
+        prisma.studySession.findMany({
           where: {
             userId,
             startedAt: { gte: currentWeekStart },
           },
-          _sum: { duration: true },
-          _count: true,
+          select: {
+            startedAt: true,
+            endedAt: true,
+            duration: true,
+            status: true,
+          },
         }),
-        prisma.studySession.aggregate({
+        prisma.studySession.findMany({
           where: {
             userId,
             startedAt: { gte: previousWeekStart, lt: currentWeekStart },
           },
-          _sum: { duration: true },
-          _count: true,
+          select: {
+            startedAt: true,
+            endedAt: true,
+            duration: true,
+            status: true,
+          },
         }),
       ]),
     ]);
@@ -235,35 +249,87 @@ export async function GET(_request: NextRequest) {
     ] = roomCounts;
 
     // Extract weekly stats
-    const [currentWeekStats, previousWeekStats] = weeklyStats;
-    const currentWeekTime = currentWeekStats._sum.duration || 0;
-    const previousWeekTime = previousWeekStats._sum.duration || 0;
-    const currentWeekCount = currentWeekStats._count;
-    const previousWeekCount = previousWeekStats._count;
+    const [currentWeekSessions, previousWeekSessions] = weeklyStats;
 
-    // Calculate basic statistics
-    const totalStudyTime = studySessions.reduce(
-      (total, session) => total + (session.duration || 0),
+    // Function to calculate actual duration for any session
+    const calculateSessionDuration = (session: any): number => {
+      if (session.status === "COMPLETED") {
+        // For completed sessions, prefer stored duration if it exists and > 0
+        if (session.duration && session.duration > 0) {
+          return session.duration;
+        }
+
+        // Fallback: calculate from startedAt to endedAt for old completed sessions
+        if (session.endedAt) {
+          const startTime = new Date(session.startedAt);
+          const endTime = new Date(session.endedAt);
+          return Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
+        }
+      }
+
+      // For active/paused sessions, calculate from start time
+      if (session.status === "ACTIVE" || session.status === "PAUSED") {
+        const endTime = session.endedAt
+          ? new Date(session.endedAt)
+          : new Date();
+        const startTime = new Date(session.startedAt);
+        return Math.floor((endTime.getTime() - startTime.getTime()) / 1000); // Convert to seconds
+      }
+
+      // For cancelled sessions or fallback, use stored duration or 0
+      return session.duration || 0;
+    };
+
+    // Calculate weekly totals with dynamic duration
+    const currentWeekTime = currentWeekSessions.reduce(
+      (total: number, session: any) => {
+        return total + calculateSessionDuration(session);
+      },
       0,
     );
+
+    const previousWeekTime = previousWeekSessions.reduce(
+      (total: number, session: any) => {
+        return total + calculateSessionDuration(session);
+      },
+      0,
+    );
+
+    const currentWeekCount = currentWeekSessions.length;
+    const previousWeekCount = previousWeekSessions.length;
+
+    // Calculate basic statistics - use dynamic duration calculation
+    const totalStudyTime = studySessions.reduce((total, session) => {
+      return total + calculateSessionDuration(session);
+    }, 0);
     const totalSessions = studySessions.length;
 
-    // Calculate study streak efficiently
+    // Calculate study streak efficiently with dynamic duration
     let currentStreak = 0;
     let maxStreak = 0;
     let tempStreak = 0;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Aggregate daily sessions for streak calculation with dynamic duration
+    const dailySessionsMap = new Map<string, number>();
+
+    dailyStudySessions.forEach((session) => {
+      const sessionDate = new Date(session.startedAt);
+      const dateKey = sessionDate.toISOString().split("T")[0];
+      const currentTotal = dailySessionsMap.get(dateKey) || 0;
+      const sessionDuration = calculateSessionDuration(session);
+      dailySessionsMap.set(dateKey, currentTotal + sessionDuration);
+    });
+
     for (let i = 0; i < 30; i++) {
       const checkDate = new Date(today);
       checkDate.setDate(checkDate.getDate() - i);
+      const dateKey = checkDate.toISOString().split("T")[0];
 
-      const hasStudyOnDate = dailyStudySessions.some((session) => {
-        const sessionDate = new Date(session.startedAt);
-        sessionDate.setHours(0, 0, 0, 0);
-        return sessionDate.getTime() === checkDate.getTime();
-      });
+      const hasStudyOnDate =
+        dailySessionsMap.has(dateKey) &&
+        (dailySessionsMap.get(dateKey) || 0) > 0;
 
       if (hasStudyOnDate) {
         tempStreak++;
@@ -274,6 +340,28 @@ export async function GET(_request: NextRequest) {
       }
     }
     maxStreak = Math.max(maxStreak, tempStreak);
+
+    // Aggregate study time by day (JavaScript aggregation with dynamic duration calculation)
+    const studyTimeByDayMap = new Map<string, number>();
+
+    // Process the raw study time data with dynamic duration
+    studyTimeByDay.forEach((session) => {
+      const sessionDate = new Date(session.startedAt);
+      const dateKey = sessionDate.toISOString().split("T")[0]; // YYYY-MM-DD format
+      const currentTotal = studyTimeByDayMap.get(dateKey) || 0;
+      const sessionDuration = calculateSessionDuration(session);
+      studyTimeByDayMap.set(dateKey, currentTotal + sessionDuration);
+    });
+
+    // Convert map to array format expected by frontend
+    const aggregatedStudyTimeByDay = Array.from(
+      studyTimeByDayMap.entries(),
+    ).map(([date, totalDuration]) => ({
+      startedAt: date,
+      _sum: {
+        duration: totalDuration,
+      },
+    }));
 
     // Calculate percentage changes for trends
     const timeChangePercent =
@@ -413,12 +501,12 @@ export async function GET(_request: NextRequest) {
         streak: {
           current: currentStreak,
           max: maxStreak,
-          days: dailyStudySessions.length,
+          days: dailySessionsMap.size, // Number of unique days with study sessions
         },
         recentSessions: studySessions,
         recentRooms: joinedRooms,
         recentNotes,
-        studyTimeByDay,
+        studyTimeByDay: aggregatedStudyTimeByDay,
         sessionTypes,
         roomActivity,
       },
