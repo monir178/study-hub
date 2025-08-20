@@ -251,8 +251,16 @@ export async function GET(_request: NextRequest) {
     // Extract weekly stats
     const [currentWeekSessions, previousWeekSessions] = weeklyStats;
 
+    // Type for session data used in calculations
+    type SessionData = {
+      startedAt: Date;
+      endedAt: Date | null;
+      duration: number | null;
+      status: string;
+    };
+
     // Function to calculate actual duration for any session
-    const calculateSessionDuration = (session: any): number => {
+    const calculateSessionDuration = (session: SessionData): number => {
       if (session.status === "COMPLETED") {
         // For completed sessions, prefer stored duration if it exists and > 0
         if (session.duration && session.duration > 0) {
@@ -282,14 +290,14 @@ export async function GET(_request: NextRequest) {
 
     // Calculate weekly totals with dynamic duration
     const currentWeekTime = currentWeekSessions.reduce(
-      (total: number, session: any) => {
+      (total: number, session: SessionData) => {
         return total + calculateSessionDuration(session);
       },
       0,
     );
 
     const previousWeekTime = previousWeekSessions.reduce(
-      (total: number, session: any) => {
+      (total: number, session: SessionData) => {
         return total + calculateSessionDuration(session);
       },
       0,
@@ -362,6 +370,112 @@ export async function GET(_request: NextRequest) {
         duration: totalDuration,
       },
     }));
+
+    // Generate enhanced chart data for better visualization (last 28 days)
+    const twentyEightDaysAgo = new Date(
+      now.getTime() - 28 * 24 * 60 * 60 * 1000,
+    );
+
+    // Get data for last 28 days for better charts
+    const extendedStudySessions = await prisma.studySession.findMany({
+      where: {
+        userId,
+        startedAt: { gte: twentyEightDaysAgo },
+      },
+      select: {
+        startedAt: true,
+        endedAt: true,
+        duration: true,
+        status: true,
+        type: true,
+      },
+    });
+
+    const extendedRoomMembers = await prisma.roomMember.findMany({
+      where: {
+        userId,
+        joinedAt: { gte: twentyEightDaysAgo },
+      },
+      select: {
+        joinedAt: true,
+        roomId: true,
+      },
+    });
+
+    const extendedCreatedRooms = await prisma.studyRoom.findMany({
+      where: {
+        creatorId: userId,
+        createdAt: { gte: twentyEightDaysAgo },
+      },
+      select: {
+        createdAt: true,
+        isPublic: true,
+      },
+    });
+
+    // Create comprehensive daily data for charts
+    const chartData = {
+      studyTime: [] as Array<{ date: string; value: number }>,
+      sessions: [] as Array<{ date: string; value: number }>,
+      joinedRooms: [] as Array<{ date: string; value: number }>,
+      createdRooms: [] as Array<{ date: string; value: number }>,
+      privateRooms: [] as Array<{ date: string; value: number }>,
+    };
+
+    // Generate data for last 28 days
+    for (let i = 27; i >= 0; i--) {
+      const checkDate = new Date(now);
+      checkDate.setDate(checkDate.getDate() - i);
+      const dateKey = checkDate.toISOString().split("T")[0];
+
+      // Study time for this day
+      const dayStudyTime = extendedStudySessions
+        .filter((session) => {
+          const sessionDate = new Date(session.startedAt)
+            .toISOString()
+            .split("T")[0];
+          return sessionDate === dateKey;
+        })
+        .reduce(
+          (total, session) => total + calculateSessionDuration(session),
+          0,
+        );
+
+      // Session count for this day
+      const daySessionCount = extendedStudySessions.filter((session) => {
+        const sessionDate = new Date(session.startedAt)
+          .toISOString()
+          .split("T")[0];
+        return sessionDate === dateKey;
+      }).length;
+
+      // Joined rooms for this day (cumulative)
+      const joinedRoomsCount = extendedRoomMembers.filter((member) => {
+        const joinDate = new Date(member.joinedAt).toISOString().split("T")[0];
+        return joinDate <= dateKey;
+      }).length;
+
+      // Created rooms for this day (cumulative)
+      const createdRoomsCount = extendedCreatedRooms.filter((room) => {
+        const createDate = new Date(room.createdAt).toISOString().split("T")[0];
+        return createDate <= dateKey;
+      }).length;
+
+      // Private rooms for this day (cumulative)
+      const privateRoomsCount = extendedCreatedRooms.filter((room) => {
+        const createDate = new Date(room.createdAt).toISOString().split("T")[0];
+        return createDate <= dateKey && !room.isPublic;
+      }).length;
+
+      chartData.studyTime.push({
+        date: dateKey,
+        value: Math.round(dayStudyTime / 60),
+      }); // Convert to minutes
+      chartData.sessions.push({ date: dateKey, value: daySessionCount });
+      chartData.joinedRooms.push({ date: dateKey, value: joinedRoomsCount });
+      chartData.createdRooms.push({ date: dateKey, value: createdRoomsCount });
+      chartData.privateRooms.push({ date: dateKey, value: privateRoomsCount });
+    }
 
     // Calculate percentage changes for trends
     const timeChangePercent =
@@ -509,6 +623,7 @@ export async function GET(_request: NextRequest) {
         studyTimeByDay: aggregatedStudyTimeByDay,
         sessionTypes,
         roomActivity,
+        chartData, // Enhanced chart data for better visualization
       },
     });
   } catch (error) {

@@ -233,6 +233,19 @@ export interface StudyStreak {
   days: number;
 }
 
+export interface ChartDataPoint {
+  date: string;
+  value: number;
+}
+
+export interface ChartData {
+  studyTime: ChartDataPoint[];
+  sessions: ChartDataPoint[];
+  joinedRooms: ChartDataPoint[];
+  createdRooms: ChartDataPoint[];
+  privateRooms: ChartDataPoint[];
+}
+
 export interface UserDashboardData {
   stats: UserDashboardStats;
   trends: DashboardTrends;
@@ -243,4 +256,5 @@ export interface UserDashboardData {
   studyTimeByDay: StudyTimeByDay[];
   sessionTypes: SessionTypeDistribution[];
   roomActivity: RoomActivity[];
+  chartData: ChartData;
 }

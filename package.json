@@ -89,7 +89,7 @@
     "react-redux": "^9.2.0",
     "react-select": "^5.10.2",
     "react-sounds": "^1.0.25",
-    "recharts": "2.15.4",
+    "recharts": "2.15.1",
     "remark-gfm": "^4.0.1",
     "resend": "^6.0.0",
     "slate": "^0.117.2",
@@ -101,7 +101,7 @@
     "zod": "^4.0.17"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@eslint/eslintrc": "2.15.4",
     "@storybook/addon-docs": "^9.0.18",
     "@storybook/addon-links": "^9.0.18",
     "@storybook/addon-onboarding": "^9.0.18",

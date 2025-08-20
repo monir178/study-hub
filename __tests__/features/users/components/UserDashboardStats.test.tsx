@@ -2,6 +2,23 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { UserDashboardStats } from "@/features/users/components/UserDashboardStats";
 
+// Mock next-intl
+jest.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+}));
+
+// Mock recharts components
+jest.mock("recharts", () => ({
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="responsive-container">{children}</div>
+  ),
+  AreaChart: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="area-chart">{children}</div>
+  ),
+  Area: () => <div data-testid="area" />,
+  Tooltip: () => <div data-testid="tooltip" />,
+}));
+
 describe("UserDashboardStats", () => {
   const stats = {
     totalStudyTime: 3600,

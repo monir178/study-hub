@@ -78,6 +78,10 @@ export function UserDashboard({ loading }: UserDashboardProps) {
       <UserDashboardStats
         stats={data.stats}
         trends={data.trends}
+        studyTimeByDay={data.studyTimeByDay}
+        sessionTypes={data.sessionTypes}
+        roomActivity={data.roomActivity}
+        chartData={data.chartData}
         loading={isLoading || loading}
       />
 
