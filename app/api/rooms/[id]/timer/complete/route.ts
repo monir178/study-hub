@@ -49,14 +49,17 @@ export async function POST(
 
     if (completedDuration && completedDuration > 0) {
       // Use the duration calculated by the frontend (for natural completion)
-      actualDuration = completedDuration;
+      // Add to existing duration in case this session was paused/resumed
+      actualDuration = (currentSession.duration || 0) + completedDuration;
     } else {
-      // Fallback: calculate from startedAt to now
+      // Fallback: calculate current study period from startedAt to now
       const startTime = currentSession.startedAt;
       const endTime = new Date();
-      actualDuration = Math.floor(
+      const currentPeriodDuration = Math.floor(
         (endTime.getTime() - startTime.getTime()) / 1000,
       );
+      // Add to existing duration in case this session was paused/resumed
+      actualDuration = (currentSession.duration || 0) + currentPeriodDuration;
     }
 
     // Complete the session with calculated duration

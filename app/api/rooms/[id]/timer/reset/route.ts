@@ -50,19 +50,23 @@ export async function POST(
       });
 
       if (currentSession) {
-        // Calculate actual duration: endTime - startTime
+        // Calculate current study period duration
         const startTime = currentSession.startedAt;
         const endTime = new Date();
-        const actualDuration = Math.floor(
+        const currentPeriodDuration = Math.floor(
           (endTime.getTime() - startTime.getTime()) / 1000,
         );
+
+        // Add to existing duration in case this session was paused/resumed
+        const totalDuration =
+          (currentSession.duration || 0) + currentPeriodDuration;
 
         await prisma.studySession.update({
           where: { id: sessionId },
           data: {
             status: "COMPLETED",
             endedAt: endTime,
-            duration: actualDuration, // Store the calculated duration
+            duration: totalDuration, // Store the accumulated duration
           },
         });
       }

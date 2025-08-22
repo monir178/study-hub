@@ -35,7 +35,7 @@ export function StudyTimeChart({ data, loading }: StudyTimeChartProps) {
   // Transform data for chart
   const chartData = data.map((item) => ({
     date: format(new Date(item.startedAt), "MMM dd"),
-    time: Math.round((item._sum.duration || 0) / 60), // Convert to minutes
+    time: Math.max(0, Math.round((item._sum.duration || 0) / 60)), // Ensure positive values and convert to minutes
   }));
 
   // Fill missing days with 0
@@ -76,6 +76,7 @@ export function StudyTimeChart({ data, loading }: StudyTimeChartProps) {
               <YAxis
                 tickLine={false}
                 axisLine={false}
+                domain={[0, "dataMax"]}
                 tickFormatter={(value) => `${value}m`}
               />
               <Tooltip

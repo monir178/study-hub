@@ -41,12 +41,37 @@ export async function POST(
       );
     }
 
-    // Update session to paused
+    // Get the current session to calculate how much time was actually studied
+    const currentSession = await prisma.studySession.findUnique({
+      where: { id: sessionId },
+      select: { startedAt: true, duration: true },
+    });
+
+    if (!currentSession) {
+      return NextResponse.json(
+        { success: false, error: "Session not found" },
+        { status: 404 },
+      );
+    }
+
+    // Calculate time studied during this active period
+    const studyStartTime = currentSession.startedAt;
+    const pauseTime = new Date();
+    const timeStudiedInThisSession = Math.floor(
+      (pauseTime.getTime() - studyStartTime.getTime()) / 1000,
+    );
+
+    // Add to existing duration (for resumed sessions)
+    const totalStudyTime =
+      (currentSession.duration || 0) + timeStudiedInThisSession;
+
+    // Update session to paused with accumulated study time
     const updatedSession = await prisma.studySession.update({
       where: { id: sessionId },
       data: {
         status: "PAUSED",
         remaining: remainingTime,
+        duration: totalStudyTime, // Store actual time studied so far
         controlledBy: session.user.id,
       },
     });

@@ -275,8 +275,14 @@ export async function GET(_request: NextRequest) {
         }
       }
 
-      // For active/paused sessions, calculate from start time
-      if (session.status === "ACTIVE" || session.status === "PAUSED") {
+      // For PAUSED sessions, use stored duration (time studied before pause)
+      if (session.status === "PAUSED") {
+        // Paused sessions should NOT continue growing - use stored duration
+        return session.duration || 0;
+      }
+
+      // For ACTIVE sessions, calculate from start time to now (only currently running sessions)
+      if (session.status === "ACTIVE") {
         const endTime = session.endedAt
           ? new Date(session.endedAt)
           : new Date();

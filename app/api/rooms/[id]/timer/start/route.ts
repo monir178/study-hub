@@ -47,22 +47,31 @@ export async function POST(
         roomId,
         status: { in: ["ACTIVE", "PAUSED"] },
       },
-      select: { id: true, startedAt: true },
+      select: { id: true, startedAt: true, duration: true, status: true },
     });
 
     // Calculate duration for each existing session and complete them
     const endTime = new Date();
     for (const session of existingSessions) {
-      const actualDuration = Math.floor(
-        (endTime.getTime() - session.startedAt.getTime()) / 1000,
-      );
+      let totalDuration: number;
+
+      if (session.status === "PAUSED") {
+        // For paused sessions, just use the stored duration (no additional time)
+        totalDuration = session.duration || 0;
+      } else {
+        // For active sessions, calculate current period and add to existing duration
+        const currentPeriodDuration = Math.floor(
+          (endTime.getTime() - session.startedAt.getTime()) / 1000,
+        );
+        totalDuration = (session.duration || 0) + currentPeriodDuration;
+      }
 
       await prisma.studySession.update({
         where: { id: session.id },
         data: {
           status: "COMPLETED",
           endedAt: endTime,
-          duration: actualDuration, // Store the calculated duration
+          duration: totalDuration, // Store the accumulated duration
         },
       });
     }
