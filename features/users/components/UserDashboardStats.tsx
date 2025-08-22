@@ -187,7 +187,7 @@ export function UserDashboardStats({
     {
       title: t("totalSessions"),
       value: stats.totalSessions.toString(),
-      period: "", // Remove "This week" text
+      period: "This week",
       data: generateChartData("sessions", stats.totalSessions),
       color: "#3b82f6", // blue-500
       icon: Timer,
@@ -199,7 +199,7 @@ export function UserDashboardStats({
     {
       title: t("joinedRooms"),
       value: stats.joinedRoomsCount.toString(),
-      period: "", // Remove redundant text
+      period: "This week",
       data: generateChartData("joinedRooms", stats.joinedRoomsCount),
       color: "#10b981", // emerald-500
       icon: Users,
@@ -211,7 +211,7 @@ export function UserDashboardStats({
     {
       title: t("createdRooms"),
       value: stats.createdRooms.toString(),
-      period: "", // Remove redundant text
+      period: "This week",
       data: generateChartData("createdRooms", stats.createdRooms),
       color: "#8b5cf6", // violet-500
       icon: BookOpen,
@@ -223,7 +223,7 @@ export function UserDashboardStats({
     {
       title: t("privateRooms"),
       value: stats.privateRooms.toString(),
-      period: "", // Remove redundant text
+      period: "This week",
       data: generateChartData("privateRooms", stats.privateRooms),
       color: "#f97316", // orange-500
       icon: TrendingUp,
@@ -266,19 +266,22 @@ export function UserDashboardStats({
 
                 <div className="flex items-end gap-4 justify-between">
                   {/* Details */}
-                  <div className="flex flex-col gap-1">
-                    {/* Period - only show if not empty */}
-                    {card.period && (
-                      <div className="text-sm text-muted-foreground whitespace-nowrap">
-                        {card.period}
-                      </div>
-                    )}
+                  <div className="flex flex-col gap-2">
+                    {/* Main Value - Top */}
+                    <div className="text-3xl font-bold text-foreground tracking-tight">
+                      {card.value}
+                    </div>
 
-                    {/* Value with trend indicator */}
-                    <div className="flex items-center gap-2">
-                      <div className="text-3xl font-bold text-foreground tracking-tight">
-                        {card.value}
-                      </div>
+                    {/* Bottom row: Period and Trend */}
+                    <div className="flex items-center justify-between gap-2">
+                      {/* Period text on the left */}
+                      {card.period && (
+                        <div className="text-sm text-muted-foreground whitespace-nowrap">
+                          {card.period}
+                        </div>
+                      )}
+
+                      {/* Trend indicator on the right */}
                       {card.change && (
                         <span
                           className="text-xs font-medium px-1.5 py-0.5 rounded"
