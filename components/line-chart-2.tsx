@@ -2,13 +2,7 @@
 
 import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardToolbar,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -144,13 +138,15 @@ export default function LineChart2() {
     <div className="min-h-screen flex items-center justify-center p-6 lg:p-8">
       <Card className="w-full lg:max-w-4xl ">
         <CardHeader className="border-0 min-h-auto pt-6 pb-4">
-          <CardTitle className="text-lg font-semibold">Cashflow</CardTitle>
-          <CardToolbar>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold">Cashflow</CardTitle>
             <Select
               value={selectedPeriod}
               onValueChange={(value) => setSelectedPeriod(value as PeriodKey)}
             >
-              <SelectTrigger>{currentPeriod.label}</SelectTrigger>
+              <SelectTrigger className="w-[140px]">
+                {currentPeriod.label}
+              </SelectTrigger>
               <SelectContent align="end">
                 {Object.values(PERIODS).map((period) => (
                   <SelectItem key={period.key} value={period.key}>
@@ -159,7 +155,7 @@ export default function LineChart2() {
                 ))}
               </SelectContent>
             </Select>
-          </CardToolbar>
+          </div>
         </CardHeader>
 
         <CardContent className="px-0">
@@ -172,7 +168,10 @@ export default function LineChart2() {
               <div className="text-3xl font-bold">
                 ${totalCash.toLocaleString()}
               </div>
-              <Badge variant="success" appearance="light">
+              <Badge
+                variant="default"
+                className="bg-green-500 text-white hover:bg-green-600"
+              >
                 <TrendingUp className="size-3" />
                 {Math.abs(percentageChange).toFixed(2)}%
               </Badge>
