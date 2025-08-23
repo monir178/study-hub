@@ -68,7 +68,7 @@ export function useRoomTimer({
 
   // Countdown logic - synchronized with server timestamps for accuracy
   const startCountdown = useCallback(() => {
-    console.log("🔄 startCountdown called");
+    // console.log("🔄 startCountdown called");
     if (countdownIntervalRef.current) {
       clearInterval(countdownIntervalRef.current);
     }
@@ -80,14 +80,14 @@ export function useRoomTimer({
           prevState.isPaused ||
           !prevState.startedAt
         ) {
-          console.log(
-            "⏸️ Countdown stopped - not running or missing startedAt:",
-            {
-              isRunning: prevState.isRunning,
-              isPaused: prevState.isPaused,
-              hasStartedAt: !!prevState.startedAt,
-            },
-          );
+          // console.log(
+          //   "⏸️ Countdown stopped - not running or missing startedAt:",
+          //   {
+          //     isRunning: prevState.isRunning,
+          //     isPaused: prevState.isPaused,
+          //     hasStartedAt: !!prevState.startedAt,
+          //   },
+          // );
           return prevState;
         }
 
@@ -102,12 +102,12 @@ export function useRoomTimer({
           initialRemainingTimeRef.current - elapsedSeconds,
         );
 
-        console.log("⏰ Countdown tick:", {
-          elapsedSeconds,
-          initialRemaining: initialRemainingTimeRef.current,
-          newRemainingTime,
-          totalDuration: prevState.totalDuration,
-        });
+        // console.log("⏰ Countdown tick:", {
+        //   elapsedSeconds,
+        //   initialRemaining: initialRemainingTimeRef.current,
+        //   newRemainingTime,
+        //   totalDuration: prevState.totalDuration,
+        // });
 
         // Timer completed
         if (newRemainingTime === 0 && prevState.sessionId) {
@@ -289,10 +289,10 @@ export function useRoomTimer({
 
   // Subscribe to Pusher events
   useEffect(() => {
-    console.log("📡 Subscribing to Pusher events for room:", roomId);
+    // console.log("📡 Subscribing to Pusher events for room:", roomId);
     const unsubscribe = subscribeToTimerEvents(roomId, handleTimerEvent);
     return () => {
-      console.log("📡 Unsubscribing from Pusher events for room:", roomId);
+      // console.log("📡 Unsubscribing from Pusher events for room:", roomId);
       unsubscribe();
       stopCountdown();
     };
@@ -346,8 +346,7 @@ export function useRoomTimer({
             startCountdown();
           }
         }
-      } catch (error) {
-        console.error("Failed to initialize timer:", error);
+      } catch {
         setError("Failed to load timer state");
       }
     };
@@ -363,12 +362,12 @@ export function useRoomTimer({
         return;
       }
 
-      console.log("🎬 Start button clicked - current state:", {
-        isPaused: state.isPaused,
-        sessionId: state.sessionId,
-        remainingTime: state.remainingTime,
-        isRunning: state.isRunning,
-      });
+      // console.log("🎬 Start button clicked - current state:", {
+      //   isPaused: state.isPaused,
+      //   sessionId: state.sessionId,
+      //   remainingTime: state.remainingTime,
+      //   isRunning: state.isRunning,
+      // });
 
       setLoading((prev) => ({ ...prev, start: true }));
       setError(null);
@@ -376,10 +375,10 @@ export function useRoomTimer({
       try {
         // Check if we're resuming a paused timer or starting fresh
         if (state.isPaused && state.sessionId && state.remainingTime > 0) {
-          console.log("🔄 Resuming existing session:", {
-            sessionId: state.sessionId,
-            remainingTime: state.remainingTime,
-          });
+          // console.log("🔄 Resuming existing session:", {
+          //   sessionId: state.sessionId,
+          //   remainingTime: state.remainingTime,
+          // });
           // Resume existing session
           await TimerApiService.resumeTimer(
             roomId,
@@ -387,7 +386,7 @@ export function useRoomTimer({
             state.remainingTime,
           );
         } else {
-          console.log("🆕 Starting new session");
+          // console.log("🆕 Starting new session");
           // Start new session
           await TimerApiService.startTimer(
             roomId,
@@ -396,8 +395,7 @@ export function useRoomTimer({
           );
         }
         // State will be updated via Pusher event
-      } catch (error) {
-        console.error("Failed to start timer:", error);
+      } catch {
         setError("Failed to start timer");
       } finally {
         setLoading((prev) => ({ ...prev, start: false }));
@@ -422,8 +420,7 @@ export function useRoomTimer({
           state.sessionNumber,
         );
         // State will be updated via Pusher event
-      } catch (error) {
-        console.error("Failed to pause timer:", error);
+      } catch {
         setError("Failed to pause timer");
       } finally {
         setLoading((prev) => ({ ...prev, pause: false }));
@@ -442,8 +439,8 @@ export function useRoomTimer({
       try {
         await TimerApiService.resetTimer(roomId, state.sessionId);
         // State will be updated via Pusher event
-      } catch (error) {
-        console.error("Failed to reset timer:", error);
+      } catch {
+        // console.error("Failed to reset timer:", error);
         setError("Failed to reset timer");
       } finally {
         setLoading((prev) => ({ ...prev, reset: false }));

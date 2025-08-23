@@ -67,7 +67,7 @@
     "input-otp": "^1.4.2",
     "jspdf": "^3.0.1",
     "liquid-glass-react": "^1.1.1",
-    "lucide-react": "^0.525.0",
+    "lucide-react": "latest",
     "motion": "^12.23.9",
     "next": "15.4.4",
     "next-auth": "5.0.0-beta.29",
@@ -79,6 +79,7 @@
     "prisma": "^6.13.0",
     "pusher": "^5.2.0",
     "pusher-js": "^8.4.0",
+    "radix-ui": "^1.4.3",
     "react": "19.1.0",
     "react-day-picker": "^9.8.1",
     "react-dom": "19.1.0",
@@ -101,7 +102,7 @@
     "zod": "^4.0.17"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/eslintrc": "^0.525.0",
     "@storybook/addon-docs": "^9.0.18",
     "@storybook/addon-links": "^9.0.18",
     "@storybook/addon-onboarding": "^9.0.18",

@@ -73,37 +73,37 @@ export function UserDashboardStats({
     if (chartData) {
       switch (type) {
         case "sessions":
-          return chartData.sessions.map((item) => ({
+          return chartData.sessions.slice(-7).map((item) => ({
             value: item.value,
             date: item.date,
             label: `${item.value} sessions`,
           }));
         case "joinedRooms":
-          return chartData.joinedRooms.map((item) => ({
+          return chartData.joinedRooms.slice(-7).map((item) => ({
             value: item.value,
             date: item.date,
             label: `${item.value} rooms joined`,
           }));
         case "createdRooms":
-          return chartData.createdRooms.map((item) => ({
+          return chartData.createdRooms.slice(-7).map((item) => ({
             value: item.value,
             date: item.date,
             label: `${item.value} rooms created`,
           }));
         case "privateRooms":
-          return chartData.privateRooms.map((item) => ({
+          return chartData.privateRooms.slice(-7).map((item) => ({
             value: item.value,
             date: item.date,
             label: `${item.value} private rooms`,
           }));
         case "studyTime":
-          return chartData.studyTime.map((item) => ({
+          return chartData.studyTime.slice(-7).map((item) => ({
             value: item.value,
             date: item.date,
             label: `${item.value} minutes studied`,
           }));
         default:
-          return chartData.sessions.map((item) => ({
+          return chartData.sessions.slice(-7).map((item) => ({
             value: item.value,
             date: item.date,
             label: `${item.value} sessions`,
@@ -140,7 +140,7 @@ export function UserDashboardStats({
       case "rooms":
         // Use room activity data
         if (roomActivity.length > 0) {
-          const dates = generateDateRange(roomActivity.length);
+          const dates = generateDateRange(7);
           return roomActivity.slice(-7).map((item, index) => {
             const value = item._count?.roomId || 0;
             return {
@@ -154,8 +154,8 @@ export function UserDashboardStats({
       case "sessionTypes":
         // Use session types for variety
         if (sessionTypes.length > 0) {
-          const dates = generateDateRange(sessionTypes.length);
-          return sessionTypes.map((item, index) => {
+          const dates = generateDateRange(7);
+          return sessionTypes.slice(-7).map((item, index) => {
             const value = item._count?.type || 0;
             return {
               value,
@@ -170,8 +170,8 @@ export function UserDashboardStats({
     // Generate realistic trend data with dates (only as last resort)
     const baseValue = Math.max(currentValue * 0.7, 1);
     const variation = currentValue * 0.3;
-    const dates = generateDateRange(28);
-    return Array.from({ length: 28 }, (_, i) => {
+    const dates = generateDateRange(7);
+    return Array.from({ length: 7 }, (_, i) => {
       const value = Math.round(
         baseValue + Math.random() * variation + (i * variation) / 20,
       );
