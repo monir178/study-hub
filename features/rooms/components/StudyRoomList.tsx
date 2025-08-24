@@ -111,7 +111,7 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">{t("title")}</h2>
           <p className="text-muted-foreground">{t("subtitle")}</p>
@@ -156,18 +156,30 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="public">
-            <Globe className="w-4 h-4 mr-2" />
-            {t("publicRooms")}
+        <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-4">
+          <TabsTrigger
+            value="public"
+            className="flex items-center gap-1 text-xs sm:text-sm"
+          >
+            <Globe className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden xs:inline sm:mr-2">{t("publicRooms")}</span>
+            <span className="xs:hidden">Public</span>
           </TabsTrigger>
-          <TabsTrigger value="joined">
-            <Users className="w-4 h-4 mr-2" />
-            {t("joinedRooms")}
+          <TabsTrigger
+            value="joined"
+            className="flex items-center gap-1 text-xs sm:text-sm"
+          >
+            <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden xs:inline sm:mr-2">{t("joinedRooms")}</span>
+            <span className="xs:hidden">Joined</span>
           </TabsTrigger>
-          <TabsTrigger value="my-rooms">
-            <Users className="w-4 h-4 mr-2" />
-            {t("myRooms")}
+          <TabsTrigger
+            value="my-rooms"
+            className="flex items-center gap-1 text-xs sm:text-sm"
+          >
+            <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden xs:inline sm:mr-2">{t("myRooms")}</span>
+            <span className="xs:hidden">Mine</span>
           </TabsTrigger>
         </TabsList>
 
