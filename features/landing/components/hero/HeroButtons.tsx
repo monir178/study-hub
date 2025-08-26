@@ -48,7 +48,7 @@ export function HeroButtons() {
       variants={fadeUpVariants}
       initial={initial}
       animate={animate}
-      className="flex flex-col md:flex-row items-center justify-center gap-3 sm:gap-6 mb-8 sm:mb-12 px-4"
+      className="flex flex-col md:flex-row items-center justify-center gap-6 mb-8 sm:mb-12 px-4"
     >
       {/* Primary Button - Default variant */}
       <Link href="/auth/signup">
@@ -99,8 +99,8 @@ export function HeroButtons() {
       {/* Demo Popover Form */}
       <PopoverForm
         title={
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 shadow-[0_0_8px_rgba(59,130,246,0.5)]">
+          <div className="flex items-center gap-2 ">
+            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-blue-500  to-purple-600 shadow-[0_0_8px_rgba(59,130,246,0.5)]">
               <Play className="w-3 h-3 text-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
             </div>
             <span className="font-semibold whitespace-nowrap">

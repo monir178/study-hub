@@ -36,7 +36,7 @@ export function PopoverForm({
         layoutId={`${typeof title === "string" ? title : "popover-form"}-wrapper`}
         onClick={() => setOpen(true)}
         style={{ borderRadius: 8 }}
-        className="flex h-10 items-center border-2 border-red-400 bg-background hover:bg-accent hover:text-accent-foreground px-4 text-sm font-medium outline-none transition-colors shadow-sm"
+        className="flex h-10 items-center border-2 border-primary bg-background hover:bg-accent hover:text-accent-foreground px-4 text-sm font-medium outline-none transition-colors shadow-sm"
       >
         <motion.span
           layoutId={`${typeof title === "string" ? title : "popover-form"}-title`}
