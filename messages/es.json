@@ -214,6 +214,7 @@
       "creating": "Creando sala...",
       "createButton": "Crear Sala",
       "cancel": "Cancelar",
+      "back": "Atrás",
       "validation": {
         "nameRequired": "El nombre de la sala es requerido",
         "nameMinLength": "El nombre de la sala debe tener al menos 3 caracteres",

@@ -214,6 +214,7 @@
       "creating": "Creating room...",
       "createButton": "Create Room",
       "cancel": "Cancel",
+      "back": "Back",
       "validation": {
         "nameRequired": "Room name is required",
         "nameMinLength": "Room name must be at least 3 characters",

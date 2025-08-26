@@ -27,7 +27,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Globe, Lock, Users, Plus } from "lucide-react";
+import { Globe, Lock, Users, Plus, ArrowLeft } from "lucide-react";
 import { useCreateRoom } from "../hooks/useRooms";
 
 // Zod schema factory for form validation with translations
@@ -110,10 +110,24 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Plus className="w-5 h-5" />
-          {t("title")}
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Plus className="w-5 h-5" />
+            <CardTitle>{t("title")}</CardTitle>
+          </div>
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onCancel}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>{t("back")}</span>
+            </Button>
+          )}
+        </div>
         <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
 
