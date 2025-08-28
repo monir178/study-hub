@@ -194,6 +194,9 @@ importers:
       react-phone-number-input:
         specifier: ^3.4.12
         version: 3.4.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react-photo-view:
+        specifier: ^1.2.7
+        version: 1.2.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react-redux:
         specifier: ^9.2.0
         version: 9.2.0(@types/react@19.1.8)(react@19.1.0)(redux@5.0.1)
@@ -6486,6 +6489,12 @@ packages:
     peerDependencies:
       react: '>=16.8'
       react-dom: '>=16.8'
+
+  react-photo-view@1.2.7:
+    resolution: {integrity: sha512-MfOWVPxuibncRLaycZUNxqYU8D9IA+rbGDDaq6GM8RIoGJal592hEJoRAyRSI7ZxyyJNJTLMUWWL3UIXHJJOpw==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   react-promise-suspense@0.3.4:
     resolution: {integrity: sha512-I42jl7L3Ze6kZaq+7zXWSunBa3b1on5yfvUW6Eo/3fFOj6dZ5Bqmcd264nJbTK/gn1HjjILAjSwnZbV4RpSaNQ==}
@@ -14976,6 +14985,11 @@ snapshots:
       input-format: 0.3.14(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       libphonenumber-js: 1.12.10
       prop-types: 15.8.1
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+
+  react-photo-view@1.2.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    dependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 

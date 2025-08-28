@@ -41,6 +41,8 @@ import {
   Reply,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import "react-photo-view/dist/react-photo-view.css";
 
 interface GroupChatProps {
   roomId: string;
@@ -360,15 +362,17 @@ export function GroupChat({ roomId }: GroupChatProps) {
     if (isImageUrl(fileUrl) || isSvgFile) {
       return {
         content: (
-          <div className="relative max-w-xs">
-            <Image
-              src={fileUrl}
-              alt={msg.fileName || "Image"}
-              width={300}
-              height={200}
-              className="rounded-lg object-cover"
-              style={{ maxHeight: "200px" }}
-            />
+          <div className="relative max-w-[280px] sm:max-w-xs">
+            <PhotoView src={fileUrl}>
+              <Image
+                src={fileUrl}
+                alt={msg.fileName || "Image"}
+                width={300}
+                height={200}
+                className="rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity w-full h-auto"
+                style={{ maxHeight: "200px" }}
+              />
+            </PhotoView>
           </div>
         ),
         hasWrapper: false, // No bubble wrapper for images
@@ -379,11 +383,11 @@ export function GroupChat({ roomId }: GroupChatProps) {
     if (isVideoUrl(fileUrl)) {
       return {
         content: (
-          <div className="relative max-w-xs">
+          <div className="relative max-w-[280px] sm:max-w-xs">
             <video
               src={fileUrl}
               controls
-              className="rounded-lg max-h-48"
+              className="rounded-lg max-h-48 w-full h-auto"
               preload="metadata"
             />
           </div>
@@ -407,7 +411,7 @@ export function GroupChat({ roomId }: GroupChatProps) {
       };
     }
 
-    // File Display (non-media) - Keep wrapper
+    // File Display (non-media) - Keep wrapper and show filename
     return {
       content: (
         <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
@@ -611,82 +615,79 @@ export function GroupChat({ roomId }: GroupChatProps) {
         <div className="flex flex-col h-full">
           {/* Messages Area with Auto-scroll */}
           <div className="flex-1 min-h-0">
-            <ChatMessageList smooth className="h-full [&>div>div]:space-y-1">
-              {messages.length === 0 ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center py-8">
-                    <p className="text-sm text-muted-foreground">
-                      No messages yet
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Start the conversation!
-                    </p>
+            <PhotoProvider>
+              <ChatMessageList smooth className="h-full [&>div>div]:space-y-1">
+                {messages.length === 0 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center py-8">
+                      <p className="text-sm text-muted-foreground">
+                        No messages yet
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Start the conversation!
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                messages.map(renderMessage)
-              )}
-            </ChatMessageList>
+                ) : (
+                  messages.map(renderMessage)
+                )}
+              </ChatMessageList>
+            </PhotoProvider>
           </div>
 
           {/* Input Area - Inside the rounded container */}
           <div className="border-t p-3 sm:p-4 space-y-3  flex-shrink-0">
             {/* File Preview */}
             {selectedFile && (
-              <div className="p-2 bg-muted/50 rounded-lg">
-                {filePreviewUrl ? (
-                  // Image Preview
-                  <div className="flex items-start gap-2">
-                    <div className="relative">
-                      <Image
-                        src={filePreviewUrl}
-                        alt={selectedFile.name}
-                        width={80}
-                        height={80}
-                        className="rounded-lg object-cover"
-                        style={{ maxHeight: "80px", maxWidth: "80px" }}
-                      />
+              <PhotoProvider>
+                <div className="inline-block p-2 bg-muted/50 rounded-lg max-w-[280px] sm:max-w-xs lg:max-w-sm">
+                  {filePreviewUrl ? (
+                    // Image/Video Preview - No filename for media files
+                    <div className="flex items-start gap-2">
+                      <div className="relative">
+                        <PhotoView src={filePreviewUrl}>
+                          <Image
+                            src={filePreviewUrl}
+                            alt={selectedFile.name}
+                            width={80}
+                            height={80}
+                            className="rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity w-20 h-20"
+                          />
+                        </PhotoView>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={handleRemoveFile}
+                        className="h-6 w-6 p-0 flex-shrink-0"
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="text-sm font-medium truncate block">
-                        {selectedFile.name}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                      </span>
+                  ) : (
+                    // Non-image File Preview - Show filename for non-media files
+                    <div className="flex items-center gap-2">
+                      {getFileIcon(selectedFile.type)}
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm font-medium truncate block">
+                          {selectedFile.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                        </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={handleRemoveFile}
+                        className="h-6 w-6 p-0 flex-shrink-0"
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={handleRemoveFile}
-                      className="h-6 w-6 p-0 flex-shrink-0"
-                    >
-                      <X className="w-3 h-3" />
-                    </Button>
-                  </div>
-                ) : (
-                  // Non-image File Preview
-                  <div className="flex items-center gap-2">
-                    {getFileIcon(selectedFile.type)}
-                    <div className="flex-1 min-w-0">
-                      <span className="text-sm font-medium truncate block">
-                        {selectedFile.name}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                      </span>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={handleRemoveFile}
-                      className="h-6 w-6 p-0 flex-shrink-0"
-                    >
-                      <X className="w-3 h-3" />
-                    </Button>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              </PhotoProvider>
             )}
 
             {/* Voice Recording Indicator */}

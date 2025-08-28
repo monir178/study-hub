@@ -91,6 +91,7 @@
     "react-hook-form": "^7.61.1",
     "react-markdown": "^10.1.0",
     "react-phone-number-input": "^3.4.12",
+    "react-photo-view": "^1.2.7",
     "react-redux": "^9.2.0",
     "react-select": "^5.10.2",
     "react-sounds": "^1.0.25",
