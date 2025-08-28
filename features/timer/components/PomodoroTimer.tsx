@@ -496,7 +496,7 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
         </div>
       </div>
 
-      {/* Mobile & Tablet - Ultra Minimalistic Design */}
+      {/* Mobile & Tablet - Minimalistic Design */}
       <div className="block lg:hidden">
         {/* Success Feedback */}
         {actionSuccess && (
@@ -508,13 +508,26 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
           </div>
         )}
 
-        <div className="bg-background/95 backdrop-blur-sm border rounded-lg p-3 shadow-lg">
+        <div className="bg-background/95 backdrop-blur-sm border rounded-lg p-3 shadow-lg mx-4 mb-3">
+          {/* Single Row - All Controls */}
           <div className="flex items-center justify-between">
-            {/* Left: Phase Info & Timer */}
-            <TimerDisplay timer={timerForComponents} variant="mobile" />
+            {/* Left: Timer & Phase */}
+            <div className="flex items-center gap-2">
+              <div className="text-lg font-mono font-bold">
+                {formatTime(timer.remainingTime)}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {timer.phase === "focus"
+                  ? "Focus"
+                  : timer.phase === "break"
+                    ? "Break"
+                    : "Long Break"}{" "}
+                • {timer.sessionNumber}/4
+              </div>
+            </div>
 
-            {/* Right: Status & Controls */}
-            <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Right: Status, Sound & Controls */}
+            <div className="flex items-center gap-2">
               {/* Status Indicator */}
               <div
                 className={`w-2 h-2 rounded-full ${
@@ -526,7 +539,21 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
                 }`}
               ></div>
 
-              {/* Compact Controls */}
+              {/* Sound Toggle */}
+              <Button
+                onClick={handleToggleSound}
+                variant="outline"
+                size="sm"
+                className="h-7 w-7 p-0"
+              >
+                {soundEnabled ? (
+                  <Volume2 className="w-3 h-3 text-green-600" />
+                ) : (
+                  <VolumeX className="w-3 h-3 text-muted-foreground" />
+                )}
+              </Button>
+
+              {/* Controls */}
               <TimerControls
                 actions={actionsWithSound}
                 loading={loading}
@@ -535,25 +562,22 @@ export function PomodoroTimer({ roomId, roomCreatorId }: PomodoroTimerProps) {
                 _isPaused={timer?.isPaused || false}
                 variant="mobile"
               />
-
-              {/* Sound Toggle - Compact */}
-              <Button
-                onClick={handleToggleSound}
-                variant="outline"
-                size="sm"
-                className="h-8 w-8 p-0"
-              >
-                {soundEnabled ? (
-                  <Volume2 className="w-3 h-3 text-green-600" />
-                ) : (
-                  <VolumeX className="w-3 h-3 text-muted-foreground" />
-                )}
-              </Button>
             </div>
           </div>
 
           {/* Progress Bar - Compact */}
-          <TimerProgress timer={timerForComponents} variant="mobile" />
+          <div className="mt-2">
+            <TimerProgress timer={timerForComponents} variant="mobile" />
+          </div>
+
+          {/* Permission Message - Small and Subtle */}
+          {!permissions.canControl && (
+            <div className="mt-2 text-center">
+              <p className="text-xs text-muted-foreground/70">
+                Only room owner can control the timer
+              </p>
+            </div>
+          )}
 
           {/* Error Display - Compact */}
           {error && (

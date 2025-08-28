@@ -23,14 +23,18 @@ export function TimerControls({
   _isPaused,
   variant = "desktop",
 }: TimerControlsProps) {
-  if (!canControl) {
+  if (!canControl && variant === "desktop") {
     return (
       <div className="text-center p-3 rounded-lg bg-muted/20 border border-border/30">
-        <p className="text-sm text-muted-foreground">
-          Only moderators can control the timer
+        <p className="text-xs md:text-sm text-muted-foreground">
+          Only room owner can control the timer
         </p>
       </div>
     );
+  }
+
+  if (!canControl && variant === "mobile") {
+    return null; // Don't show anything for mobile, handled in parent component
   }
 
   if (variant === "mobile") {
