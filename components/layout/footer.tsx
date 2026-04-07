@@ -2,7 +2,8 @@
 
 import { Link } from "@/i18n/navigation";
 import { usePathname } from "next/navigation";
-import { Github, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
+import { GithubIcon } from "@/components/ui/github-icon";
 import Image from "next/image";
 
 interface FooterProps {
@@ -30,7 +31,7 @@ const socialLinks = [
   {
     name: "GitHub",
     href: "https://github.com/monir178/study-hub",
-    icon: Github,
+    icon: GithubIcon,
   },
   { name: "Email", href: "mailto:monir.mzs17@gmail.com", icon: Mail },
 ];
@@ -181,7 +182,7 @@ export function Footer({ locale: _locale = "en" }: FooterProps) {
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 text-primary hover:underline font-medium"
               >
-                <Github className="h-4 w-4" />
+                <GithubIcon className="h-4 w-4" />
                 Star
               </a>
             </div>

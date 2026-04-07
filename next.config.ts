@@ -14,9 +14,10 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       allowedOrigins: ["localhost:3000"],
-      bodySizeLimit: "50mb", // Increase body size limit for file uploads
+      bodySizeLimit: "50mb",
     },
   },
+  serverExternalPackages: ["pusher"],
 };
 
 export default withNextIntl(nextConfig);

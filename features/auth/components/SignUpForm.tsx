@@ -12,7 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { Eye, EyeOff, Github, Mail, User } from "lucide-react";
+import { Eye, EyeOff, Mail, User } from "lucide-react";
+import { GithubIcon } from "@/components/ui/github-icon";
 import { signIn } from "next-auth/react";
 import { Link } from "@/i18n/navigation";
 import { useApiMutation } from "@/lib/api/hooks/use-api-mutation";
@@ -320,7 +321,7 @@ export function SignUpForm() {
             onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
             disabled={isSubmitting}
           >
-            <Github className="mr-2 h-4 w-4" />
+            <GithubIcon className="mr-2 h-4 w-4" />
             GitHub
           </Button>
         </div>

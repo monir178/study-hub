@@ -1,6 +1,6 @@
 import createMiddleware from "next-intl/middleware";
 import { NextRequest } from "next/server";
-import { auth } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { routing } from "./i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
@@ -10,7 +10,10 @@ export default async function middleware(request: NextRequest) {
   const response = intlMiddleware(request);
 
   // Handle authentication for protected routes
-  const session = await auth();
+  const token = await getToken({
+    req: request,
+    secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  });
   const { pathname } = request.nextUrl;
 
   // Protected routes (handle locale prefixes)
@@ -24,7 +27,7 @@ export default async function middleware(request: NextRequest) {
     pathWithoutLocale.startsWith(route),
   );
 
-  if (isProtectedRoute && !session) {
+  if (isProtectedRoute && !token) {
     return Response.redirect(new URL("/auth/signin", request.url));
   }
 

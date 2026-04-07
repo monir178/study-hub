@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { triggerChatMessage } from "@/lib/pusher";
+import { triggerChatMessage } from "@/lib/pusher-triggers";
 import { ApiResponse, ApiError } from "@/lib/api/types";
 import { z } from "zod";
 

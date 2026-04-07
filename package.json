@@ -29,8 +29,8 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "@auth/prisma-adapter": "^2.11.1",
-    "@hookform/resolvers": "^5.2.2",
+    "@auth/prisma-adapter": "^2.11.0",
+    "@hookform/resolvers": "^3.10.0",
     "@prisma/client": "^6.19.3",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -81,7 +81,7 @@
     "nodemailer": "^8.0.5",
     "ogl": "^1.0.11",
     "prisma": "^6.19.3",
-    "pusher": "^5.3.3",
+    "pusher": "^5.2.0",
     "pusher-js": "^8.5.0",
     "radix-ui": "^1.4.3",
     "react": "19.1.0",
@@ -104,7 +104,7 @@
     "slate-react": "^0.117.4",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
-    "zod": "^4.3.6"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",

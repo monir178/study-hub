@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { triggerChatMessage, triggerMemberUpdate } from "@/lib/pusher";
+import { triggerChatMessage, triggerMemberUpdate } from "@/lib/pusher-triggers";
 import { z } from "zod";
 
 const joinRoomSchema = z.object({

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { pusherServer } from "@/lib/pusher";
+import { pusherServer } from "@/lib/pusher-triggers";
 import { TimerCompleteEvent } from "@/features/timer/types/timer-events";
 
 // POST - Complete timer (when timer naturally finishes)

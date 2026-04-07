@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { pusherServer } from "@/lib/pusher";
+import { pusherServer } from "@/lib/pusher-triggers";
 import { TimerResetEvent } from "@/features/timer/types/timer-events";
 import { canControlRoomTimer } from "@/lib/utils/timer-permissions";
 

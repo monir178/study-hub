@@ -13,7 +13,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { Eye, EyeOff, Github, Mail } from "lucide-react";
+import { Eye, EyeOff, Mail } from "lucide-react";
+import { GithubIcon } from "@/components/ui/github-icon";
 import { Link } from "@/i18n/navigation";
 import { useForgotPassword } from "@/features/auth/hooks/useAuthFlows";
 import { savePendingPasswordReset } from "@/features/auth/utils/pendingPasswordReset";
@@ -217,7 +218,7 @@ export function SignInForm() {
             onClick={() => handleOAuthSignIn("github")}
             disabled={isSubmitting}
           >
-            <Github className="mr-2 h-4 w-4" />
+            <GithubIcon className="mr-2 h-4 w-4" />
             GitHub
           </Button>
         </div>

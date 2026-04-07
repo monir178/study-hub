@@ -1,5 +1,6 @@
+"use client";
+
 import PusherClient from "pusher-js";
-import PusherServer from "pusher";
 
 // Initialize Pusher client (for client-side) with fallbacks for build time
 export const pusherClient = new PusherClient(
@@ -9,15 +10,6 @@ export const pusherClient = new PusherClient(
     forceTLS: true,
   },
 );
-
-// Initialize Pusher server (for server-side) with fallbacks for build time
-export const pusherServer = new PusherServer({
-  appId: process.env.PUSHER_APP_ID || "dummy-app-id",
-  key: process.env.NEXT_PUBLIC_PUSHER_KEY || "dummy-key",
-  secret: process.env.PUSHER_SECRET || "dummy-secret",
-  cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "us2",
-  useTLS: true,
-});
 
 // Helper function to subscribe to room timer channel
 export const subscribeToRoomTimer = (roomId: string) => {
@@ -47,84 +39,4 @@ export const subscribeToRoomChat = (roomId: string) => {
 // Helper function to unsubscribe from room chat channel
 export const unsubscribeFromRoomChat = (roomId: string) => {
   pusherClient.unsubscribe(`room-${roomId}-chat`);
-};
-
-// Server-side helper to trigger timer updates
-export const triggerTimerUpdate = async (
-  roomId: string,
-  timer: Record<string, unknown>,
-  action: string,
-  controlledBy: string,
-) => {
-  try {
-    // Skip pusher only during build time or if environment variables are missing
-    if (!process.env.PUSHER_SECRET) {
-      console.log("Skipping Pusher trigger - missing environment variables");
-      return;
-    }
-
-    await pusherServer.trigger(`room-${roomId}-timer`, "update", {
-      timer,
-      action,
-      controlledBy,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error("Error triggering timer update:", error);
-  }
-};
-
-// Server-side helper to trigger chat message updates
-export const triggerChatMessage = async (
-  roomId: string,
-  message: Record<string, unknown>,
-) => {
-  try {
-    // Skip pusher only during build time or if environment variables are missing
-    if (!process.env.PUSHER_SECRET) {
-      console.log("Skipping Pusher trigger - missing environment variables");
-      return;
-    }
-
-    await pusherServer.trigger(`room-${roomId}-chat`, "new-message", {
-      message,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error("Error triggering chat message:", error);
-  }
-};
-
-// Server-side helper to trigger member updates
-export const triggerMemberUpdate = async (
-  roomId: string,
-  event: "member-joined" | "member-left",
-  data: {
-    member: Record<string, unknown>;
-    memberCount: number;
-    members?: Array<{
-      id: string;
-      user: {
-        id: string;
-        name: string | null;
-        image: string | null;
-      };
-      role: string;
-    }>;
-  },
-) => {
-  try {
-    // Skip pusher only during build time or if environment variables are missing
-    if (!process.env.PUSHER_SECRET) {
-      console.log("Skipping Pusher trigger - missing environment variables");
-      return;
-    }
-
-    await pusherServer.trigger(`room-${roomId}-members`, event, {
-      ...data,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error("Error triggering member update:", error);
-  }
 };

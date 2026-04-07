@@ -23,13 +23,18 @@ export function useApiMutation<TData, TVariables>({
 }: MutationConfig<TData, TVariables>) {
   return useMutation({
     mutationFn,
-    onSuccess: async (data, variables, context) => {
+    onSuccess: async (data, variables, context, meta) => {
       if (successMessage) {
         toast.success(successMessage);
       }
-      options?.onSuccess?.(data, variables, context);
+      options?.onSuccess?.(data, variables, context, meta);
     },
-    onError: async (error: AxiosError<ErrorResponse>, variables, context) => {
+    onError: async (
+      error: AxiosError<ErrorResponse>,
+      variables,
+      context,
+      meta,
+    ) => {
       // Extract error message from API response
       const errorMessage =
         error.response?.data?.message ||
@@ -37,7 +42,7 @@ export function useApiMutation<TData, TVariables>({
         error.message ||
         "An error occurred";
       toast.error(errorMessage);
-      options?.onError?.(error, variables, context);
+      options?.onError?.(error, variables, context, meta);
     },
     ...options,
   });
