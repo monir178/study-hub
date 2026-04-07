@@ -64,6 +64,8 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  feedbackEmailsSent Int  @default(0)
+
   accounts      Account[]
   sessions      Session[]
   createdRooms  StudyRoom[]     @relation("RoomCreator")

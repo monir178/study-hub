@@ -75,12 +75,15 @@ export function useRooms(params?: {
   search?: string;
   myRooms?: boolean;
   joinedRooms?: boolean;
+  adminPrivate?: boolean;
 }) {
-  const queryKey = params?.joinedRooms
-    ? queryKeys.joinedRooms()
-    : params?.myRooms
-      ? queryKeys.myRooms()
-      : queryKeys.publicRooms();
+  const queryKey = params?.adminPrivate
+    ? queryKeys.adminPrivateRooms()
+    : params?.joinedRooms
+      ? queryKeys.joinedRooms()
+      : params?.myRooms
+        ? queryKeys.myRooms()
+        : queryKeys.publicRooms();
 
   return useApiQuery<RoomsResponse>({
     queryKey: [...queryKey, params],
@@ -91,6 +94,7 @@ export function useRooms(params?: {
       if (params?.search) searchParams.set("search", params.search);
       if (params?.myRooms) searchParams.set("myRooms", "true");
       if (params?.joinedRooms) searchParams.set("joinedRooms", "true");
+      if (params?.adminPrivate) searchParams.set("adminPrivate", "true");
 
       return apiClient.get(`/rooms?${searchParams.toString()}`);
     },
@@ -261,6 +265,15 @@ export function usePublicRooms(params?: {
   search?: string;
 }) {
   return useRooms({ ...params, myRooms: false });
+}
+
+// Admin-only: all private rooms across all users
+export function useAdminPrivateRooms(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+}) {
+  return useRooms({ ...params, adminPrivate: true });
 }
 
 // Prefetch room hook

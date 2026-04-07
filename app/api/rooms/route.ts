@@ -35,12 +35,30 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || "";
     const myRooms = searchParams.get("myRooms") === "true";
     const joinedRooms = searchParams.get("joinedRooms") === "true";
+    const adminPrivate = searchParams.get("adminPrivate") === "true";
+
+    // Admin-only: viewing all private rooms across all users
+    if (adminPrivate) {
+      const dbUser = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { role: true },
+      });
+      if (dbUser?.role !== "ADMIN") {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Forbidden: Admin access required",
+          } satisfies ApiError,
+          { status: 403 },
+        );
+      }
+    }
 
     const skip = (page - 1) * limit;
 
-    const where = myRooms
+    const where = adminPrivate
       ? {
-          creatorId: session.user.id, // Only rooms created by the current user
+          isPublic: false,
           ...(search && {
             OR: [
               { name: { contains: search, mode: "insensitive" as const } },
@@ -50,10 +68,9 @@ export async function GET(request: NextRequest) {
             ],
           }),
         }
-      : joinedRooms
+      : myRooms
         ? {
-            // Rooms where the current user is a member (public or private)
-            members: { some: { userId: session.user.id } },
+            creatorId: session.user.id, // Only rooms created by the current user
             ...(search && {
               OR: [
                 { name: { contains: search, mode: "insensitive" as const } },
@@ -66,20 +83,36 @@ export async function GET(request: NextRequest) {
               ],
             }),
           }
-        : {
-            isPublic: true,
-            ...(search && {
-              OR: [
-                { name: { contains: search, mode: "insensitive" as const } },
-                {
-                  description: {
-                    contains: search,
-                    mode: "insensitive" as const,
+        : joinedRooms
+          ? {
+              // Rooms where the current user is a member (public or private)
+              members: { some: { userId: session.user.id } },
+              ...(search && {
+                OR: [
+                  { name: { contains: search, mode: "insensitive" as const } },
+                  {
+                    description: {
+                      contains: search,
+                      mode: "insensitive" as const,
+                    },
                   },
-                },
-              ],
-            }),
-          };
+                ],
+              }),
+            }
+          : {
+              isPublic: true,
+              ...(search && {
+                OR: [
+                  { name: { contains: search, mode: "insensitive" as const } },
+                  {
+                    description: {
+                      contains: search,
+                      mode: "insensitive" as const,
+                    },
+                  },
+                ],
+              }),
+            };
 
     const [rooms, total] = await Promise.all([
       prisma.studyRoom.findMany({

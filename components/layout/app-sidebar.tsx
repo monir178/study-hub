@@ -7,6 +7,17 @@ import { signOut } from "next-auth/react";
 import { Link } from "@/i18n/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { SignOutDialog } from "@/features/shared/components/SignOutDialog";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -23,7 +34,16 @@ import {
   SidebarMenuBadge,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { BookOpen, Users, FileText, User, Home, LogOut } from "lucide-react";
+import {
+  BookOpen,
+  Users,
+  FileText,
+  User,
+  Home,
+  LogOut,
+  Mail,
+  Loader2,
+} from "lucide-react";
 import Image from "next/image";
 
 interface NavItem {
@@ -39,9 +59,33 @@ export function AppSidebar() {
     isOpen: false,
     isSigningOut: false,
   });
+  const [broadcastState, setBroadcastState] = useState({
+    isOpen: false,
+    isBroadcasting: false,
+  });
   const { user, isAuthenticated } = useAuth();
   const pathname = usePathname();
   const t = useTranslations("sidebar");
+
+  const handleBroadcast = async () => {
+    try {
+      setBroadcastState((prev) => ({ ...prev, isBroadcasting: true }));
+      const res = await fetch("/api/admin/broadcast-feedback", {
+        method: "POST",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Failed to broadcast");
+
+      toast.success(data.message);
+      setBroadcastState({ isOpen: false, isBroadcasting: false });
+    } catch (error) {
+      const e = error as Error;
+      toast.error(e.message || "An error occurred");
+      setBroadcastState((prev) => ({ ...prev, isBroadcasting: false }));
+    }
+  };
 
   // Don't render sidebar on public pages or if not authenticated
   if (
@@ -208,6 +252,21 @@ export function AppSidebar() {
                   </span>
                 </SidebarMenuButton>
               </SidebarMenuItem> */}
+
+              {user.role === "ADMIN" && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => {
+                      setBroadcastState((prev) => ({ ...prev, isOpen: true }));
+                    }}
+                    className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:text-amber-300 dark:hover:bg-amber-950"
+                  >
+                    <Mail className="h-4 w-4" />
+                    <span>Broadcast Feedback</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => {
@@ -267,6 +326,45 @@ export function AppSidebar() {
         onSignOut={handleSignOut}
         translationNamespace="sidebar"
       />
+
+      {/* Broadcast Dialog */}
+      <AlertDialog
+        open={broadcastState.isOpen}
+        onOpenChange={(open) => {
+          if (!broadcastState.isBroadcasting) {
+            setBroadcastState((prev) => ({ ...prev, isOpen: open }));
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Broadcast Feedback Emails</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to send a feedback email to all registered
+              users? This process may take a few minutes as it sends emails
+              sequentially to avoid spam filters.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={broadcastState.isBroadcasting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleBroadcast();
+              }}
+              disabled={broadcastState.isBroadcasting}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              {broadcastState.isBroadcasting && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              {broadcastState.isBroadcasting ? "Sending..." : "Send Broadcast"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Sidebar>
   );
 }

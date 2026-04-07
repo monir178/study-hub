@@ -258,6 +258,24 @@ export function UsersDataTable({}: UsersDataTableProps) {
       },
     },
     {
+      accessorKey: "feedbackEmailsSent",
+      header: "Feedback Email",
+      cell: ({ row }) => {
+        const count = (row.getValue("feedbackEmailsSent") as number) || 0;
+        return (
+          <div className="text-sm font-medium">
+            {count > 0 ? (
+              <span className="text-green-600 dark:text-green-400">
+                Yes ({count})
+              </span>
+            ) : (
+              <span className="text-muted-foreground">No</span>
+            )}
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "createdAt",
       header: "Joined",
       cell: ({ row }) => {
@@ -417,6 +435,7 @@ export function UsersDataTable({}: UsersDataTableProps) {
                 <TableRow>
                   <TableHead>User</TableHead>
                   <TableHead>Role</TableHead>
+                  <TableHead>Feedback Email</TableHead>
                   <TableHead>Joined</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -435,6 +454,9 @@ export function UsersDataTable({}: UsersDataTableProps) {
                     </TableCell>
                     <TableCell>
                       <Skeleton className="w-16 h-6 rounded-full" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="w-16 h-4" />
                     </TableCell>
                     <TableCell>
                       <Skeleton className="w-24 h-4" />

@@ -73,8 +73,15 @@ export async function POST(
       );
     }
 
-    // Check password if room is private
-    if (!room.isPublic && room.password) {
+    // Fetch the joining user's platform role from DB
+    const joiningUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true },
+    });
+    const isAdmin = joiningUser?.role === "ADMIN";
+
+    // Check password if room is private — admins bypass this
+    if (!isAdmin && !room.isPublic && room.password) {
       if (!password || password.trim().length === 0) {
         return NextResponse.json(
           { success: false, error: "Password is required" },
@@ -99,34 +106,36 @@ export async function POST(
       },
     });
 
-    // Create system message
-    const systemMessage = await prisma.message.create({
-      data: {
-        content: `${session.user.name || session.user.email} joined the room`,
-        type: "SYSTEM",
-        authorId: session.user.id,
-        roomId: roomId,
-      },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-            role: true,
+    // Create system message — skip for admins to keep their join invisible
+    if (!isAdmin) {
+      const systemMessage = await prisma.message.create({
+        data: {
+          content: `${session.user.name || session.user.email} joined the room`,
+          type: "SYSTEM",
+          authorId: session.user.id,
+          roomId: roomId,
+        },
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              role: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    // Broadcast system message via Pusher
-    await triggerChatMessage(roomId, {
-      id: systemMessage.id,
-      content: systemMessage.content,
-      type: systemMessage.type,
-      createdAt: systemMessage.createdAt,
-      author: systemMessage.author,
-    });
+      // Broadcast system message via Pusher
+      await triggerChatMessage(roomId, {
+        id: systemMessage.id,
+        content: systemMessage.content,
+        type: systemMessage.type,
+        createdAt: systemMessage.createdAt,
+        author: systemMessage.author,
+      });
+    }
 
     // Get updated room data
     const updatedRoom = await prisma.studyRoom.findUnique({

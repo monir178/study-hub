@@ -22,6 +22,8 @@ export interface User {
   postalCode: string | null;
   country: string | null;
 
+  feedbackEmailsSent: number;
+
   createdAt: string; // ISO string instead of Date
   updatedAt: string; // ISO string instead of Date
 }

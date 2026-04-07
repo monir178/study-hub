@@ -17,12 +17,19 @@ import {
   Globe,
   AlertCircle,
   Lock,
+  ShieldAlert,
 } from "lucide-react";
 import { StudyRoomCard } from "./StudyRoomCard";
 import { CreateRoomForm } from "./CreateRoomForm";
 import { JoinPrivateRoomDialog } from "./JoinPrivateRoomDialog";
-import { useRooms, useJoinRoom, useLeaveRoom } from "../hooks/useRooms";
+import {
+  useRooms,
+  useJoinRoom,
+  useLeaveRoom,
+  useAdminPrivateRooms,
+} from "../hooks/useRooms";
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 interface StudyRoomListProps {
   onRoomSelect?: (roomId: string) => void;
@@ -31,6 +38,8 @@ interface StudyRoomListProps {
 export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
   const t = useTranslations("rooms");
   const tCommon = useTranslations("common");
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
   const [search, setSearch] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showJoinPrivateDialog, setShowJoinPrivateDialog] = useState(false);
@@ -60,6 +69,18 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
     search: debouncedSearch,
     myRooms: activeTab === "my-rooms",
     joinedRooms: activeTab === "joined",
+  });
+
+  // Admin-only: private rooms across all users (only fetched when admin is on that tab)
+  const {
+    data: privateRoomsData,
+    isLoading: isLoadingPrivate,
+    error: privateError,
+    refetch: refetchPrivate,
+  } = useAdminPrivateRooms({
+    page,
+    limit: 12,
+    search: debouncedSearch,
   });
 
   const joinRoom = useJoinRoom();
@@ -144,7 +165,10 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
         </div>
         <Button
           variant="outline"
-          onClick={() => refetch()}
+          onClick={() => {
+            refetch();
+            if (isAdmin && refetchPrivate) refetchPrivate();
+          }}
           disabled={isRefetching}
         >
           <RefreshCw
@@ -156,7 +180,9 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-4">
+        <TabsList
+          className={`grid w-full max-w-2xl mb-4 ${isAdmin ? "grid-cols-4" : "grid-cols-3"}`}
+        >
           <TabsTrigger
             value="public"
             className="flex items-center gap-1 text-xs sm:text-sm"
@@ -181,6 +207,16 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
             <span className="hidden xs:inline sm:mr-2">{t("myRooms")}</span>
             <span className="xs:hidden">Mine</span>
           </TabsTrigger>
+          {isAdmin && (
+            <TabsTrigger
+              value="private"
+              className="flex items-center gap-1 text-xs sm:text-sm"
+            >
+              <ShieldAlert className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:mr-2">Private</span>
+              <span className="xs:hidden">Priv.</span>
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="public" className="space-y-4">
@@ -381,6 +417,118 @@ export function StudyRoomList({ onRoomSelect }: StudyRoomListProps) {
             </div>
           )}
         </TabsContent>
+
+        {/* Admin-only: Private Rooms across all users */}
+        {isAdmin && (
+          <TabsContent value="private" className="space-y-4">
+            {/* Stats */}
+            {privateRoomsData?.pagination && (
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <ShieldAlert className="w-4 h-4" />
+                  <span>
+                    {privateRoomsData.pagination.total} private room
+                    {privateRoomsData.pagination.total !== 1 ? "s" : ""} (all
+                    users)
+                  </span>
+                </div>
+                {debouncedSearch && (
+                  <Badge variant="outline">
+                    {t("searchPrefix")} "{debouncedSearch}"
+                  </Badge>
+                )}
+              </div>
+            )}
+
+            {/* Loading Skeleton */}
+            {isLoadingPrivate && (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Card key={i}>
+                    <CardHeader>
+                      <div className="space-y-2">
+                        <div className="h-5 bg-muted animate-pulse rounded w-3/4"></div>
+                        <div className="h-4 bg-muted animate-pulse rounded w-full"></div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="h-4 bg-muted animate-pulse rounded w-1/2"></div>
+                        <div className="h-4 bg-muted animate-pulse rounded w-2/3"></div>
+                        <div className="h-8 bg-muted animate-pulse rounded"></div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {/* Error */}
+            {privateError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Failed to load private rooms
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Empty state */}
+            {!isLoadingPrivate &&
+              !privateError &&
+              (privateRoomsData?.rooms ?? []).length === 0 && (
+                <Card>
+                  <CardContent className="text-center py-12">
+                    <ShieldAlert className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-lg font-medium mb-2">
+                      No private rooms found
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {debouncedSearch
+                        ? "No private rooms match your search."
+                        : "There are no private rooms on the platform yet."}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+            {/* Rooms Grid */}
+            {!isLoadingPrivate &&
+              !privateError &&
+              (privateRoomsData?.rooms ?? []).length > 0 && (
+                <>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {(privateRoomsData?.rooms ?? []).map((room) => (
+                      <StudyRoomCard
+                        key={room.id}
+                        room={room}
+                        onJoin={handleJoinRoom}
+                        onLeave={handleLeaveRoom}
+                        onView={onRoomSelect}
+                        loading={joinRoom.isPending || leaveRoom.isPending}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Load More */}
+                  {privateRoomsData?.pagination &&
+                    page < privateRoomsData.pagination.pages && (
+                      <div className="text-center">
+                        <Button
+                          variant="outline"
+                          onClick={handleLoadMore}
+                          disabled={isLoadingPrivate}
+                        >
+                          {isLoadingPrivate
+                            ? tCommon("loading")
+                            : tCommon("loadMore")}
+                        </Button>
+                      </div>
+                    )}
+                </>
+              )}
+          </TabsContent>
+        )}
       </Tabs>
 
       {/* Join Private Room Dialog */}

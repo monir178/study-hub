@@ -34,7 +34,12 @@ export interface EmailData {
   resetToken?: string;
   verificationToken?: string;
   otp?: string;
-  purpose?: "WELCOME" | "PASSWORD_RESET" | "EMAIL_VERIFICATION" | "OTP";
+  purpose?:
+    | "WELCOME"
+    | "PASSWORD_RESET"
+    | "EMAIL_VERIFICATION"
+    | "OTP"
+    | "FEEDBACK";
 }
 
 export class UnifiedEmailService {
@@ -44,7 +49,12 @@ export class UnifiedEmailService {
    */
   private static async sendEmail(
     emailData: EmailData,
-    template: "welcome" | "password-reset" | "verification" | "otp",
+    template:
+      | "welcome"
+      | "password-reset"
+      | "verification"
+      | "otp"
+      | "feedback",
   ): Promise<EmailResponse> {
     try {
       if (!gmailTransporter) {
@@ -69,7 +79,12 @@ export class UnifiedEmailService {
    */
   private static async sendViaGmail(
     emailData: EmailData,
-    template: "welcome" | "password-reset" | "verification" | "otp",
+    template:
+      | "welcome"
+      | "password-reset"
+      | "verification"
+      | "otp"
+      | "feedback",
   ): Promise<EmailResponse> {
     if (!gmailTransporter) {
       throw new Error("Gmail transporter not initialized");
@@ -93,7 +108,12 @@ export class UnifiedEmailService {
    */
   private static getEmailTemplate(
     emailData: EmailData,
-    template: "welcome" | "password-reset" | "verification" | "otp",
+    template:
+      | "welcome"
+      | "password-reset"
+      | "verification"
+      | "otp"
+      | "feedback",
   ): { subject: string; html: string } {
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
@@ -194,6 +214,35 @@ export class UnifiedEmailService {
                     `,
         };
 
+      case "feedback":
+        return {
+          subject: "We value your feedback on StudyHub!",
+          html: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                            <div style="background-color: #f8f9fa; padding: 20px; text-align: center;">
+                                <h1 style="color: #333; margin: 0;">Help Us Improve!</h1>
+                            </div>
+                            <div style="padding: 20px;">
+                                <h2>Hello ${emailData.firstName || "User"},</h2>
+                                <p>We are constantly trying to make StudyHub better for our community, and we'd love to hear your thoughts!</p>
+                                <p>Could you take a couple of minutes to reply to this email to answer a few quick questions?</p>
+                                
+                                <div style="background-color: #f1f5f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                                    <ol style="margin-top: 0; margin-bottom: 0px; padding-left: 20px;">
+                                        <li style="margin-bottom: 10px;"><strong>How did you find out about StudyHub?</strong></li>
+                                        <li style="margin-bottom: 10px;"><strong>What do you like most about the platform?</strong></li>
+                                        <li style="margin-bottom: 10px;"><strong>What is one thing we could improve or add?</strong></li>
+                                        <li><strong>Any other thoughts or suggestions?</strong></li>
+                                    </ol>
+                                </div>
+                                
+                                <p><strong>Just hit "Reply" and let us know!</strong> We read every single email.</p>
+                                <p>Best regards,<br />The StudyHub Team</p>
+                            </div>
+                        </div>
+                    `,
+        };
+
       default:
         throw new Error(`Unknown template: ${template}`);
     }
@@ -231,6 +280,13 @@ export class UnifiedEmailService {
     firstName?: string,
   ): Promise<EmailResponse> {
     return this.sendEmail({ to, otp, firstName }, "otp");
+  }
+
+  static async sendFeedbackEmail(
+    to: string,
+    firstName?: string,
+  ): Promise<EmailResponse> {
+    return this.sendEmail({ to, firstName }, "feedback");
   }
 
   /**
