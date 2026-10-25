@@ -1,4 +1,5 @@
 # StudyHub 📚
+...
 
 > **Study Together, Achieve More**
 
